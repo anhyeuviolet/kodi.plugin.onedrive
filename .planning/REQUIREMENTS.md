@@ -15,8 +15,6 @@ Scope note: this is a brownfield refactor. Requirements below describe the targe
 - [ ] **SETUP-04**: A written registration runbook lives in the repo, including the `AADSTS7000218` symptom of skipping SETUP-02
 - [ ] **SETUP-05**: Two test accounts are available — one personal Microsoft account and one work/school account
 - [ ] **SETUP-06**: A clean test environment exists — a Kodi profile with no sibling cloud-drive add-ons installed, plus a real Android TV box on Wi-Fi with a real remote
-- [ ] **SETUP-07**: A pre-upgrade v2.3.0 profile (`accounts.db` and `settings.xml`) is archived as a migration fixture before anything overwrites it
-
 ### Vendoring
 
 - [ ] **VND-01**: `script.module.clouddrive.common` v1.4.0 is vendored into the repo from the `matrix` branch, not the `master` branch, which carries the Python 2 / Kodi 18 line
@@ -107,15 +105,9 @@ Scope note: this is a brownfield refactor. Requirements below describe the targe
 - [ ] **KODI-07**: The `SourceService`, its HTML index, and both the `allow_directory_listing` and `port_directory_listing` settings are deleted from the codebase
 - [ ] **KODI-08**: Third-party error reporting code and the `report_error` setting are deleted; errors go to `kodi.log` only
 
-### Existing-user migration
+### Release readiness
 
-- [ ] **MIG-01**: Because the add-on id changed, migration reads the old `addon_data/plugin.onedrive/` profile without writing to it, and carries account display names and drive selections into the new profile
-- [ ] **MIG-02**: Stored tokens are discarded and each account is marked as needing re-authentication
-- [ ] **MIG-03**: The user is told at first launch, proactively and in plain language, that they must sign in again and why — not through a failed-refresh error dialog
-- [ ] **MIG-04**: The stored `sign-in-server` and `allow_directory_listing` values are explicitly cleared, since removing a setting definition orphans its stored value rather than clearing it
-- [ ] **MIG-05**: The migration runs once, gated on a `schema_version` setting, and leaves the old profile untouched — the id change makes migration non-destructive by construction, so a failure can be retried and the original add-on keeps working
-- [ ] **MIG-06**: The migration is verified against the real archived pre-upgrade profile from SETUP-07
-- [ ] **MIG-07**: Installing this add-on alongside the original causes no harm — separate profiles, and neither overwrites the other's settings or accounts
+- [ ] **REL-01**: The registration hosting the embedded `client_id` is one the project can keep indefinitely — the Microsoft 365 E5 Developer tenant renews on activity, and if it lapses the `client_id` dies for every installed copy at once. Decided before anyone is told to install
 
 ### Quality and CI
 
@@ -195,7 +187,6 @@ Cross-cutting notes. `CI-06` (per-phase manual acceptance on Windows and real An
 | SETUP-04 | Phase 3 | Pending |
 | SETUP-05 | Phase 2 | Pending |
 | SETUP-06 | Phase 1 | Pending |
-| SETUP-07 | Phase 1 | Pending |
 | VND-01 | Phase 1 | Pending |
 | VND-02 | Phase 1 | Pending |
 | VND-03 | Phase 1 | Pending |
@@ -268,13 +259,6 @@ Cross-cutting notes. `CI-06` (per-phase manual acceptance on Windows and real An
 | KODI-06 | Phase 7 | Pending |
 | KODI-07 | Phase 7 | Pending |
 | KODI-08 | Phase 7 | Pending |
-| MIG-01 | Phase 8 | Pending |
-| MIG-02 | Phase 8 | Pending |
-| MIG-03 | Phase 8 | Pending |
-| MIG-04 | Phase 8 | Pending |
-| MIG-05 | Phase 8 | Pending |
-| MIG-06 | Phase 8 | Pending |
-| MIG-07 | Phase 8 | Pending |
 | CI-01 | Phase 2 | Pending |
 | CI-02 | Phase 2 | Pending |
 | CI-03 | Phase 2 | Pending |
@@ -282,6 +266,7 @@ Cross-cutting notes. `CI-06` (per-phase manual acceptance on Windows and real An
 | CI-05 | Phase 2 | Pending |
 | CI-06 | Phase 1 | Pending |
 | CI-07 | Phase 8 | Pending |
+| REL-01 | Phase 8 | Pending |
 | ERR-01 | Phase 4 | Pending |
 | ERR-02 | Phase 4 | Pending |
 | ERR-03 | Phase 4 | Pending |
@@ -295,18 +280,18 @@ Cross-cutting notes. `CI-06` (per-phase manual acceptance on Windows and real An
 
 | Phase | Requirements | Count |
 |-------|--------------|-------|
-| 1. Vendor Lift | VND-01..11, ID-01..05, KODI-01, KODI-02, SETUP-06, SETUP-07, CI-06 | 21 |
+| 1. Vendor Lift | VND-01..11, ID-01..05, KODI-01, KODI-02, SETUP-06, CI-06 | 20 |
 | 2. Pure Core and CI Harness | CI-01..05, BROWSE-02, BROWSE-03, BROWSE-04, BROWSE-07, BROWSE-16, SETUP-05 | 11 |
 | 3. Authentication | AUTH-01..23, SETUP-01..04 | 27 |
 | 4. Browse | BROWSE-01, BROWSE-05, BROWSE-06, BROWSE-08..14, ERR-01..03 | 13 |
 | 5. Distribution | DIST-01..05 | 5 |
 | 6. Play | PLAY-01..09 | 9 |
 | 7. Kodi Modernization | KODI-03..08, PLAY-10 | 7 |
-| 8. Existing-User Migration and Release | MIG-01..07, CI-07 | 8 |
+| 8. Release Readiness | CI-07, REL-01 | 2 |
 
 **Coverage:**
-- v1 requirements: 101 total
-- Mapped to phases: 101
+- v1 requirements: 94 total
+- Mapped to phases: 94
 - Unmapped: 0 ✓
 
 ---

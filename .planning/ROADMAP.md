@@ -2,7 +2,7 @@
 
 ## Overview
 
-The add-on is dead in one specific place: sign-in went with a Heroku free dyno in November 2022. Everything else still works, sitting on top of an unmaintained external module with an unpinnable version constraint. The journey is therefore: take ownership of that module first and alone, prove the pure parsing logic against real Graph JSON while an Azure registration is being stood up in parallel, then build in-add-on device-code authentication until a user can sign in from a sofa with a remote. Those two tracks converge at a Graph client that browses drives, at which point the self-hosted repository goes up immediately — its auto-update test has multi-hour latency and must overlap later work rather than block a release. Playback follows and delivers the core value: a file from OneDrive plays and keeps playing across a long pause and a seek. Then the deferrable cleanups — typed InfoTag setters, the modern settings schema, the deletion of the unauthenticated directory-listing server — and finally the migration that tells every existing user, proactively and in plain language, that they must sign in again.
+The add-on is dead in one specific place: sign-in went with a Heroku free dyno in November 2022. Everything else still works, sitting on top of an unmaintained external module with an unpinnable version constraint. The journey is therefore: take ownership of that module first and alone, prove the pure parsing logic against real Graph JSON while an Azure registration is being stood up in parallel, then build in-add-on device-code authentication until a user can sign in from a sofa with a remote. Those two tracks converge at a Graph client that browses drives, at which point the self-hosted repository goes up immediately — its auto-update test has multi-hour latency and must overlap later work rather than block a release. Playback follows and delivers the core value: a file from OneDrive plays and keeps playing across a long pause and a seek. Then the deferrable cleanups — typed InfoTag setters, the modern settings schema, the deletion of the unauthenticated directory-listing server — and finally a release gate: one clean pass on real hardware with both account types, and a decision on where the embedded `client_id` will live long term.
 
 The dominant risks here are silent, not hard. A discarded rotated refresh token works perfectly for 90 days and then kills every user at once. Vendoring while a sibling cloud-drive add-on is installed breaks only on clean installs. A stale repository index stops auto-updates for everyone except the maintainer. The success criteria below are written as mechanical checks — greps, log assertions, two-interpreter tests, a clean profile, a Business account, and a real Android TV box with a real remote — because vigilance does not catch this class of failure and structure does.
 
@@ -21,7 +21,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 5: Distribution** - Updates arrive on the Android TV box by themselves after one URL entry
 - [ ] **Phase 6: Play** - A file from OneDrive plays, and survives a long pause and a seek
 - [ ] **Phase 7: Kodi Modernization** - Current Kodi APIs, the modern settings schema, and the deleted subsystems actually gone
-- [ ] **Phase 8: Existing-User Migration and Release** - A v2.3.0 user upgrades, keeps their accounts, and is told plainly to sign in again
+- [ ] **Phase 8: Release Readiness** - One clean end-to-end pass on real hardware, and a `client_id` whose home will still exist next year
 
 ## Parallel Tracks
 
@@ -49,7 +49,7 @@ The project config has `parallelization: true`, and two of these tracks are genu
                     |                     Phase 7  KODI MODERNIZATION
                     +--------------+--------------+
                                    v
-                     Phase 8  MIGRATION AND RELEASE
+                     Phase 8  RELEASE READINESS
 ```
 
 - **Phases 1-2 and Phase 3 run concurrently.** Phase 3's first three plans (token store and lock, device-code protocol, TokenProvider) need neither the vendored tree nor the Kodi runtime. Only the device-code dialog plan needs Phase 1 landed, because it reuses the vendored `pin-dialog.xml` skin.
@@ -61,14 +61,13 @@ The project config has `parallelization: true`, and two of these tracks are genu
 ### Phase 1: Vendor Lift
 **Goal**: The add-on carries its own complete, renamed copy of the common module, ships under its own identity, and depends on nothing outside `xbmc.python`, behaving exactly as it did before.
 **Depends on**: Nothing (first phase; head of Track V/P, runs concurrently with Track A)
-**Requirements**: VND-01, VND-02, VND-03, VND-04, VND-05, VND-06, VND-07, VND-08, VND-09, VND-10, VND-11, ID-01, ID-02, ID-03, ID-04, ID-05, KODI-01, KODI-02, SETUP-06, SETUP-07, CI-06
+**Requirements**: VND-01, VND-02, VND-03, VND-04, VND-05, VND-06, VND-07, VND-08, VND-09, VND-10, VND-11, ID-01, ID-02, ID-03, ID-04, ID-05, KODI-01, KODI-02, SETUP-06, CI-06
 
-The identity change (`plugin.onedrive` becomes `plugin.onedrive.kn`) belongs here because it touches the same files as the vendor lift and because it must land before anything writes to the new `addon_data` path. It also makes Phase 8 non-destructive: with a different id, migration reads the old profile rather than overwriting it.
+The identity change (`plugin.onedrive` becomes `plugin.onedrive.kn`) belongs here because it touches the same files as the vendor lift and because it must land before anything writes to the new `addon_data` path. It also removes the need for any migration at all: a new id means a new profile, so the original add-on is never read from or written to.
 
 **Prerequisites** (maintainer, not code — do these before the first file is copied):
-  1. SETUP-07: archive a real pre-upgrade v2.3.0 profile (`accounts.db` and `settings.xml`). Once overwritten it cannot be recreated, and Phase 8 cannot be verified without it.
-  2. SETUP-06: provision a clean Kodi profile with `plugin.googledrive`, `plugin.dropbox` and `script.module.clouddrive.common` uninstalled, plus a real Android TV box on Wi-Fi with a real remote.
-  3. Decide the vendored package name. Reversing it later means redoing every import.
+  1. SETUP-06: provision a clean Kodi profile with `plugin.googledrive`, `plugin.dropbox` and `script.module.clouddrive.common` uninstalled, plus a real Android TV box on Wi-Fi with a real remote.
+  2. Decide the vendored package name. Reversing it later means redoing every import.
 
 **Success Criteria** (what must be TRUE):
   1. A repo-wide grep returns zero hits for `script.module.clouddrive.common` and zero for `eval(`, and `addon.xml` declares no `<import>` other than `xbmc.python`.
@@ -178,19 +177,20 @@ The identity change (`plugin.onedrive` becomes `plugin.onedrive.kn`) belongs her
 **Plans**: TBD (3 expected)
 **UI hint**: yes
 
-### Phase 8: Existing-User Migration and Release
-**Goal**: A v2.3.0 user upgrades, keeps their account names and drive selections, and is told plainly at first launch that they must sign in again and why.
-**Depends on**: Phase 3 (you cannot write "sign in again" before sign-in exists) and Phase 7. Gates the first release published to existing users through the Phase 5 repository.
-**Requirements**: MIG-01, MIG-02, MIG-03, MIG-04, MIG-05, MIG-06, MIG-07, CI-07
+### Phase 8: Release Readiness
+**Goal**: The add-on is fit to hand to someone else — one clean end-to-end pass on real hardware, and a `client_id` whose home will still exist next year.
+**Depends on**: Phase 5 (a published repository to install from) and Phase 7.
+**Requirements**: CI-07, REL-01
+
+There is no migration phase. Under a new add-on id there is no prior profile to read, and even with the old id migration could carry almost nothing: refresh tokens are bound to a `client_id`, so they must be discarded, and the only remaining state — account display name and drive selection — is regenerated by signing in. The add-on installs alongside the original without touching it.
 
 **Success Criteria** (what must be TRUE):
-  1. Upgrading the real archived v2.3.0 profile from SETUP-07 preserves every account display name and drive selection, discards every stored token, and marks each account as needing re-authentication. Tokens cannot be carried over at all — refresh tokens are bound to a `client_id`, and the old ones belong to the broker's registration.
-  2. At first launch after the upgrade the user sees a proactive, plain-language explanation that they must sign in again and why, reached without any failed-refresh error dialog appearing first.
-  3. The migration runs exactly once, gated on a `schema_version` setting; running it a second time changes nothing, and the old account database survives as an archived copy rather than being deleted.
-  4. The stored `sign-in-server` and `allow_directory_listing` values are absent from the upgraded profile's `settings.xml`, verified by reading the file — removing a setting definition orphans its stored value rather than clearing it.
-  5. Release gate: one full acceptance pass on a clean profile with a Business account on real Android TV hardware — install from the repository, migrate the archived profile, re-authenticate, browse and play.
+  1. One full acceptance pass on a clean Kodi profile on real Android TV hardware with a remote: install from the published repository, sign in, browse, and play — performed once with a Business account and once with a personal account, because the reserved-character and consent behaviours differ between them.
+  2. Installing this add-on on a box that already has the original `plugin.onedrive` changes nothing about the original: separate `addon_data`, separate settings, both still work.
+  3. A decision is recorded on where the embedded `client_id` lives. The Microsoft 365 E5 Developer tenant renews on activity; if it lapses, the `client_id` dies for every installed copy simultaneously. Either the tenant is confirmed durable, or the registration moves to one that does not expire.
+  4. `CREDITS.md` and `LICENSE.txt` are present and accurate, and `addon.xml` names the current maintainer.
 
-**Plans**: TBD (3 expected)
+**Plans**: TBD (2 expected)
 
 ## Deferred to v2
 
@@ -210,7 +210,7 @@ Phases execute in numeric order, with two concurrent pairs: {1, 2} runs alongsid
 | 5. Distribution | 0/3 | Not started | - |
 | 6. Play | 0/4 | Not started | - |
 | 7. Kodi Modernization | 0/3 | Not started | - |
-| 8. Existing-User Migration and Release | 0/3 | Not started | - |
+| 8. Release Readiness | 0/2 | Not started | - |
 
 ---
 *Roadmap created: 2026-08-22*

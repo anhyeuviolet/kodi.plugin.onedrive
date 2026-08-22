@@ -54,6 +54,7 @@ Decisions are logged in PROJECT.md Key Decisions table. Reconciled research posi
 
 Load-bearing choices for current work:
 
+- Ships as `plugin.onedrive.kn` — separate add-on, own profile, no migration from v2.3.0
 - Device code flow with an embedded public `client_id`; no broker server, no client secret, ever
 - Scope set is `Files.Read offline_access openid profile` — never `Files.Read.All`
 - Vendor from the `matrix` branch (v1.4.0); `master` is 1.3.9, the Python 2 line
@@ -76,7 +77,7 @@ Open concerns:
 - **The E5 Developer tenant hosting the `client_id` may not last.** Microsoft 365 Developer tenants renew on activity and the programme has tightened. If that tenant lapses, the embedded `client_id` dies for every installed copy simultaneously — the worst possible failure distribution. Registering under a personal Microsoft account instead would remove the expiry entirely. Decide before the first public release.
 - **AUTH-18 cannot be fully verified yet.** No tenant that actually blocks third-party apps has been tested, so the exact `AADSTS` code that should trigger the custom `client_id` escape hatch is still unknown. The escape hatch is worthless if the user is never told it exists.
 - **Real Android TV hardware is required for release**, not optional. Nothing about a 10-foot interface is verifiable from a desktop.
-- **Existing users cannot be carried across.** Refresh tokens are bound to a `client_id`; the old ones belong to the broker's registration. Phase 8 makes the re-auth proactive and explained rather than avoidable.
+- **No migration path exists, by design.** The add-on ships under a new id (`plugin.onedrive.kn`) so there is no prior profile to read, and tokens could not have been carried over anyway. Anyone coming from v2.3.0 simply signs in.
 - **Graph fixtures must be recorded from both drive classes.** The spike found real material worth capturing: Vietnamese names with diacritics and spaces on both drives, and the OneDrive Personal Vault, which Graph returns without a `folder` facet so naive detection renders it as a file (BROWSE-16).
 
 ## Deferred Items
