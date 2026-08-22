@@ -91,5 +91,5 @@ Open concerns:
 ## Session Continuity
 
 Last session: 2026-08-22
-Stopped at: Auth spike verified against a live registration; 95 of 95 v1 requirements mapped across 8 phases
+Stopped at: Migration phase dropped; 94 of 94 v1 requirements mapped across 8 phases
 Resume file: None
