@@ -82,11 +82,12 @@ None yet.
 
 **Resolved 2026-08-22 — the load-bearing unknown is settled.** The `/common` authority works with this project's own `client_id` for both a work/school account and a personal Microsoft account, verified end-to-end before any code was written. Conditional Access on the E5 Developer tenant did not block device code flow. Evidence and the full endpoint matrix: `.planning/research/SPIKE-DEVICE-CODE.md`. Registration in use: `efe197b3-5c14-4d67-810f-e10406742a06`, SETUP-01 through SETUP-03 satisfied.
 
+**Confirmed 2026-08-22 — the hardware dependency is met.** The maintainer has an Android TV device, and confirms it is the primary target, not a secondary platform to be checked at the end. This closes the one dependency with no fallback: nothing about a 10-foot interface is verifiable from a desktop, and CI-06 makes a manual acceptance pass on real hardware a per-phase gate that every phase inherits. It also makes the device checklist in `.planning/research/ANDROID-PLAYBACK-STORAGE.md` §7 runnable — including §7.2, the five-minute observation that decides whether PLAY-06 is achievable with a redirector alone. Provisioning the box for the phase-1 acceptance pass (clean profile, reachable over `adb`) remains a task, tracked as plan `01-01`.
+
 Open concerns:
 
 - **The E5 Developer tenant hosting the `client_id` may not last.** Microsoft 365 Developer tenants renew on activity and the programme has tightened. If that tenant lapses, the embedded `client_id` dies for every installed copy simultaneously — the worst possible failure distribution. Registering under a personal Microsoft account instead would remove the expiry entirely. Decide before the first public release.
 - **AUTH-18 cannot be fully verified yet.** No tenant that actually blocks third-party apps has been tested, so the exact `AADSTS` code that should trigger the custom `client_id` escape hatch is still unknown. The escape hatch is worthless if the user is never told it exists.
-- **Real Android TV hardware is required for release**, not optional. Nothing about a 10-foot interface is verifiable from a desktop.
 - **No migration path exists, by design.** The add-on ships under a new id (`plugin.onedrive.kn`) so there is no prior profile to read, and tokens could not have been carried over anyway. Anyone coming from v2.3.0 simply signs in.
 - **Graph fixtures must be recorded from both drive classes.** The spike found real material worth capturing: Vietnamese names with diacritics and spaces on both drives, and the OneDrive Personal Vault, which Graph returns without a `folder` facet so naive detection renders it as a file (BROWSE-16).
 
