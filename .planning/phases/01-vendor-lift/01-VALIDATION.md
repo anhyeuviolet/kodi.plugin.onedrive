@@ -59,7 +59,7 @@ the plans must satisfy.
 | VND-07 | Module service disposition recorded in `VENDORED.md` | — | unit | `::test_vendored_md_sections` | ❌ W0 | ⬜ pending |
 | VND-08 | Skin XML and media present; textures resolve | — | unit | `::test_skin_assets_present` | ❌ W0 | ⬜ pending |
 | VND-09 | `VENDORED.md` fields; both licence files present | — | unit | `::test_licences_present` | ❌ W0 | ⬜ pending |
-| VND-10 | Identical behaviour, every dialog opens, clean profile | — | **manual** | Manual acceptance matrix | n/a | ⬜ pending |
+| VND-10 | Loads, renders, opens every dialog, no traceback, on a clean profile — minus the two recorded deviations (dead broker; `allow_directory_listing` defaulted off) | — | **manual** | Manual acceptance matrix | n/a | ⬜ pending |
 | VND-11 | Exactly one `<import>`, `xbmc.python` 3.0.1 | — | unit | `::test_addon_xml_imports` | ❌ W0 | ⬜ pending |
 | ID-01 | No `plugin.onedrive` outside `plugin.onedrive.kn` | — | unit | `::test_addon_id_everywhere` | ❌ W0 | ⬜ pending |
 | ID-02 | `provider-name` and display name changed | — | unit | `::test_addon_xml_identity` | ❌ W0 | ⬜ pending |
