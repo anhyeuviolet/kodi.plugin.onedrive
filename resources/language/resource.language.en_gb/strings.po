@@ -1,7 +1,7 @@
 # Kodi Media Center language file
-# Addon Name: OneDrive
-# Addon id: plugin.onedrive
-# Addon Provider: Carlos Guzman (cguZZman)
+# Addon Name: OneDrive KN
+# Addon id: plugin.onedrive.kn
+# Addon Provider: Kenny Nguyen
 msgid ""
 msgstr ""
 "Project-Id-Version: Kodi Addons\n"

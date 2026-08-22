@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="plugin.onedrive" name="OneDrive" version="2.3.0" provider-name="Carlos Guzman (cguZZman)">
+<addon id="plugin.onedrive.kn" name="OneDrive KN" version="1.0.0" provider-name="Kenny Nguyen">
 	<requires>
-		<import addon="xbmc.python" version="3.0.0" />
+		<import addon="xbmc.python" version="3.0.1" />
 		<import addon="script.module.clouddrive.common" version="1.4.0"/>
 	</requires>
 	<extension point="xbmc.python.pluginsource" library="entrypoint.py">
@@ -31,16 +31,17 @@ Play all your media from OneDrive including Videos, Music and Pictures.
   - תוכנית זו אינה מזוהה עם או בחסות מיקרוסופט.
 		</description>		
 		<license>GPL-3.0-or-later</license>
-		<source>https://github.com/cguZZman/plugin.onedrive</source>
-		<forum>https://github.com/cguZZman/plugin.onedrive/issues</forum>
-		<website>https://addons.kodi.tv/show/plugin.onedrive</website>
+		<source>https://github.com/anhyeuviolet/kodi.plugin.onedrive</source>
+		<forum>https://github.com/anhyeuviolet/kodi.plugin.onedrive/issues</forum>
 		<assets>
 			<icon>icon.png</icon>
 			<fanart>fanart.jpg</fanart>
 		</assets>
 		<news>
-v2.3.0 released Jan 21, 2023:
-- Kodi 20 fix
+v1.0.0:
+- First release under a new add-on id, maintained independently of the original.
+- Self-contained: the Cloud Drive common module is bundled, so no separate module add-on is needed.
+- Requires Kodi 20 or newer.
 		</news>
 		<disclaimer lang="en_GB">
 This cloud drive addon uses a third-party authentication mechanism commonly known as OAuth 2.0.
