@@ -87,18 +87,6 @@ class Utils:
         return Utils.unicode(txt).encode("utf-8")
     
     @staticmethod
-    def get_fqn(o):
-        return o.__module__ + "." + o.__class__.__name__
-    
-    @staticmethod
-    def get_class(fqn):
-        data = fqn.split('.')
-        module = __import__(data[0])
-        for comp in data[1:]:
-            module = getattr(module, comp)
-        return module
-    
-    @staticmethod
     def get_file_buffer():
         from io import StringIO
         return StringIO()
