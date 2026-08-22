@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 01
 current_phase_name: vendor-lift
 status: executing
-stopped_at: Completed 01-04-PLAN.md
-last_updated: "2026-08-22T14:07:50.363Z"
+stopped_at: Completed 01-05-PLAN.md
+last_updated: "2026-08-22T14:22:16.999Z"
 last_activity: 2026-08-22
 last_activity_desc: Phase 01 execution started
 progress:
   total_phases: 1
   completed_phases: 0
   total_plans: 7
-  completed_plans: 3
+  completed_plans: 4
 ---
 
 # Project State
@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (updated 2026-08-22)
 ## Current Position
 
 Phase: 01 (vendor-lift) — EXECUTING
-Plan: 4 of 7
+Plan: 5 of 7
 Status: Ready to execute
 Last activity: 2026-08-22 — Phase 01 execution started
 
-Progress: [████░░░░░░] 43%
+Progress: [██████░░░░] 57%
 
 ## Performance Metrics
 
@@ -61,6 +61,7 @@ Progress: [████░░░░░░] 43%
 | Phase 01 P02 | 30min | 2 tasks | 3 files |
 | Phase 01 P03 | 20min | 2 tasks | 5 files |
 | Phase 01 P04 | 15min | 2 tasks | 44 files |
+| Phase 01 P05 | 20min | 2 tasks | 14 files |
 
 ## Accumulated Context
 
@@ -88,6 +89,10 @@ Load-bearing choices for current work:
 - [Phase 1]: The vendored package lives at resources/lib/vendor/clouddrive_common/ and the rename is anchored on a line-start import prefix, never a bare substring, so the six add-on-id literals could not be corrupted
 - [Phase 1]: The module's 89 string ids stay at 32000-32088 untouched; five are resolved at runtime and two of those are persisted in the exports store, so renumbering them would invalidate stored rows
 - [Phase 1]: Utils.get_class and Utils.get_fqn are deleted: they were the only string-based import mechanism in the tree and had no callers, so a text sweep over imports is now a complete proof of a rename
+- [Phase ?]: common_addon_id is None, not this add-on's own id literal: None makes the common Addon object and this add-on's the same object, where a literal would make them two that happen to agree and break again at the next rename
+- [Phase ?]: The QR image filename carries a fresh uuid4 hex per invocation, because Kodi's texture cache is keyed by path and a fixed name lets a repeat sign-in render the previous code
+- [Phase ?]: pyqrcode is vendored from the Kodi omega add-on zip (1.2.1+matrix.4) rather than PyPI: it is the build the add-on was tested against and the only distribution bundling the MIT PNG writer
+- [Phase ?]: test_gpl_headers_intact is made licence-aware via a per-file FOREIGN_NOTICES map rather than GPL-stamping BSD/MIT source, which the test's own closing assertion forbids
 
 ### Pending Todos
 
@@ -120,6 +125,6 @@ Open concerns:
 
 ## Session Continuity
 
-Last session: 2026-08-22T14:07:48.767Z
-Stopped at: Completed 01-04-PLAN.md
+Last session: 2026-08-22T14:22:16.987Z
+Stopped at: Completed 01-05-PLAN.md
 Resume file: None

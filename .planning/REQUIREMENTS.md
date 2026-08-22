@@ -21,14 +21,14 @@ Scope note: this is a brownfield refactor. Requirements below describe the targe
 - [x] **VND-01**: `script.module.clouddrive.common` v1.4.0 is vendored into the repo from the `matrix` branch, not the `master` branch, which carries the Python 2 / Kodi 18 line
 - [x] **VND-02**: The vendored package is renamed under this add-on's namespace, with the name decided before the first file is copied
 - [x] **VND-03**: The module's `resources/` contents are merged into this add-on's existing `resources/` rather than vendored as a second importable top-level package
-- [ ] **VND-04**: Every hardcoded `script.module.clouddrive.common` id lookup resolves to this add-on's own id, version, and profile directory
+- [x] **VND-04**: Every hardcoded `script.module.clouddrive.common` id lookup resolves to this add-on's own id, version, and profile directory
 - [ ] **VND-05**: The vendored account store uses JSON instead of `repr()` and `eval()`
 - [ ] **VND-06**: Every outbound HTTP call passes an explicit `timeout=`
 - [ ] **VND-07**: The module's own `xbmc.service` extension point is folded into this add-on's `service.py`, with an explicit decision recorded about what survives
-- [ ] **VND-08**: Skin XML and media are copied and every dialog construction site's path argument is updated
+- [x] **VND-08**: Skin XML and media are copied and every dialog construction site's path argument is updated
 - [ ] **VND-09**: `VENDORED.md` records upstream URL, branch, version, commit SHA, per-subtree licence, and local modifications; both the GPL-3.0 and Apache-2.0 licence files are preserved
 - [ ] **VND-10**: The add-on behaves identically after the vendor commit, verified on a clean profile with every sibling cloud-drive add-on uninstalled, with every dialog opening
-- [ ] **VND-11**: The external `<import>` of `script.module.clouddrive.common` is removed from `addon.xml`
+- [x] **VND-11**: The external `<import>` of `script.module.clouddrive.common` is removed from `addon.xml`
 
 ### Identity and attribution
 
@@ -191,14 +191,14 @@ Cross-cutting notes. `CI-06` (per-phase manual acceptance on Windows and on an A
 | VND-01 | Phase 1 | Complete |
 | VND-02 | Phase 1 | Complete |
 | VND-03 | Phase 1 | Complete |
-| VND-04 | Phase 1 | Pending |
+| VND-04 | Phase 1 | Complete |
 | VND-05 | Phase 1 | Pending |
 | VND-06 | Phase 1 | Pending |
 | VND-07 | Phase 1 | Pending |
-| VND-08 | Phase 1 | Pending |
+| VND-08 | Phase 1 | Complete |
 | VND-09 | Phase 1 | Pending |
 | VND-10 | Phase 1 | Pending |
-| VND-11 | Phase 1 | Pending |
+| VND-11 | Phase 1 | Complete |
 | ID-01 | Phase 1 | Complete |
 | ID-02 | Phase 1 | Complete |
 | ID-03 | Phase 1 | Complete |
