@@ -142,6 +142,24 @@ def probe(url):
         return False, type(e).__name__
 
 
+def wait_visibly(seconds):
+    """Sleep, but keep saying so.
+
+    A silent five-minute gap between poll lines is indistinguishable from a hang,
+    and the natural reaction is to kill the run — which discards the elapsed time
+    that is the entire measurement. So count down in place.
+    """
+    end = time.time() + seconds
+    while True:
+        left = end - time.time()
+        if left <= 0:
+            break
+        mins, secs = divmod(int(left), 60)
+        print(f"\r    next poll in {mins:d}:{secs:02d} ...", end="", flush=True)
+        time.sleep(min(1.0, left))
+    print("\r" + " " * 40 + "\r", end="", flush=True)
+
+
 def report(started, last_ok, first_fail, detail, interval):
     print()
     print("=" * 68)
@@ -222,7 +240,7 @@ def main():
                 last_ok = time.time()
             else:
                 return report(started, last_ok, time.time(), detail, interval)
-            time.sleep(interval)
+            wait_visibly(interval)
         return report(started, last_ok, None, detail, interval)
     except KeyboardInterrupt:
         print("\nStopped early.")

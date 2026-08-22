@@ -173,7 +173,41 @@ Two hard constraints fall out, neither currently recorded anywhere in the planni
 
    **PLAY-08 and PLAY-09 as written cannot both be satisfied by a per-item-id URL scheme.** Fix in §6.4.
 
-### 1.7 `Range` requests to `*.files.1drv.com` — what is settled and what still needs the box
+### 1.6b The download host is not always `1drv.com` — measured, 2026-08-22
+
+Everything above, and every other document in `.planning/research/`, names the download
+host as `*.files.1drv.com`. That is right for a personal Microsoft account and **wrong for a
+work/school account**. Measured live against the project's own registration:
+
+```
+item : Sing.2016.2160p.MA.WEB-DL.DDP5.1.Atmos.H.265-HHWEB.mkv  (19.9 GB)
+host : x14m4-my.sharepoint.com
+first one-byte Range: HTTP 206
+```
+
+A work/school account's *personal* OneDrive is backed by SharePoint, and Graph mints its
+`@microsoft.graph.downloadUrl` against `<tenant>-my.sharepoint.com`. This is **not** the
+"SharePoint document libraries" case that `PROJECT.md` scopes out and `AUTH-24` defers to v2 —
+that one is `/sites/{id}/drives`. This is the mainline Business drive, which `PROJECT.md`
+lists as a first-class tested account type alongside Personal.
+
+Consequences:
+
+- **Any hostname assumption breaks on Business.** Anything that allowlists, matches, logs or
+  asserts on `files.1drv.com` must accept `*-my.sharepoint.com` too. The safe rule is to make
+  no assumption at all: treat the `downloadUrl` as opaque, use whatever host it names, and
+  never parse it.
+- **§7.2's checklist step is affected.** It says to find `CCurlFile::Open - … Effective URL is
+  https://...files.1drv.com/...` in `kodi.log`. On a Business account that line names
+  SharePoint and the check silently finds nothing. Match on `Effective URL is` alone, then read
+  the host off it.
+- **The lifetime may differ between the two hosts**, which is exactly why PLAY-07 specifies
+  Personal *and* Business rather than one measurement. Two hosts, two issuers, no reason to
+  assume one number covers both. Do not generalise a Business result to Personal or the reverse.
+- **§1.7 below still holds** — the rule is "`Range` targets the `downloadUrl` host, not
+  `/content`". Only the host's name generalises, not the rule.
+
+### 1.7 `Range` requests to the download host — what is settled and what still needs the box
 
 Settled from Microsoft's own reference for `driveItem: get content`: the pre-authenticated URL accepts `Range` and returns `206 Partial Content`; `Range` must be appended to the `downloadUrl`, not to `/content`; no `Authorization` header is needed; the URL is valid for a limited time and "might expire within minutes". `[CITED: learn.microsoft.com/graph/api/driveitem-get-content]`
 
