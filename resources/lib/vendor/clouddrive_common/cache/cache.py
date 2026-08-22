@@ -18,6 +18,7 @@
 #
 
 import datetime
+import json
 import sqlite3
 import time
 
@@ -63,7 +64,7 @@ class Cache(object):
     def get(self, key):
         row = self._read(key)
         if row and row[1] > self._get_datetime(datetime.datetime.now()):
-            return eval(row[0])
+            return json.loads(row[0])
         return
 
     def set(self, key, value):
@@ -73,7 +74,7 @@ class Cache(object):
     def setmany(self, key_value_list):
         expiration = self._get_datetime(datetime.datetime.now() + self._expiration)
         for kv in key_value_list:
-            kv[1] = repr(kv[1])
+            kv[1] = json.dumps(kv[1])
             kv.append(expiration)
         self._execute_sql("insert or replace into cache(key, value, expiration) values(?,?,?)", key_value_list)
         
@@ -93,7 +94,7 @@ class Cache(object):
         return self._execute_sql("select value, expiration from cache where key = ?", (key,))
         
     def _insert(self, key, value, expiration):
-        self._execute_sql("insert or replace into cache(key, value, expiration) values(?,?,?)", (key, repr(value), expiration,))
+        self._execute_sql("insert or replace into cache(key, value, expiration) values(?,?,?)", (key, json.dumps(value), expiration,))
         
     def _execute_sql(self, query, data=None):
         result = None

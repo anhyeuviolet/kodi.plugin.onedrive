@@ -17,6 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+import json
 import sqlite3
 
 from resources.lib.vendor.clouddrive_common.ui.logger import Logger
@@ -56,14 +57,14 @@ class SimpleKeyValueDb(object):
     def get(self, key):
         row = self._read(key)
         if row:
-            return eval(row[0])
+            return json.loads(row[0])
         return
     
     def getall(self):
         d = {}
         rows = self._readall()
         for row in rows:
-            d[row[0]] = eval(row[1])
+            d[row[0]] = json.loads(row[1])
         return d
 
     def set(self, key, value):
@@ -71,7 +72,7 @@ class SimpleKeyValueDb(object):
     
     def setmany(self, key_value_list):
         for kv in key_value_list:
-            kv[1] = repr(kv[1])
+            kv[1] = json.dumps(kv[1])
         self._execute_sql("insert or replace into store(key, value) values(?,?)", key_value_list)
         
     def remove(self, key):
@@ -88,7 +89,7 @@ class SimpleKeyValueDb(object):
         return self._execute_sql("select value from store where key = ?", (key,))
     
     def _insert(self, key, value):
-        self._execute_sql("insert or replace into store(key, value) values(?,?)", (key, repr(value)))
+        self._execute_sql("insert or replace into store(key, value) values(?,?)", (key, json.dumps(value)))
         
     def _execute_sql(self, query, data=None, fetchall=False):
         result = None
