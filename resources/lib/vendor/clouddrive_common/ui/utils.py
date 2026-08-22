@@ -244,9 +244,18 @@ class KodiUtils:
     
     @staticmethod
     def to_datetime(s):
-        import dateutil.parser
+        import datetime
+        import re
         try:
-            return dateutil.parser.parse(s)
+            # datetime.fromisoformat is documented to accept three or six
+            # fractional-second digits. Graph emits seven for some
+            # SharePoint-backed items, and the bare handler below would
+            # swallow that and silently drop the list item's date rather
+            # than report it. Truncate to six first; the substitution is a
+            # no-op for every value with six digits or fewer, so this is not
+            # redundant with the handler and must not be removed as such.
+            s = re.sub(r'(\.\d{6})\d+', r'\1', s)
+            return datetime.datetime.fromisoformat(s)
         except:
             return None
         

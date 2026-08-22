@@ -123,7 +123,7 @@ class QRDialogProgress(xbmcgui.WindowXMLDialog):
         return self.canceled
     
     def onInit(self):
-        import pyqrcode
+        import resources.lib.vendor.pyqrcode as pyqrcode
         profile_path = Utils.unicode(KodiUtils.translate_path(KodiUtils.get_addon_info("profile")))
         # A brand-new add-on id means a brand-new addon_data directory, which
         # may not exist on first sign-in; without this the write raises before
