@@ -16,55 +16,51 @@ msgstr ""
 "Language: he_IL\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgctxt "#32000"
+msgctxt "#30000"
 msgid "Account"
 msgstr "חשבון"
 
-msgctxt "#32001"
+msgctxt "#30001"
 msgid "Video Library Export Folder"
 msgstr "תיקיית ייצוא ספריית וידאו"
 
-msgctxt "#32002"
+msgctxt "#30002"
 msgid "Music Library Export Folder"
 msgstr "תיקיית ייצוא ספריית מוזיקה"
 
-msgctxt "#32003"
+msgctxt "#30003"
 msgid "Before export to library, remove previous files and folders"
 msgstr "לפני ייצוא לספריה, הסר את הקבצים והתיקיות הקודמים"
 
-msgctxt "#32004"
+msgctxt "#30004"
 msgid "When playing videos, set the subtitle file located next to the video (.srt)"
 msgstr "בעת ניגון וידאו, הגדר את קובץ הכתוביות הממוקם ליד הווידאו (.srt)"
 
-msgctxt "#32005"
+msgctxt "#30005"
 msgid "Auto-Refreshed slideshow"
 msgstr "מצגת עם רענון אוטומטי"
 
-msgctxt "#32006"
+msgctxt "#30006"
 msgid "Refresh interval in minutes"
 msgstr "מרווח זמן לרענון בדקות"
 
-msgctxt "#32007"
+msgctxt "#30007"
 msgid "Special: Photos"
 msgstr "מיוחד: תמונות"
 
-msgctxt "#32008"
+msgctxt "#30008"
 msgid "Special: Camera Roll"
 msgstr "מיוחד: סיבוב המצלמה"
 
-msgctxt "#32009"
+msgctxt "#30009"
 msgid "Special: Music"
 msgstr "מיוחד: מוסיקה"
 
-msgctxt "#32010"
+msgctxt "#30010"
 msgid "Recursive auto-refreshed slideshow"
 msgstr "רענן מצגת באופן רקורסיבי ואוטומטי"
 
-msgctxt "#32011"
+msgctxt "#30011"
 msgid "Common Settings"
 msgstr "הגדרות נפוצות"
-
-msgctxt "#32012"
-msgid "Open Cloud Drive Common Settings..."
-msgstr "פתח הגדרות נפוצות של כונן ענן ..."
 

@@ -16,106 +16,102 @@ msgstr ""
 "Language: en\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgctxt "#32000"
+msgctxt "#30000"
 msgid "Player Service"
 msgstr ""
 
-msgctxt "#32001"
+msgctxt "#30001"
 msgid "Export Service"
 msgstr ""
 
-msgctxt "#32002"
+msgctxt "#30002"
 msgid "Source Service"
 msgstr ""
 
-msgctxt "#32003"
+msgctxt "#30003"
 msgid "Before export to library, remove previous files and folders"
 msgstr ""
 
-msgctxt "#32004"
+msgctxt "#30004"
 msgid "Automatically set subtitles from cloud drive"
 msgstr ""
 
-msgctxt "#32005"
+msgctxt "#30005"
 msgid "Auto-Refreshed slideshow"
 msgstr ""
 
-msgctxt "#32006"
+msgctxt "#30006"
 msgid "Refresh interval in minutes"
 msgstr ""
 
-msgctxt "#32007"
+msgctxt "#30007"
 msgid "Special: Photos"
 msgstr ""
 
-msgctxt "#32008"
+msgctxt "#30008"
 msgid "Special: Camera Roll"
 msgstr ""
 
-msgctxt "#32009"
+msgctxt "#30009"
 msgid "Special: Music"
 msgstr ""
 
-msgctxt "#32010"
+msgctxt "#30010"
 msgid "Recursive auto-refreshed slideshow"
 msgstr ""
 
-msgctxt "#32011"
+msgctxt "#30011"
 msgid "Resume playing when resume point exists in library"
 msgstr ""
 
-msgctxt "#32012"
-msgid "Open Cloud Drive Common Settings..."
-msgstr ""
-
-msgctxt "#32017"
+msgctxt "#30017"
 msgid "Ask to resume if resume point exists in library"
 msgstr ""
 
-msgctxt "#32018"
+msgctxt "#30018"
 msgid "Save resume points and watched status in library"
 msgstr ""
 
-msgctxt "#32019"
+msgctxt "#30019"
 msgid "Do not include filename extension in a .strm"
 msgstr ""
 
-msgctxt "#32020"
+msgctxt "#30020"
 msgid "Hide exporting progress dialog"
 msgstr ""
 
-msgctxt "#32030"
+msgctxt "#30030"
 msgid "Collaboration"
 msgstr ""
 
-msgctxt "#32031"
+msgctxt "#30031"
 msgid "Report errors automatically to help resolve them quickly"
 msgstr ""
 
-msgctxt "#32032"
+msgctxt "#30032"
 msgid "Advanced"
 msgstr ""
 
-msgctxt "#32033"
+msgctxt "#30033"
 msgid "Sign-in Server"
 msgstr ""
 
-msgctxt "#32034"
+msgctxt "#30034"
 msgid "Cache expiration time (in minutes)"
 msgstr ""
 
-msgctxt "#32035"
+msgctxt "#30035"
 msgid "Clear cache now"
 msgstr ""
 
-msgctxt "#32067"
+msgctxt "#30067"
 msgid "Services"
 msgstr ""
 
-msgctxt "#32068"
+msgctxt "#30068"
 msgid "Allow using OneDrive as a source"
 msgstr ""
 
-msgctxt "#32069"
+msgctxt "#30069"
 msgid "     Source server port  -  http://localhost:<port>/source"
 msgstr ""

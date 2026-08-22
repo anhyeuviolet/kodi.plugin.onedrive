@@ -41,14 +41,14 @@ class OneDriveAddon(CloudDriveAddon):
                 path = 'special/photos'
                 params = {'action': '_slideshow', 'content_type': self._content_type, 'driveid': driveid, 'path': path}
                 context_options = [(self._common_addon.getLocalizedString(32032), 'RunPlugin('+self._addon_url + '?' + urllib.parse.urlencode(params)+')')]
-                drive_folders.append({'name' : self._addon.getLocalizedString(32007), 'path' : path, 'context_options': context_options})
+                drive_folders.append({'name' : self._addon.getLocalizedString(30007), 'path' : path, 'context_options': context_options})
                 
                 path = 'special/cameraroll'
                 params['path'] = path
                 context_options = [(self._common_addon.getLocalizedString(32032), 'RunPlugin('+self._addon_url + '?' + urllib.parse.urlencode(params)+')')]
-                drive_folders.append({'name' : self._addon.getLocalizedString(32008), 'path' : path, 'context_options': context_options})
+                drive_folders.append({'name' : self._addon.getLocalizedString(30008), 'path' : path, 'context_options': context_options})
             elif self._content_type == 'audio':
-                drive_folders.append({'name' : self._addon.getLocalizedString(32009), 'path' : 'special/music'})
+                drive_folders.append({'name' : self._addon.getLocalizedString(30009), 'path' : 'special/music'})
         drive_folders.append({'name' : self._common_addon.getLocalizedString(32053), 'path' : 'recent'})
         if drive['type'] != 'documentLibrary':
             drive_folders.append({'name' : self._common_addon.getLocalizedString(32058), 'path' : 'sharedWithMe'})
