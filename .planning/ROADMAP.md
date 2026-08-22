@@ -76,7 +76,16 @@ The identity change (`plugin.onedrive` becomes `plugin.onedrive.kn`) belongs her
   4. `VENDORED.md` records upstream URL, the `matrix` branch, version 1.4.0, the commit SHA, per-subtree licence and local modifications; both the GPL-3.0 and the Apache-2.0 licence files survive, and every outbound HTTP call in the vendored tree passes an explicit `timeout=`.
   5. Manual acceptance pass on Windows and on the real Android TV box with a remote, on a clean profile — establishing the per-phase standard (CI-06) that every later phase inherits.
 
-**Plans**: TBD (4 expected)
+**Plans**: 7 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Environment and repository prerequisites: fork detach, clean profile, Android TV box, Kodi install matrix
+- [ ] 01-02-PLAN.md — The verification gate: pytest.ini and all 22 repository assertions, written before anything changes
+- [ ] 01-03-PLAN.md — Identity, Kodi gating, and the string-id namespace move into the 30000 block
+- [ ] 01-04-PLAN.md — Vendor the module verbatim at a pinned commit, rename it, and merge its resources
+- [ ] 01-05-PLAN.md — Resolve the eight hardcoded id lookups, vendor the QR encoder, and reduce the manifest to one import
+- [ ] 01-06-PLAN.md — Hardening: JSON serialization for both stores, explicit HTTP timeout
+- [ ] 01-07-PLAN.md — Vendoring record, credits, dialog smoke action, install matrix and acceptance pass
 
 ### Phase 2: Pure Core and CI Harness
 **Goal**: The extraction, paging and path logic is correct and proven against real Graph JSON, and CI enforces the boundaries that keep it that way.
@@ -203,7 +212,7 @@ Phases execute in numeric order, with two concurrent pairs: {1, 2} runs alongsid
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Vendor Lift | 0/4 | Not started | - |
+| 1. Vendor Lift | 0/7 | Not started | - |
 | 2. Pure Core and CI Harness | 0/4 | Not started | - |
 | 3. Authentication | 0/5 | Not started | - |
 | 4. Browse | 0/4 | Not started | - |
