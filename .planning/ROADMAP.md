@@ -85,7 +85,7 @@ The identity change (`plugin.onedrive` becomes `plugin.onedrive.kn`) belongs her
 Plans:
 **Wave 1**
 
-- [ ] 01-01-PLAN.md — Environment and repository prerequisites: fork detach, clean profile, Android TV box, Kodi install matrix
+- [ ] 01-01-PLAN.md — Environment and repository prerequisites: fork detach, clean profile, Android test phone, Kodi install matrix
 - [ ] 01-02-PLAN.md — The verification gate: pytest.ini and all 22 repository assertions, written before anything changes
 - [ ] 01-03-PLAN.md — Identity, Kodi gating, and the string-id namespace move into the 30000 block
 
@@ -176,7 +176,7 @@ Plans:
 
   1. A build produces `plugin.onedrive-<version>.zip` containing exactly one top-level `plugin.onedrive/` directory, and it installs from the Kodi file manager.
   2. The published repository is served over HTTPS, uses the `<dir>` schema with `<checksum verify="sha256">` and `<hashes>sha256</hashes>`, and contains no MD5 hash and no flat pre-Gotham layout.
-  3. Installing the repository on the Android TV box takes exactly one URL entry with the remote and no further manual steps.
+  3. Installing the repository on the Android TV box takes exactly one URL entry with the remote and no further manual steps. **CI-06 exception — resolve when planning this phase:** the phone cannot make this claim. "One URL entry with the remote" is a remote-interaction assertion, and it is the whole point of the self-hosted repository, so it cannot be quietly dropped either. It either moves to release under CI-07 or becomes a use-and-report observation on the box.
   4. A throwaway N to N+1 pair published to that repository is confirmed to arrive on the box without anyone pressing "Check for updates" — verified by waiting out Kodi's periodic check, not by force-refreshing, since a maintainer who always force-refreshes is structurally unable to reproduce the failure users see.
   5. Every published version number is plain, with no pre-release suffix, because Kodi's Debian-style comparison sorts `3.0.0-beta` below `3.0.0`.
 
@@ -190,7 +190,7 @@ Plans:
 
 **Success Criteria** (what must be TRUE):
 
-  1. Video, audio and image files play from both a Personal and a Business drive on the Android TV box.
+  1. Video, audio and image files play from both a Personal and a Business drive on the Android device. **CI-06 exception — resolve when planning this phase:** the phone carries the substance here — container and codec handling, demuxer selection and `Range` behaviour are Kodi's Android build, not the form factor — but hardware decode capability differs between a phone SoC and a low-end TV box, so a green playback result on the phone is not evidence the box decodes the same file. Record the phone result at this gate and re-check codec coverage on the box before release.
   2. Kodi is never handed a Graph URL: the URL passed to `setResolvedUrl` is `http://127.0.0.1:<dynamically allocated port>/<per-session random token>/…`, `setResolvedUrl` is called exactly once per playback invocation, and a grep of directory item URLs and of any exported `.strm` finds no `@microsoft.graph.downloadUrl`. A guessed item id alone is not sufficient to reach the redirector.
   3. The real download-URL lifetime is measured at T+1, +5, +15, +30 and +60 minutes separately on a Personal and a Business drive, and the numbers are recorded in the repo.
   4. Same-name subtitles are discovered across Kodi's full extension set including language suffixes and VOBsub `.idx`/`.sub` pairs, are served through the same redirector as media, and failure is silent.

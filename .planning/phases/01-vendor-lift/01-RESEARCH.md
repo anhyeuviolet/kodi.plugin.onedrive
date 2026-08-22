@@ -851,6 +851,13 @@ This is a rename and re-identification phase, so runtime state matters more than
 
 ## Environment Availability
 
+> **Superseded on the Android device, 2026-08-22.** This section was written before the test device
+> was settled. The Android test device is an **Android phone** running Kodi over `adb`, not the TV
+> box: the box is the deployment target and the design authority for the ten-foot interface, and it
+> is checked before release rather than per phase. See `REQUIREMENTS.md` SETUP-06 and CI-06, which
+> are the contract, and plan `01-01` Task 3, which is what to execute. Every other finding in this
+> section still stands.
+
 | Dependency | Required by | Available | Version | Fallback |
 |---|---|---|---|---|
 | Python 3 | Rename scripts, gate tests | ✓ | 3.11.9 | — (and it matches Kodi 20/21's 3.11) |
@@ -1027,7 +1034,7 @@ test; adding them now would be scaffolding this phase does not use.
 - [ ] A phase-local `_dialog_smoke` plugin action, so Success Criterion 3 is testable at all
 - [ ] `pip install kodi-addon-checker` on the development machine
 - [ ] Kodi 19, 20 and 22 portable installs
-- [ ] Confirm the Android TV box is available and reachable over `adb`
+- [ ] Confirm the Android test phone runs Android 11+, has Kodi installed, and is reachable over `adb` (superseded from "the Android TV box" — see the note under Environment Availability)
 
 Nothing else. Do not build a Kodi-stub harness in this phase.
 
