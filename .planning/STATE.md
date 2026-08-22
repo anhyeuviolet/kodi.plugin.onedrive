@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 01
 current_phase_name: vendor-lift
 status: executing
-stopped_at: Completed 01-05-PLAN.md
-last_updated: "2026-08-22T14:22:16.999Z"
+stopped_at: Completed 01-06-PLAN.md
+last_updated: "2026-08-22T14:31:18.773Z"
 last_activity: 2026-08-22
 last_activity_desc: Phase 01 execution started
 progress:
   total_phases: 1
   completed_phases: 0
   total_plans: 7
-  completed_plans: 4
+  completed_plans: 5
 ---
 
 # Project State
@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (updated 2026-08-22)
 ## Current Position
 
 Phase: 01 (vendor-lift) — EXECUTING
-Plan: 5 of 7
+Plan: 6 of 7
 Status: Ready to execute
 Last activity: 2026-08-22 — Phase 01 execution started
 
-Progress: [██████░░░░] 57%
+Progress: [███████░░░] 71%
 
 ## Performance Metrics
 
@@ -62,6 +62,7 @@ Progress: [██████░░░░] 57%
 | Phase 01 P03 | 20min | 2 tasks | 5 files |
 | Phase 01 P04 | 15min | 2 tasks | 44 files |
 | Phase 01 P05 | 20min | 2 tasks | 14 files |
+| Phase 01 P06 | 12min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -93,6 +94,9 @@ Load-bearing choices for current work:
 - [Phase ?]: The QR image filename carries a fresh uuid4 hex per invocation, because Kodi's texture cache is keyed by path and a fixed name lets a repeat sign-in render the previous code
 - [Phase ?]: pyqrcode is vendored from the Kodi omega add-on zip (1.2.1+matrix.4) rather than PyPI: it is the build the add-on was tested against and the only distribution bundling the MIT PNG writer
 - [Phase ?]: test_gpl_headers_intact is made licence-aware via a per-file FOREIGN_NOTICES map rather than GPL-stamping BSD/MIT source, which the test's own closing assertion forbids
+- [Phase ?]: All four repr( write sites converted to JSON, not the two the plan names; db.setmany and cache.setmany are write sites too
+- [Phase ?]: The page cache stores a response body as bytes, a third shape JSON cannot carry; decoded at the write site in source.py, the exact inverse of the read path's Utils.encode
+- [Phase ?]: Request.HTTP_TIMEOUT_SECONDS = 30, recorded as unmeasured and confirmed on the Android test phone in 01-07; retry loop worst case 155s recorded, not bounded
 
 ### Pending Todos
 
@@ -125,6 +129,6 @@ Open concerns:
 
 ## Session Continuity
 
-Last session: 2026-08-22T14:22:16.987Z
-Stopped at: Completed 01-05-PLAN.md
+Last session: 2026-08-22T14:31:10.610Z
+Stopped at: Completed 01-06-PLAN.md
 Resume file: None
