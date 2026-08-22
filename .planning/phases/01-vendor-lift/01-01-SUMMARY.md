@@ -310,3 +310,11 @@ leans on the matrix.
 **SETUP-06 — resolved and held.** No sibling cloud-drive add-on was installed on the Windows test
 profile at any point. The profile was verified clean before the work, and verified byte-identical
 after three portable Kodi launches.
+
+## Self-Check: PASSED
+
+- `.planning/phases/01-vendor-lift/01-01-SUMMARY.md` exists
+- Commit `40eea68` exists in history
+- `D:\KodiPortable\_logs\kodi-emulator-api30.log` exists (33,693 bytes)
+- `kodi.exe` present in each of `kodi-19.5`, `kodi-20.5`, `kodi-22.0-beta1`
+- The SUMMARY commit deletes no tracked file

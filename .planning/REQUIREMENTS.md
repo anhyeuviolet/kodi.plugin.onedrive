@@ -14,7 +14,7 @@ Scope note: this is a brownfield refactor. Requirements below describe the targe
 - [ ] **SETUP-03**: No client secret or certificate exists on the registration, and none appears anywhere in the repository
 - [ ] **SETUP-04**: A written registration runbook lives in the repo, including the `AADSTS7000218` symptom of skipping SETUP-02
 - [ ] **SETUP-05**: Two test accounts are available — one personal Microsoft account and one work/school account
-- [ ] **SETUP-06**: A clean test environment exists — a Kodi profile with no sibling cloud-drive add-ons installed, plus an Android phone running Kodi and reachable over `adb`, which is the Android test device. The Android TV box is the deployment target and the design authority for the 10-foot interface, but it is not a test device: it is exercised by use, and only at release (see CI-06)
+- [x] **SETUP-06**: A clean test environment exists — a Kodi profile with no sibling cloud-drive add-ons installed, plus an Android phone running Kodi and reachable over `adb`, which is the Android test device. The Android TV box is the deployment target and the design authority for the 10-foot interface, but it is not a test device: it is exercised by use, and only at release (see CI-06)
 
 ### Vendoring
 
@@ -36,7 +36,7 @@ Scope note: this is a brownfield refactor. Requirements below describe the targe
 - [x] **ID-02**: `provider-name` in `addon.xml` names the current maintainer, and the display name distinguishes this add-on from the original in the Kodi UI
 - [x] **ID-03**: `LICENSE.txt` (GPL-3.0-or-later) is retained unchanged and every existing copyright notice is preserved — the code is a derivative work and the licence requires this
 - [ ] **ID-04**: A `CREDITS.md` (or a README section) states that the add-on originates from `plugin.onedrive` by Carlos Guzman (cguZZman) and bundles `script.module.clouddrive.common`, with licences named
-- [ ] **ID-05**: The repository no longer belongs to the upstream fork network, and its commit history is preserved rather than squashed — squashing would destroy the attribution record while keeping the code
+- [x] **ID-05**: The repository no longer belongs to the upstream fork network, and its commit history is preserved rather than squashed — squashing would destroy the attribution record while keeping the code
 
 ### Authentication
 
@@ -187,7 +187,7 @@ Cross-cutting notes. `CI-06` (per-phase manual acceptance on Windows and on an A
 | SETUP-03 | Phase 3 | Pending |
 | SETUP-04 | Phase 3 | Pending |
 | SETUP-05 | Phase 2 | Pending |
-| SETUP-06 | Phase 1 | Pending |
+| SETUP-06 | Phase 1 | Complete |
 | VND-01 | Phase 1 | Complete |
 | VND-02 | Phase 1 | Complete |
 | VND-03 | Phase 1 | Complete |
@@ -203,7 +203,7 @@ Cross-cutting notes. `CI-06` (per-phase manual acceptance on Windows and on an A
 | ID-02 | Phase 1 | Complete |
 | ID-03 | Phase 1 | Complete |
 | ID-04 | Phase 1 | Pending |
-| ID-05 | Phase 1 | Pending |
+| ID-05 | Phase 1 | Complete |
 | AUTH-01 | Phase 3 | Pending |
 | AUTH-02 | Phase 3 | Pending |
 | AUTH-03 | Phase 3 | Pending |

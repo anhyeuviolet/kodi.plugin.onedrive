@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 01
 current_phase_name: vendor-lift
 status: executing
-stopped_at: Completed 01-06-PLAN.md
-last_updated: "2026-08-22T14:31:18.773Z"
+stopped_at: Completed 01-01-PLAN.md
+last_updated: "2026-08-22T16:06:25.697Z"
 last_activity: 2026-08-22
 last_activity_desc: Phase 01 execution started
 progress:
   total_phases: 1
   completed_phases: 0
   total_plans: 7
-  completed_plans: 5
+  completed_plans: 6
 ---
 
 # Project State
@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (updated 2026-08-22)
 ## Current Position
 
 Phase: 01 (vendor-lift) — EXECUTING
-Plan: 6 of 7
+Plan: 7 of 7
 Status: Ready to execute
 Last activity: 2026-08-22 — Phase 01 execution started
 
-Progress: [███████░░░] 71%
+Progress: [█████████░] 86%
 
 ## Performance Metrics
 
@@ -63,6 +63,7 @@ Progress: [███████░░░] 71%
 | Phase 01 P04 | 15min | 2 tasks | 44 files |
 | Phase 01 P05 | 20min | 2 tasks | 14 files |
 | Phase 01 P06 | 12min | 2 tasks | 4 files |
+| Phase 01 P01 | 2h | 3 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -97,6 +98,10 @@ Load-bearing choices for current work:
 - [Phase ?]: All four repr( write sites converted to JSON, not the two the plan names; db.setmany and cache.setmany are write sites too
 - [Phase ?]: The page cache stores a response body as bytes, a third shape JSON cannot carry; decoded at the write site in source.py, the exact inverse of the read path's Utils.encode
 - [Phase ?]: Request.HTTP_TIMEOUT_SECONDS = 30, recorded as unmeasured and confirmed on the Android test phone in 01-07; retry loop worst case 155s recorded, not bounded
+- [Phase ?]: Android acceptance instrument is an API 30 emulator (Android 11), not a physical phone; storage-regime claims hold, ten-foot/GPU claims do not
+- [Phase ?]: Pulling an app-private Kodi log over adb needs root on Android 11+; a retail device must copy the log to a public directory first
+- [Phase ?]: Kodi 22 pinned to 22.0 Piers beta1 rather than a nightly, for a fixed version string and a published checksum
+- [Phase ?]: Kodi 22 ships Python 3.14 while 19/20/21 ship 3.8 — a compatibility gate is needed before Phase 2 leans on the matrix
 
 ### Pending Todos
 
@@ -129,6 +134,6 @@ Open concerns:
 
 ## Session Continuity
 
-Last session: 2026-08-22T14:31:10.610Z
-Stopped at: Completed 01-06-PLAN.md
+Last session: 2026-08-22T16:06:15.520Z
+Stopped at: Completed 01-01-PLAN.md
 Resume file: None
