@@ -56,6 +56,21 @@ EXCLUDED_DOCS = frozenset({'VENDORED.md', 'CREDITS.md', 'COVERAGE.md', 'README.m
 
 TEXT_SUFFIXES = frozenset({'.py', '.xml', '.po', '.md', '.ini', '.txt'})
 
+# Not every shipped file is GPL. The vendored QR encoder is BSD-3-Clause with
+# an MIT PNG writer bundled inside it, and stamping a GPL banner on either
+# would be exactly the re-attribution the last assertion in
+# test_gpl_headers_intact forbids. These files are therefore held to their own
+# upstream notice rather than excused from carrying one: each entry names one
+# exact string that must appear, so adding a row here is a stricter demand and
+# never an escape hatch. Like the exclusion sets above, this lives here and
+# nowhere else.
+FOREIGN_NOTICES = {
+    'resources/lib/vendor/pyqrcode/__init__.py': 'Michael Nooner',
+    'resources/lib/vendor/pyqrcode/builder.py': 'Michael Nooner',
+    'resources/lib/vendor/pyqrcode/tables.py': 'Michael Nooner',
+    'resources/lib/vendor/pyqrcode/png.py': 'Johann C. Rocholl',
+}
+
 # Pinned at plan time from the file as it stands. Do not recompute and re-pin:
 # re-pinning after an accidental edit is exactly the failure this catches.
 LICENSE_SHA256 = '0b383d5a63da644f628d99c33976ea6487ed89aaa59f0b3257992deac1171e6b'
@@ -195,13 +210,22 @@ def test_gpl_headers_intact():
         'entrypoint.py must be in the checked set, otherwise this sweep can '
         'pass without having read a single real source file')
 
+    # A row in FOREIGN_NOTICES that names nothing in the tree means the map has
+    # drifted, which is how a per-file expectation quietly stops checking a file.
+    orphans = sorted(set(FOREIGN_NOTICES) - set(checked))
+    assert not orphans, (
+        'FOREIGN_NOTICES names files that are not checked source:\n' +
+        '\n'.join(orphans))
+
     missing = []
     for rel in checked:
         head = '\n'.join(_read(rel).splitlines()[:25])
-        if 'GNU General Public License' not in head:
-            missing.append(rel)
+        expected = FOREIGN_NOTICES.get(rel, 'GNU General Public License')
+        if expected not in head:
+            missing.append('%s (expected %r)' % (rel, expected))
     assert not missing, (
-        'these files lost their GPL-3.0 header in the first 25 lines:\n' +
+        'these files lost their copyright notice from the first 25 lines; the '
+        'expected phrase is the one for that file\'s own licence:\n' +
         '\n'.join(missing))
 
     attributed = [rel for rel in checked if 'Carlos Guzman' in _read(rel)]
