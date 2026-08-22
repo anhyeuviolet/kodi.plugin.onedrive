@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 01
 current_phase_name: vendor-lift
 status: executing
-stopped_at: Completed 01-01-PLAN.md
-last_updated: "2026-08-22T16:06:25.697Z"
+stopped_at: 01-07 Tasks 1-2 complete; Task 3 blocked on the Windows install matrix and acceptance row
+last_updated: "2026-08-22T17:20:17.239Z"
 last_activity: 2026-08-22
 last_activity_desc: Phase 01 execution started
 progress:
   total_phases: 1
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 7
-  completed_plans: 6
+  completed_plans: 7
 ---
 
 # Project State
@@ -123,6 +123,7 @@ Open concerns:
 - **AUTH-18 cannot be fully verified yet.** No tenant that actually blocks third-party apps has been tested, so the exact `AADSTS` code that should trigger the custom `client_id` escape hatch is still unknown. The escape hatch is worthless if the user is never told it exists.
 - **No migration path exists, by design.** The add-on ships under a new id (`plugin.onedrive.kn`) so there is no prior profile to read, and tokens could not have been carried over anyway. Anyone coming from v2.3.0 simply signs in.
 - **Graph fixtures must be recorded from both drive classes.** The spike found real material worth capturing: Vietnamese names with diacritics and spaces on both drives, and the OneDrive Personal Vault, which Graph returns without a `folder` facet so naive detection renders it as a file (BROWSE-16).
+- 01-07 acceptance pass: the install matrix on Kodi 19/20/21.3/22 and the Windows acceptance row cannot run from this shell. The interactive Windows session is disconnected, so Kodi dies at 'FATAL CApplication::Create: Unable to create window'. The Android row is filled and clean. Zip is staged and ready.
 
 ## Deferred Items
 
@@ -134,6 +135,6 @@ Open concerns:
 
 ## Session Continuity
 
-Last session: 2026-08-22T16:06:15.520Z
-Stopped at: Completed 01-01-PLAN.md
-Resume file: None
+Last session: 2026-08-22T17:20:17.224Z
+Stopped at: 01-07 Tasks 1-2 complete; Task 3 blocked on the Windows install matrix and acceptance row
+Resume file: .planning/phases/01-vendor-lift/01-07-SUMMARY.md
