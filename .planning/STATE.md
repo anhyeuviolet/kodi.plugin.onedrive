@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 01
 current_phase_name: vendor-lift
 status: executing
-stopped_at: Completed 01-03-PLAN.md
-last_updated: "2026-08-22T13:52:08.467Z"
+stopped_at: Completed 01-04-PLAN.md
+last_updated: "2026-08-22T14:07:50.363Z"
 last_activity: 2026-08-22
 last_activity_desc: Phase 01 execution started
 progress:
   total_phases: 1
   completed_phases: 0
   total_plans: 7
-  completed_plans: 2
+  completed_plans: 3
 ---
 
 # Project State
@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (updated 2026-08-22)
 ## Current Position
 
 Phase: 01 (vendor-lift) — EXECUTING
-Plan: 3 of 7
+Plan: 4 of 7
 Status: Ready to execute
 Last activity: 2026-08-22 — Phase 01 execution started
 
-Progress: [███░░░░░░░] 29%
+Progress: [████░░░░░░] 43%
 
 ## Performance Metrics
 
@@ -60,6 +60,7 @@ Progress: [███░░░░░░░] 29%
 |------|----------|-------|-------|
 | Phase 01 P02 | 30min | 2 tasks | 3 files |
 | Phase 01 P03 | 20min | 2 tasks | 5 files |
+| Phase 01 P04 | 15min | 2 tasks | 44 files |
 
 ## Accumulated Context
 
@@ -83,6 +84,10 @@ Load-bearing choices for current work:
 - [Phase 1]: Add-on identity is plugin.onedrive.kn / OneDrive KN / Kenny Nguyen, version 1.0.0 (not the 3.0.0 research floated: the two ids never version-compare)
 - [Phase 1]: kodi.wiki Language_support confirmed verbatim: 30000-30999 is reserved for plugins, 32000-32999 for scripts - research assumption A1 is now verified
 - [Phase 1]: allow_directory_listing defaults to false: a recorded behaviour deviation, complete rather than partial because the new id means no user has a stored true
+- [Phase 1]: Vendored files are staged with core.autocrlf=false so their blobs are byte-identical to upstream at df68e9a; git would otherwise normalise CRLF to LF on files with no prior index entry
+- [Phase 1]: The vendored package lives at resources/lib/vendor/clouddrive_common/ and the rename is anchored on a line-start import prefix, never a bare substring, so the six add-on-id literals could not be corrupted
+- [Phase 1]: The module's 89 string ids stay at 32000-32088 untouched; five are resolved at runtime and two of those are persisted in the exports store, so renumbering them would invalidate stored rows
+- [Phase 1]: Utils.get_class and Utils.get_fqn are deleted: they were the only string-based import mechanism in the tree and had no callers, so a text sweep over imports is now a complete proof of a rename
 
 ### Pending Todos
 
@@ -115,6 +120,6 @@ Open concerns:
 
 ## Session Continuity
 
-Last session: 2026-08-22T13:52:08.452Z
-Stopped at: Completed 01-03-PLAN.md
+Last session: 2026-08-22T14:07:48.767Z
+Stopped at: Completed 01-04-PLAN.md
 Resume file: None

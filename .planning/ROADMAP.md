@@ -80,7 +80,7 @@ The identity change (`plugin.onedrive` becomes `plugin.onedrive.kn`) belongs her
   4. `VENDORED.md` records upstream URL, the `matrix` branch, version 1.4.0, the commit SHA, per-subtree licence and local modifications; both the GPL-3.0 and the Apache-2.0 licence files survive, and every outbound HTTP call in the vendored tree passes an explicit `timeout=`.
   5. Manual acceptance pass on Windows and on the Android phone over `adb`, on a clean profile — establishing the per-phase standard (CI-06) that every later phase inherits. The Android TV box is the deployment target, not a test device; it is checked before release.
 
-**Plans**: 2/7 plans executed
+**Plans**: 3/7 plans executed
 
 Plans:
 **Wave 1**
@@ -91,7 +91,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 01-04-PLAN.md — Vendor the module verbatim at a pinned commit, rename it, and merge its resources
+- [x] 01-04-PLAN.md — Vendor the module verbatim at a pinned commit, rename it, and merge its resources
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -243,7 +243,7 @@ Phases execute in numeric order, with two concurrent pairs: {1, 2} runs alongsid
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Vendor Lift | 2/7 | In Progress|  |
+| 1. Vendor Lift | 3/7 | In Progress|  |
 | 2. Pure Core and CI Harness | 0/4 | Not started | - |
 | 3. Authentication | 0/5 | Not started | - |
 | 4. Browse | 0/4 | Not started | - |

@@ -18,9 +18,9 @@ Scope note: this is a brownfield refactor. Requirements below describe the targe
 
 ### Vendoring
 
-- [ ] **VND-01**: `script.module.clouddrive.common` v1.4.0 is vendored into the repo from the `matrix` branch, not the `master` branch, which carries the Python 2 / Kodi 18 line
-- [ ] **VND-02**: The vendored package is renamed under this add-on's namespace, with the name decided before the first file is copied
-- [ ] **VND-03**: The module's `resources/` contents are merged into this add-on's existing `resources/` rather than vendored as a second importable top-level package
+- [x] **VND-01**: `script.module.clouddrive.common` v1.4.0 is vendored into the repo from the `matrix` branch, not the `master` branch, which carries the Python 2 / Kodi 18 line
+- [x] **VND-02**: The vendored package is renamed under this add-on's namespace, with the name decided before the first file is copied
+- [x] **VND-03**: The module's `resources/` contents are merged into this add-on's existing `resources/` rather than vendored as a second importable top-level package
 - [ ] **VND-04**: Every hardcoded `script.module.clouddrive.common` id lookup resolves to this add-on's own id, version, and profile directory
 - [ ] **VND-05**: The vendored account store uses JSON instead of `repr()` and `eval()`
 - [ ] **VND-06**: Every outbound HTTP call passes an explicit `timeout=`
@@ -188,9 +188,9 @@ Cross-cutting notes. `CI-06` (per-phase manual acceptance on Windows and on an A
 | SETUP-04 | Phase 3 | Pending |
 | SETUP-05 | Phase 2 | Pending |
 | SETUP-06 | Phase 1 | Pending |
-| VND-01 | Phase 1 | Pending |
-| VND-02 | Phase 1 | Pending |
-| VND-03 | Phase 1 | Pending |
+| VND-01 | Phase 1 | Complete |
+| VND-02 | Phase 1 | Complete |
+| VND-03 | Phase 1 | Complete |
 | VND-04 | Phase 1 | Pending |
 | VND-05 | Phase 1 | Pending |
 | VND-06 | Phase 1 | Pending |
