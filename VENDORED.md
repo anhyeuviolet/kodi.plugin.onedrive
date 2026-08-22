@@ -149,11 +149,20 @@ this change is preserved behaviour. It is deleted in the same later cleanup.
 The contract of the vendor lift was identical behaviour, so every departure from it is listed here
 with its reasoning. There are four.
 
-**1. Sign-in, account listing, browsing and playback do not work.** The sign-in flow calls a
-third-party broker that has been offline since November 2022. This is inherited, not caused by the
-lift — the original add-on has the same problem — and it is why a fresh profile shows an empty
-account list and nothing beyond it can be exercised. Sign-in is replaced by a device-code flow in
-the next stage of work.
+**1. Sign-in still goes through a third-party broker, and a fresh profile therefore shows an empty
+account list until someone completes a sign-in.** The flow posts to `drive-login.herokuapp.com`,
+which issues a short-lived code, shows it in the QR dialog, and polls until a browser elsewhere
+completes the OAuth exchange on the user's behalf. That server was long assumed dead; **it is not.**
+Measured on 2026-08-22 from the Android test instrument: `GET /ip` and `POST /pin` both answered
+`200`, a code was issued, the QR dialog rendered it, and the add-on began polling `/pin/<code>` as
+designed. So this is not a behaviour deviation at all in the sense of something broken — it is
+inherited behaviour that still functions.
+
+What it *is* is the reason a fresh profile looks empty: nothing is signed in, and signing in needs a
+human at a browser. And it remains the reason the flow is being replaced. A third party holds the
+OAuth exchange, sees which account is being connected, and is a single point of failure and of trust
+for every user of the add-on; its liveness today does not change that. A device-code flow that talks
+to Microsoft directly is the next stage of work.
 
 **2. `allow_directory_listing` now defaults to `false` instead of `true`.** The gated service binds
 a loopback port and serves an enumerable index of the entire drive, with no authorisation check
@@ -170,12 +179,13 @@ have errored or looped back into these same settings.
 **4. A dialog smoke action exists at `plugin://plugin.onedrive.kn/?action=_dialog_smoke`.** It is
 the `_dialog_smoke` method on `OneDriveAddon` in `resources/lib/addon.py`. It constructs each of
 the three `WindowXMLDialog` subclasses with dummy arguments, shows and closes them, and logs the
-resolved skin path, the profile path and both QR image paths. It exists because the QR dialog is
-unreachable by clicking while deviation 1 holds, and because asserting that the skin XML files were
-copied proves the copy but not the path argument. It performs no network call and touches no
-credential. **It is a debug affordance and is scheduled for removal, or for a debug-only gate,
-before release** — an undocumented one becomes permanent by default, which is why it is written
-down here rather than only in the code.
+resolved skin path, the profile path and both QR image paths. It exists because asserting that the
+skin XML files were copied proves the copy but not the path argument, which is the thing that
+actually breaks, and because it reaches all three dialogs without a network round trip, a live
+third-party server or a human at a browser — none of which a repeatable check should depend on. It
+performs no network call and touches no credential. **It is a debug affordance and is scheduled for
+removal, or for a debug-only gate, before release** — an undocumented one becomes permanent by
+default, which is why it is written down here rather than only in the code.
 
 Two further things that are not deviations but will surprise a reader of a fresh profile.
 

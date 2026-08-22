@@ -8,13 +8,17 @@ its settings or its stored accounts.
 
 ## Status
 
-**Sign-in does not work in this build, so nothing behind it works either.** The original add-on
-signs in through a third-party broker service that has been offline since November 2022. That
-problem is inherited, not introduced here. A device-code sign-in flow that talks to Microsoft
-directly is the next piece of work; until it lands, a fresh install shows an empty account list and
-there is nothing to browse or play.
+Early. The add-on installs and runs on its own, and every screen it has renders. What has not
+changed yet is how it signs in.
 
-What is done: the add-on is self-contained and installs on its own.
+**Sign-in still goes through a third-party server.** Inherited from the original add-on: it posts
+to `drive-login.herokuapp.com`, that server issues a short code, you complete the Microsoft login
+in a browser, and it hands the tokens back. It does work — that was checked, not assumed — but it
+means someone else's server sits in the middle of your account connection. Replacing it with a
+device-code flow that talks to Microsoft directly is the next piece of work.
+
+Until you sign in, a fresh install shows an empty account list. That is the correct result, not a
+failure.
 
 ## What makes it different from the original
 
