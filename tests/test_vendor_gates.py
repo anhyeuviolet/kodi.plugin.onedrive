@@ -425,3 +425,372 @@ def test_all_http_calls_have_timeout():
     assert found >= 1, (
         'no urlopen/urlretrieve call site was found; a sweep that passes '
         'because it found nothing is the failure this guard exists to prevent')
+
+
+# ---------------------------------------------------------------------------
+# The manifest (ID-02, VND-11)
+# ---------------------------------------------------------------------------
+
+ADDON_ID = 'plugin.onedrive.kn'
+OWN_REPO_OWNER = OWN_REPO_URL.rsplit('/', 1)[0] + '/'
+
+
+@functools.lru_cache(maxsize=1)
+def _addon_xml():
+    return ET.parse(str(REPO / 'addon.xml')).getroot()
+
+
+def test_addon_xml_identity():
+    root = _addon_xml()
+
+    assert root.get('id') == ADDON_ID, (
+        'the manifest still declares %r; the add-on ships under a new id so '
+        'there is no prior profile to collide with' % (root.get('id'),))
+    assert root.get('version') == '1.0.0', (
+        'version is %r; the lifted add-on starts its own version line at 1.0.0'
+        % (root.get('version'),))
+
+    # Non-equality rather than a pinned display string, so the maintainer can
+    # adjust the presented name without editing this gate.
+    name = (root.get('name') or '').strip()
+    assert name, 'the manifest declares no name'
+    assert name != 'OneDrive', (
+        'the display name is still the upstream one; ID-02 requires a distinct '
+        'name so a user can tell the two apart in the add-on browser')
+
+    provider = (root.get('provider-name') or '').strip()
+    assert provider, 'the manifest declares no provider-name'
+    assert provider != 'Carlos Guzman (cguZZman)', (
+        'provider-name still names the upstream author; the copyright notices '
+        'stay, but the maintainer of this fork is not him')
+
+    metadata = root.find("./extension[@point='xbmc.addon.metadata']")
+    assert metadata is not None, 'the manifest has no xbmc.addon.metadata extension'
+    assert metadata.find('website') is None, (
+        'the metadata extension still points at addons.kodi.tv, which lists the '
+        'upstream add-on and not this one')
+
+    for field in ('source', 'forum'):
+        value = (metadata.findtext(field) or '').strip()
+        assert value.startswith(OWN_REPO_OWNER), (
+            '<%s> is %r; it must point at this repository' % (field, value))
+
+
+def test_addon_xml_imports():
+    imports = _addon_xml().findall('./requires/import')
+    assert len(imports) == 1, (
+        'the add-on must be self-contained: expected exactly one <import>, '
+        'found %r' % ([i.attrib for i in imports],))
+    # 3.0.1 is the whole of the Kodi 19 rejection. Kodi 19 ships xbmc.python
+    # 3.0.0 with an ABI floor of 3.0.0, so its dependency test refuses; 20 and
+    # 21 ship 3.0.1 and 22 ships 3.0.2, all with the same floor, so all three
+    # accept. 3.0.2 would install on Kodi 22 alone and is not an alternative.
+    assert imports[0].attrib == {'addon': 'xbmc.python', 'version': '3.0.1'}, (
+        'the single <import> is %r' % (imports[0].attrib,))
+
+
+# ---------------------------------------------------------------------------
+# Strings (D2)
+# ---------------------------------------------------------------------------
+
+# This add-on's own ids, moved down out of the script block into the 30000
+# block Kodi reserves for plugins. 32012 is deleted with its settings row
+# rather than renumbered, so there is no 30012.
+ADDON_STRING_IDS = (set(range(30000, 30012)) | set(range(30017, 30021))
+                    | set(range(30030, 30036)) | set(range(30067, 30070)))
+# The vendored module's contiguous block, left exactly where it was: the module
+# resolves some of these dynamically and one is persisted, so a mechanical
+# renumber cannot see them and would invalidate stored data.
+MODULE_STRING_IDS = set(range(32000, 32089))
+EXPECTED_STRING_IDS = ADDON_STRING_IDS | MODULE_STRING_IDS
+
+# Ids no static scan can see. Hard-coded, which is what makes the reachability
+# assertion complete rather than approximately complete.
+DYNAMIC_EXCEPTION_IDS = {32065, 32018, 32021}   # raised as UIException messages
+DYNAMIC_SCHEDULE_IDS = {32081, 32082}           # persisted export schedule types
+
+PO_FILES = {
+    'en_gb': 'resources/language/resource.language.en_gb/strings.po',
+    'he_il': 'resources/language/resource.language.he_il/strings.po',
+}
+
+
+def _po_ids(rel):
+    return [int(i) for i in re.findall(r'msgctxt "#(\d+)"', _read(rel))]
+
+
+def test_string_ids_partitioned():
+    assert len(ADDON_STRING_IDS) == 25, 'the add-on owns 25 renumbered ids'
+    assert len(MODULE_STRING_IDS) == 89, 'the module owns 89 ids'
+
+    sets = {}
+    for language, rel in PO_FILES.items():
+        ids = _po_ids(rel)
+        duplicates = sorted({i for i in ids if ids.count(i) > 1})
+        assert not duplicates, (
+            '%s declares these ids twice: %r' % (rel, duplicates))
+        sets[language] = set(ids)
+
+    en_gb = sets['en_gb']
+    assert en_gb == EXPECTED_STRING_IDS, (
+        'en_gb is not the expected partition.\n  unexpected: %r\n  missing: %r'
+        % (sorted(en_gb - EXPECTED_STRING_IDS),
+           sorted(EXPECTED_STRING_IDS - en_gb)))
+
+    assert 30012 not in en_gb, (
+        '30012 must not exist: the string it would carry ("Open Cloud Drive '
+        'Common Settings") is deleted along with its settings row rather than '
+        'renumbered')
+    # 32012 is the *module's* own string ("Yes! Count me in") and stays. Only
+    # this add-on's 32012 is deleted, and it is deleted rather than moved, so
+    # the absence that can be asserted by id alone is 30012's. The settings row
+    # itself is gated separately by test_directory_listing_default_off.
+    assert 32012 in en_gb, (
+        '32012 belongs to the vendored module and must survive; the module '
+        'block 32000-32088 is contiguous')
+
+    he_il = sets['he_il']
+    assert he_il <= EXPECTED_STRING_IDS, (
+        'he_il declares ids outside the partition: %r'
+        % (sorted(he_il - EXPECTED_STRING_IDS),))
+    assert set(range(30000, 30012)) <= he_il, (
+        'he_il lost a translation in the renumber; missing: %r'
+        % (sorted(set(range(30000, 30012)) - he_il),))
+
+    # Reachability: every id named statically must resolve.
+    referenced = set()
+    settings = _read('resources/settings.xml')
+    referenced.update(int(i) for i in re.findall(r'label="(\d+)"', settings))
+    referenced.update(int(i) for i in re.findall(r'<label>(\d+)</label>', settings))
+    for rel in python_sources():
+        contents = _read(rel)
+        referenced.update(int(i) for i in re.findall(
+            r'getLocalizedString\(\s*(\d+)', contents))
+        referenced.update(int(i) for i in re.findall(
+            r'\blocalize\(\s*(\d+)', contents))
+
+    # Below 30000 is a Kodi core string and is not ours to declare.
+    unresolved = sorted(i for i in referenced if i >= 30000 and i not in en_gb)
+    assert not unresolved, (
+        'these ids are referenced but declared nowhere in en_gb: %r' % (unresolved,))
+
+    for label, dynamic in (('UIException', DYNAMIC_EXCEPTION_IDS),
+                           ('export schedule type', DYNAMIC_SCHEDULE_IDS)):
+        missing = sorted(dynamic - en_gb)
+        assert not missing, (
+            'these %s ids are resolved at runtime and cannot be seen by a '
+            'static scan, so their absence would surface only to a user: %r'
+            % (label, missing))
+
+
+# ---------------------------------------------------------------------------
+# Settings (recorded deviations)
+# ---------------------------------------------------------------------------
+
+def test_directory_listing_default_off():
+    tree = ET.parse(str(REPO / 'resources' / 'settings.xml')).getroot()
+
+    listing = [n for n in tree.iter('setting')
+               if n.get('id') == 'allow_directory_listing']
+    assert len(listing) == 1, (
+        'expected exactly one allow_directory_listing setting, found %d'
+        % len(listing))
+    node = listing[0]
+    default = node.get('default')
+    if default is None:
+        child = node.find('default')
+        default = (child.text or '').strip() if child is not None else None
+    assert default == 'false', (
+        'allow_directory_listing defaults to %r; on first run under the new '
+        'add-on id that binds an unauthenticated loopback listener serving an '
+        'enumerable index of the whole drive. This is a recorded deviation, '
+        'not an accident' % (default,))
+
+    stale = [n.get('id') for n in tree.iter('setting')
+             if '_open_common_settings' in (n.get('action') or '')]
+    assert not stale, (
+        "a settings row still opens the module's own settings dialog, which "
+        'no longer exists as a separate add-on: %r' % (stale,))
+
+
+# ---------------------------------------------------------------------------
+# Merged resources (VND-03, VND-08)
+# ---------------------------------------------------------------------------
+
+SKIN_DIR = 'resources/skins/default/1080i'
+MEDIA_DIR = 'resources/skins/default/media'
+SKIN_XML = ('pin-dialog.xml', 'export-main-dialog.xml', 'export-schedule-dialog.xml')
+SKIN_MEDIA = ('black.png', 'dialog-bg.png', 'white.png', 'dialogbutton-fo.png',
+              'dialogbutton-nofo.png', 'radio-button-on.png', 'radio-button-off.png')
+VENDOR_DIR = 'resources/lib/vendor/'
+
+
+def test_resources_merged():
+    for rel in (SKIN_DIR, MEDIA_DIR):
+        assert (REPO / rel).is_dir(), '%s is missing; the skin tree was not merged' % rel
+
+    # A second importable top-level `resources` package makes every import in
+    # the add-on ambiguous, and Kodi 20's sys.path ordering amplifies it.
+    stray = sorted({rel for rel in tracked_files()
+                    if rel.startswith(VENDOR_DIR)
+                    and 'resources' in PurePosixPath(rel).parts[3:-1]})
+    assert not stray, (
+        'a second `resources` package was copied into the vendored tree:\n' +
+        '\n'.join(stray))
+    vendor = REPO / VENDOR_DIR
+    on_disk = sorted(p.relative_to(REPO).as_posix()
+                     for p in vendor.rglob('resources')
+                     if p.is_dir()) if vendor.is_dir() else []
+    assert not on_disk, (
+        'a `resources` directory exists inside the vendored tree:\n' +
+        '\n'.join(on_disk))
+
+    pt_br = REPO / 'resources/language/resource.language.pt_br'
+    assert not pt_br.exists(), (
+        'the upstream pt_br strings were copied; they are excluded from the '
+        'lift and would carry the module id space alone')
+
+    for rel in ('resources/lib/vendor/__init__.py',
+                'resources/lib/vendor/clouddrive_common/__init__.py'):
+        assert (REPO / rel).is_file(), (
+            '%s is missing; the vendored tree is not an importable package' % rel)
+
+    settings = [rel for rel in tracked_files()
+                if rel.startswith('resources/')
+                and PurePosixPath(rel).name == 'settings.xml']
+    assert settings == ['resources/settings.xml'], (
+        "exactly one settings.xml belongs under resources/; the module's own "
+        'file has never been the live one and is dropped. Found: %r' % (settings,))
+
+
+def test_skin_assets_present():
+    skin = REPO / SKIN_DIR
+    media = REPO / MEDIA_DIR
+
+    for name in SKIN_XML:
+        assert (skin / name).is_file(), (
+            '%s/%s is missing; WindowXMLDialog raises "XML File for Window is '
+            'missing" at construction time' % (SKIN_DIR, name))
+
+    for name in SKIN_MEDIA:
+        assert (media / name).is_file(), '%s/%s is missing' % (MEDIA_DIR, name)
+
+    broken = []
+    for name in SKIN_XML:
+        root = ET.parse(str(skin / name)).getroot()
+        for element in root.iter():
+            references = []
+            if element.tag == 'texture':
+                references.append(('<texture>', element.text))
+            for attribute, value in element.attrib.items():
+                if value.strip().lower().endswith('.png'):
+                    references.append((attribute, value))
+            for where, raw in references:
+                value = (raw or '').strip()
+                if not value:
+                    # An empty texture value is a failure, not nothing to check.
+                    broken.append((name, where, '<empty>'))
+                elif not (media / value).is_file():
+                    broken.append((name, where, value))
+    assert not broken, (
+        'these skin references do not resolve under %s:\n%s'
+        % (MEDIA_DIR, '\n'.join('%s: %s = %s' % b for b in broken)))
+
+
+# ---------------------------------------------------------------------------
+# Provenance (VND-01, VND-07, VND-09, ID-04)
+# ---------------------------------------------------------------------------
+
+UPSTREAM_COMMIT = 'df68e9a589a6faef2b3228f7520e77729bc05d9b'
+UPSTREAM_URL = 'https://github.com/cguZZman/script.module.clouddrive.common'
+
+
+def test_licences_present():
+    assert (REPO / 'LICENSE.txt').is_file(), 'the GPL-3.0 text is missing from the root'
+
+    apache = REPO / 'resources/lib/vendor/clouddrive_common/cache/LICENSE'
+    assert apache.is_file(), (
+        'the Apache-2.0 file that travels with the cache subtree is missing; '
+        'it is preserved verbatim, in place, beside cache.py')
+    assert 'Apache License' in apache.read_text(encoding='utf-8', errors='replace')
+
+    bsd = REPO / 'resources/lib/vendor/pyqrcode/LICENSE.md'
+    assert bsd.is_file(), "pyqrcode's BSD-3-Clause licence is missing"
+    assert 'Michael Nooner' in bsd.read_text(encoding='utf-8', errors='replace')
+
+    png = REPO / 'resources/lib/vendor/pyqrcode/png.py'
+    assert png.is_file(), 'pypng is missing; pyqrcode renders nothing without it'
+    assert 'Johann C. Rocholl' in png.read_text(encoding='utf-8', errors='replace'), (
+        'the MIT header inside png.py is the notice; it must stay intact')
+
+
+def test_vendored_sha_recorded():
+    vendored = REPO / 'VENDORED.md'
+    assert vendored.is_file(), 'VENDORED.md is missing'
+    contents = vendored.read_text(encoding='utf-8', errors='replace')
+    for label, value in (('commit', UPSTREAM_COMMIT),
+                         ('branch', 'matrix'),
+                         ('version', '1.4.0'),
+                         ('upstream URL', UPSTREAM_URL)):
+        assert value in contents, (
+            'VENDORED.md does not record the %s (%s)' % (label, value))
+
+
+def _markdown_sections(text):
+    sections = {}
+    heading = None
+    for line in text.splitlines():
+        match = re.match(r'^#{1,6}\s+(.*?)\s*$', line)
+        if match:
+            heading = match.group(1)
+            sections.setdefault(heading, [])
+        elif heading is not None:
+            sections[heading].append(line)
+    return {k: '\n'.join(v) for k, v in sections.items()}
+
+
+def _section(sections, phrase):
+    needle = phrase.lower()
+    for heading, body in sections.items():
+        if needle in heading.lower():
+            return body
+    return None
+
+
+def test_vendored_md_sections():
+    vendored = REPO / 'VENDORED.md'
+    assert vendored.is_file(), 'VENDORED.md is missing'
+    sections = _markdown_sections(
+        vendored.read_text(encoding='utf-8', errors='replace'))
+
+    required = ('Upstream', 'Licences', 'Excluded from the copy',
+                'Local modifications', 'Service extension point',
+                'Recorded behaviour deviations')
+    # Match on headings, so a stub file fails.
+    absent = [phrase for phrase in required if _section(sections, phrase) is None]
+    assert not absent, (
+        'VENDORED.md has no heading for: %r (found: %r)'
+        % (absent, sorted(sections)))
+
+    service = _section(sections, 'Service extension point')
+    for name in ('SourceService', 'SourceRedirector'):
+        assert name in service, (
+            'the service section must name %s, so a later reader can tell '
+            '"considered and discarded" from "overlooked"' % name)
+
+    deviations = _section(sections, 'Recorded behaviour deviations')
+    assert 'allow_directory_listing' in deviations, (
+        'the deviations section must name allow_directory_listing; otherwise '
+        'the default change reads as a regression')
+
+
+def test_credits_content():
+    credits = REPO / 'CREDITS.md'
+    assert credits.is_file(), 'CREDITS.md is missing'
+    contents = credits.read_text(encoding='utf-8', errors='replace')
+    required = ('plugin.onedrive', 'Carlos Guzman',
+                'script.module.clouddrive.common',
+                'PyQRCode', 'Michael Nooner', 'pypng', 'Johann C. Rocholl',
+                'GPL-3.0', 'BSD-3-Clause', 'MIT', 'Apache-2.0')
+    absent = [value for value in required if value not in contents]
+    assert not absent, 'CREDITS.md does not name: %r' % (absent,)
