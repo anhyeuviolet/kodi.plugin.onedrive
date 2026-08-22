@@ -92,7 +92,7 @@ Nothing else. Do not build a Kodi-stub harness in this phase.
 
 | Behavior | Requirement | Why Manual | Test Instructions |
 |----------|-------------|------------|-------------------|
-| Every dialog opens without a traceback | VND-10, CI-06 | The broker is dead, so sign-in cannot complete and no dialog is reachable by navigating the UI | Invoke each dialog through the phase-local `_dialog_smoke` action on a clean profile; assert no traceback in `kodi.log`. Includes the QR dialog that writes `qr.png` |
+| Every dialog opens without a traceback | VND-10, CI-06 | The broker is dead, so sign-in cannot complete and no dialog is reachable by navigating the UI | Invoke each dialog through the phase-local `_dialog_smoke` action on a clean profile; assert no traceback in `kodi.log`. Includes the QR dialog, which writes a per-invocation `qr-<hex>.png` into a profile directory it creates first; two constructions in one session must log two different paths |
 | Kodi 19 refuses installation | KODI-01 | Requires a real Kodi 19 install; the manifest logic is proven from source but the refusal is an installer behaviour | Attempt install of the built zip on a portable Kodi 19; expect rejection on the `xbmc.python` version |
 | Installs and runs on Kodi 20 / 21 / 22 | KODI-02 | Three real installs; entry-point loading is a runtime behaviour | Install on each; confirm both the plugin and the service entry points load, from `kodi.log` |
 | Android TV acceptance with a remote | CI-06, SETUP-06 | Nothing about a 10-foot interface is verifiable from a desktop | Clean profile on the real box; navigate with the remote only; archive `kodi.log` |
