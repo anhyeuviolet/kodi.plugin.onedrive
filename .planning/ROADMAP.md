@@ -80,14 +80,14 @@ The identity change (`plugin.onedrive` becomes `plugin.onedrive.kn`) belongs her
   4. `VENDORED.md` records upstream URL, the `matrix` branch, version 1.4.0, the commit SHA, per-subtree licence and local modifications; both the GPL-3.0 and the Apache-2.0 licence files survive, and every outbound HTTP call in the vendored tree passes an explicit `timeout=`.
   5. Manual acceptance pass on Windows and on the Android phone over `adb`, on a clean profile — establishing the per-phase standard (CI-06) that every later phase inherits. The Android TV box is the deployment target, not a test device; it is checked before release.
 
-**Plans**: 1/7 plans executed
+**Plans**: 2/7 plans executed
 
 Plans:
 **Wave 1**
 
 - [ ] 01-01-PLAN.md — Environment and repository prerequisites: fork detach, clean profile, Android test phone, Kodi install matrix
 - [x] 01-02-PLAN.md — The verification gate: pytest.ini and all 22 repository assertions, written before anything changes
-- [ ] 01-03-PLAN.md — Identity, Kodi gating, and the string-id namespace move into the 30000 block
+- [x] 01-03-PLAN.md — Identity, Kodi gating, and the string-id namespace move into the 30000 block
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -243,7 +243,7 @@ Phases execute in numeric order, with two concurrent pairs: {1, 2} runs alongsid
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Vendor Lift | 1/7 | In Progress|  |
+| 1. Vendor Lift | 2/7 | In Progress|  |
 | 2. Pure Core and CI Harness | 0/4 | Not started | - |
 | 3. Authentication | 0/5 | Not started | - |
 | 4. Browse | 0/4 | Not started | - |

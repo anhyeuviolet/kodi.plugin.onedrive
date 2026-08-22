@@ -32,8 +32,8 @@ Scope note: this is a brownfield refactor. Requirements below describe the targe
 
 ### Identity and attribution
 
-- [ ] **ID-01**: The add-on id becomes `plugin.onedrive.kn`, and every `plugin://` reference, profile path, and internal id lookup follows it — so this is a genuinely separate add-on that can never collide with the official `plugin.onedrive` in the Kodi repository
-- [ ] **ID-02**: `provider-name` in `addon.xml` names the current maintainer, and the display name distinguishes this add-on from the original in the Kodi UI
+- [x] **ID-01**: The add-on id becomes `plugin.onedrive.kn`, and every `plugin://` reference, profile path, and internal id lookup follows it — so this is a genuinely separate add-on that can never collide with the official `plugin.onedrive` in the Kodi repository
+- [x] **ID-02**: `provider-name` in `addon.xml` names the current maintainer, and the display name distinguishes this add-on from the original in the Kodi UI
 - [x] **ID-03**: `LICENSE.txt` (GPL-3.0-or-later) is retained unchanged and every existing copyright notice is preserved — the code is a derivative work and the licence requires this
 - [ ] **ID-04**: A `CREDITS.md` (or a README section) states that the add-on originates from `plugin.onedrive` by Carlos Guzman (cguZZman) and bundles `script.module.clouddrive.common`, with licences named
 - [ ] **ID-05**: The repository no longer belongs to the upstream fork network, and its commit history is preserved rather than squashed — squashing would destroy the attribution record while keeping the code
@@ -97,7 +97,7 @@ Scope note: this is a brownfield refactor. Requirements below describe the targe
 
 ### Kodi modernization
 
-- [ ] **KODI-01**: `addon.xml` declares `<import addon="xbmc.python" version="3.0.1"/>`, installing on Kodi 20, 21, and 22 and being rejected by Kodi 19
+- [x] **KODI-01**: `addon.xml` declares `<import addon="xbmc.python" version="3.0.1"/>`, installing on Kodi 20, 21, and 22 and being rejected by Kodi 19
 - [ ] **KODI-02**: The add-on installs and runs on Kodi 20 Nexus, 21 Omega, and 22 Piers
 - [ ] **KODI-03**: List items use typed InfoTag setters, and this lands in the same commit as the integer-duration fix
 - [ ] **KODI-04**: A full browse-and-play `kodi.log` contains zero `is deprecated` warnings from this add-on
@@ -199,8 +199,8 @@ Cross-cutting notes. `CI-06` (per-phase manual acceptance on Windows and on an A
 | VND-09 | Phase 1 | Pending |
 | VND-10 | Phase 1 | Pending |
 | VND-11 | Phase 1 | Pending |
-| ID-01 | Phase 1 | Pending |
-| ID-02 | Phase 1 | Pending |
+| ID-01 | Phase 1 | Complete |
+| ID-02 | Phase 1 | Complete |
 | ID-03 | Phase 1 | Complete |
 | ID-04 | Phase 1 | Pending |
 | ID-05 | Phase 1 | Pending |
@@ -252,7 +252,7 @@ Cross-cutting notes. `CI-06` (per-phase manual acceptance on Windows and on an A
 | PLAY-08 | Phase 6 | Pending |
 | PLAY-09 | Phase 6 | Pending |
 | PLAY-10 | Phase 7 | Pending |
-| KODI-01 | Phase 1 | Pending |
+| KODI-01 | Phase 1 | Complete |
 | KODI-02 | Phase 1 | Pending |
 | KODI-03 | Phase 7 | Pending |
 | KODI-04 | Phase 7 | Pending |

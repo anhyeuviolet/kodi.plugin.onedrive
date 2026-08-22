@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 01
 current_phase_name: vendor-lift
 status: executing
-stopped_at: Completed 01-02-PLAN.md
-last_updated: "2026-08-22T13:45:40.992Z"
+stopped_at: Completed 01-03-PLAN.md
+last_updated: "2026-08-22T13:52:08.467Z"
 last_activity: 2026-08-22
 last_activity_desc: Phase 01 execution started
 progress:
   total_phases: 1
   completed_phases: 0
   total_plans: 7
-  completed_plans: 1
+  completed_plans: 2
 ---
 
 # Project State
@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (updated 2026-08-22)
 ## Current Position
 
 Phase: 01 (vendor-lift) — EXECUTING
-Plan: 2 of 7
+Plan: 3 of 7
 Status: Ready to execute
 Last activity: 2026-08-22 — Phase 01 execution started
 
-Progress: [█░░░░░░░░░] 14%
+Progress: [███░░░░░░░] 29%
 
 ## Performance Metrics
 
@@ -59,6 +59,7 @@ Progress: [█░░░░░░░░░] 14%
 | Plan | Duration | Tasks | Files |
 |------|----------|-------|-------|
 | Phase 01 P02 | 30min | 2 tasks | 3 files |
+| Phase 01 P03 | 20min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -79,6 +80,9 @@ Load-bearing choices for current work:
 - InfoTag migration is deferred behind auth and playback, but must land in the same commit as the integer-duration fix
 - [Phase 1]: Phase 1 gates live in one pytest file written before any change; the exclusion set is defined once and every sweep carries a non-vacuity guard
 - [Phase 1]: The string-id gate asserts 30012 absent and 32012 present: 32012 is the vendored module's own string and stays, only this add-on's copy is deleted
+- [Phase 1]: Add-on identity is plugin.onedrive.kn / OneDrive KN / Kenny Nguyen, version 1.0.0 (not the 3.0.0 research floated: the two ids never version-compare)
+- [Phase 1]: kodi.wiki Language_support confirmed verbatim: 30000-30999 is reserved for plugins, 32000-32999 for scripts - research assumption A1 is now verified
+- [Phase 1]: allow_directory_listing defaults to false: a recorded behaviour deviation, complete rather than partial because the new id means no user has a stored true
 
 ### Pending Todos
 
@@ -111,6 +115,6 @@ Open concerns:
 
 ## Session Continuity
 
-Last session: 2026-08-22T13:45:32.852Z
-Stopped at: Completed 01-02-PLAN.md
+Last session: 2026-08-22T13:52:08.452Z
+Stopped at: Completed 01-03-PLAN.md
 Resume file: None
