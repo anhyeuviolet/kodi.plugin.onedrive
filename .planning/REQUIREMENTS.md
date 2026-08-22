@@ -31,6 +31,14 @@ Scope note: this is a brownfield refactor. Requirements below describe the targe
 - [ ] **VND-10**: The add-on behaves identically after the vendor commit, verified on a clean profile with every sibling cloud-drive add-on uninstalled, with every dialog opening
 - [ ] **VND-11**: The external `<import>` of `script.module.clouddrive.common` is removed from `addon.xml`
 
+### Identity and attribution
+
+- [ ] **ID-01**: The add-on id becomes `plugin.onedrive.kn`, and every `plugin://` reference, profile path, and internal id lookup follows it — so this is a genuinely separate add-on that can never collide with the official `plugin.onedrive` in the Kodi repository
+- [ ] **ID-02**: `provider-name` in `addon.xml` names the current maintainer, and the display name distinguishes this add-on from the original in the Kodi UI
+- [ ] **ID-03**: `LICENSE.txt` (GPL-3.0-or-later) is retained unchanged and every existing copyright notice is preserved — the code is a derivative work and the licence requires this
+- [ ] **ID-04**: A `CREDITS.md` (or a README section) states that the add-on originates from `plugin.onedrive` by Carlos Guzman (cguZZman) and bundles `script.module.clouddrive.common`, with licences named
+- [ ] **ID-05**: The repository no longer belongs to the upstream fork network, and its commit history is preserved rather than squashed — squashing would destroy the attribution record while keeping the code
+
 ### Authentication
 
 - [ ] **AUTH-01**: A user signs in by reading a code off the TV and entering it on a phone, without typing a URL, username, or password on the remote
@@ -101,12 +109,13 @@ Scope note: this is a brownfield refactor. Requirements below describe the targe
 
 ### Existing-user migration
 
-- [ ] **MIG-01**: An upgrade from v2.3.0 preserves account display names and drive selections
+- [ ] **MIG-01**: Because the add-on id changed, migration reads the old `addon_data/plugin.onedrive/` profile without writing to it, and carries account display names and drive selections into the new profile
 - [ ] **MIG-02**: Stored tokens are discarded and each account is marked as needing re-authentication
 - [ ] **MIG-03**: The user is told at first launch, proactively and in plain language, that they must sign in again and why — not through a failed-refresh error dialog
 - [ ] **MIG-04**: The stored `sign-in-server` and `allow_directory_listing` values are explicitly cleared, since removing a setting definition orphans its stored value rather than clearing it
-- [ ] **MIG-05**: The migration runs once, gated on a `schema_version` setting, and archives the old account database rather than deleting it
+- [ ] **MIG-05**: The migration runs once, gated on a `schema_version` setting, and leaves the old profile untouched — the id change makes migration non-destructive by construction, so a failure can be retried and the original add-on keeps working
 - [ ] **MIG-06**: The migration is verified against the real archived pre-upgrade profile from SETUP-07
+- [ ] **MIG-07**: Installing this add-on alongside the original causes no harm — separate profiles, and neither overwrites the other's settings or accounts
 
 ### Quality and CI
 
@@ -198,6 +207,11 @@ Cross-cutting notes. `CI-06` (per-phase manual acceptance on Windows and real An
 | VND-09 | Phase 1 | Pending |
 | VND-10 | Phase 1 | Pending |
 | VND-11 | Phase 1 | Pending |
+| ID-01 | Phase 1 | Pending |
+| ID-02 | Phase 1 | Pending |
+| ID-03 | Phase 1 | Pending |
+| ID-04 | Phase 1 | Pending |
+| ID-05 | Phase 1 | Pending |
 | AUTH-01 | Phase 3 | Pending |
 | AUTH-02 | Phase 3 | Pending |
 | AUTH-03 | Phase 3 | Pending |
@@ -260,6 +274,7 @@ Cross-cutting notes. `CI-06` (per-phase manual acceptance on Windows and real An
 | MIG-04 | Phase 8 | Pending |
 | MIG-05 | Phase 8 | Pending |
 | MIG-06 | Phase 8 | Pending |
+| MIG-07 | Phase 8 | Pending |
 | CI-01 | Phase 2 | Pending |
 | CI-02 | Phase 2 | Pending |
 | CI-03 | Phase 2 | Pending |
@@ -280,18 +295,18 @@ Cross-cutting notes. `CI-06` (per-phase manual acceptance on Windows and real An
 
 | Phase | Requirements | Count |
 |-------|--------------|-------|
-| 1. Vendor Lift | VND-01..11, KODI-01, KODI-02, SETUP-06, SETUP-07, CI-06 | 16 |
+| 1. Vendor Lift | VND-01..11, ID-01..05, KODI-01, KODI-02, SETUP-06, SETUP-07, CI-06 | 21 |
 | 2. Pure Core and CI Harness | CI-01..05, BROWSE-02, BROWSE-03, BROWSE-04, BROWSE-07, BROWSE-16, SETUP-05 | 11 |
 | 3. Authentication | AUTH-01..23, SETUP-01..04 | 27 |
 | 4. Browse | BROWSE-01, BROWSE-05, BROWSE-06, BROWSE-08..14, ERR-01..03 | 13 |
 | 5. Distribution | DIST-01..05 | 5 |
 | 6. Play | PLAY-01..09 | 9 |
 | 7. Kodi Modernization | KODI-03..08, PLAY-10 | 7 |
-| 8. Existing-User Migration and Release | MIG-01..06, CI-07 | 7 |
+| 8. Existing-User Migration and Release | MIG-01..07, CI-07 | 8 |
 
 **Coverage:**
-- v1 requirements: 95 total
-- Mapped to phases: 95
+- v1 requirements: 101 total
+- Mapped to phases: 101
 - Unmapped: 0 ✓
 
 ---

@@ -59,9 +59,11 @@ The project config has `parallelization: true`, and two of these tracks are genu
 ## Phase Details
 
 ### Phase 1: Vendor Lift
-**Goal**: The add-on carries its own complete, renamed copy of the common module and depends on nothing outside `xbmc.python`, behaving exactly as it did before.
+**Goal**: The add-on carries its own complete, renamed copy of the common module, ships under its own identity, and depends on nothing outside `xbmc.python`, behaving exactly as it did before.
 **Depends on**: Nothing (first phase; head of Track V/P, runs concurrently with Track A)
-**Requirements**: VND-01, VND-02, VND-03, VND-04, VND-05, VND-06, VND-07, VND-08, VND-09, VND-10, VND-11, KODI-01, KODI-02, SETUP-06, SETUP-07, CI-06
+**Requirements**: VND-01, VND-02, VND-03, VND-04, VND-05, VND-06, VND-07, VND-08, VND-09, VND-10, VND-11, ID-01, ID-02, ID-03, ID-04, ID-05, KODI-01, KODI-02, SETUP-06, SETUP-07, CI-06
+
+The identity change (`plugin.onedrive` becomes `plugin.onedrive.kn`) belongs here because it touches the same files as the vendor lift and because it must land before anything writes to the new `addon_data` path. It also makes Phase 8 non-destructive: with a different id, migration reads the old profile rather than overwriting it.
 
 **Prerequisites** (maintainer, not code — do these before the first file is copied):
   1. SETUP-07: archive a real pre-upgrade v2.3.0 profile (`accounts.db` and `settings.xml`). Once overwritten it cannot be recreated, and Phase 8 cannot be verified without it.
@@ -179,7 +181,7 @@ The project config has `parallelization: true`, and two of these tracks are genu
 ### Phase 8: Existing-User Migration and Release
 **Goal**: A v2.3.0 user upgrades, keeps their account names and drive selections, and is told plainly at first launch that they must sign in again and why.
 **Depends on**: Phase 3 (you cannot write "sign in again" before sign-in exists) and Phase 7. Gates the first release published to existing users through the Phase 5 repository.
-**Requirements**: MIG-01, MIG-02, MIG-03, MIG-04, MIG-05, MIG-06, CI-07
+**Requirements**: MIG-01, MIG-02, MIG-03, MIG-04, MIG-05, MIG-06, MIG-07, CI-07
 
 **Success Criteria** (what must be TRUE):
   1. Upgrading the real archived v2.3.0 profile from SETUP-07 preserves every account display name and drive selection, discards every stored token, and marks each account as needing re-authentication. Tokens cannot be carried over at all — refresh tokens are bound to a `client_id`, and the old ones belong to the broker's registration.
