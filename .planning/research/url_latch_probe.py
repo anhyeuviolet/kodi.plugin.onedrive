@@ -33,6 +33,27 @@ touched again.
 Range support matters: without it Kodi cannot seek at all, and the test would measure
 nothing. This serves 206 responses with a correct Content-Range.
 
+This answers ONE of the two questions behind PLAY-06. It does not answer PLAY-06.
+
+    Q1  Does a seek bypass the redirector?        <- this script
+    Q2  How long does a real downloadUrl live?    <- url_lifetime_probe.py
+
+Q1 only matters because of Q2. If Microsoft's URLs live for hours the latch is
+harmless; if they live for minutes the latch is the whole problem. Run both.
+
+Two configurations
+------------------
+`--target-url <a live @microsoft.graph.downloadUrl>` is the **production shape**: a
+local 302 into a real remote host over https, with whatever further redirects that
+host issues on its own. Prefer it. `url_lifetime_probe.py --print-url` hands you one.
+
+Without it the script serves a generated file from a second local port. That still
+tests the latch — the latch is `m_url = efurl` in Kodi's C++ and does not inspect the
+URL — but it does not exercise the http->https scheme change or a redirect chain,
+and over loopback the file arrives so fast that Kodi may buffer past any seek you
+make, returning INCONCLUSIVE. Treat the local mode as a harness check, not as the
+answer.
+
 Usage
 -----
     # 0. check the harness itself works, no Kodi involved
@@ -41,7 +62,10 @@ Usage
     # 1. generate a test video (needs ffmpeg; ~10 min, low bitrate, seekable)
     python url_latch_probe.py --make-media
 
-    # 2. run the probe
+    # 2a. production shape — what to actually trust
+    python url_latch_probe.py --target-url "https://...files.1drv.com/..."
+
+    # 2b. local shape — mechanism only
     python url_latch_probe.py
 
 Then in Kodi: open the .strm the script writes, or paste the redirector URL into
@@ -210,15 +234,26 @@ class Threaded(socketserver.ThreadingMixIn, http.server.HTTPServer):
     allow_reuse_address = True
 
 
-def start_servers(media_path):
-    name = os.path.basename(media_path)
-    MediaHandler.media_path = media_path
-    RedirectHandler.media_url = f"http://127.0.0.1:{MEDIA_PORT}{MEDIA_PREFIX}{name}"
+def start_servers(media_path, target_url=None):
+    """Start the redirector, and the local media server unless redirecting elsewhere.
+
+    With `target_url` set the redirector points at a real remote URL — a live
+    OneDrive `@microsoft.graph.downloadUrl` — which is the production shape and the
+    only configuration that also exercises the http->https scheme change and any
+    further redirect the storage host issues on its own.
+    """
+    RedirectHandler.media_url = target_url or (
+        f"http://127.0.0.1:{MEDIA_PORT}{MEDIA_PREFIX}{os.path.basename(media_path)}"
+    )
 
     red = Threaded(("127.0.0.1", REDIRECT_PORT), RedirectHandler)
+    threading.Thread(target=red.serve_forever, daemon=True).start()
+    if target_url:
+        return red, None
+
+    MediaHandler.media_path = media_path
     med = Threaded(("127.0.0.1", MEDIA_PORT), MediaHandler)
-    for srv in (red, med):
-        threading.Thread(target=srv.serve_forever, daemon=True).start()
+    threading.Thread(target=med.serve_forever, daemon=True).start()
     return red, med
 
 
@@ -277,7 +312,7 @@ def selftest(media_path):
     return 0 if ok else 1
 
 
-def verdict(before, after):
+def verdict(before, after, remote):
     new = after[len(before):]
     red_new = [e for e in new if e["server"] == "redirector"]
     med_new = [e for e in new if e["server"] == "media"]
@@ -288,15 +323,27 @@ def verdict(before, after):
     print("=" * 68)
     print(f"Requests during the seek window: {len(new)}")
     print(f"  redirector : {len(red_new)}")
-    print(f"  media      : {len(med_new)}")
+    if not remote:
+        print(f"  media      : {len(med_new)}")
     print()
 
-    if not med_new:
+    if remote and not red_new:
+        print("Note: the byte requests went straight to the remote host, so this script")
+        print("cannot see them and cannot prove on its own that the seek caused any")
+        print("network activity at all. Before trusting the verdict below, confirm the")
+        print("seek was real: in kodi.log look for a fresh 'CCurlFile::Open' or")
+        print("'FillBuffer - Reconnect' line at the moment you seeked. If there is none,")
+        print("the seek landed in cache and this run measured nothing — seek further.")
+        print()
+
+    if not remote and not med_new:
         print("INCONCLUSIVE — the media server saw no request either.")
         print()
         print("The seek was served from Kodi's cache, so no HTTP happened at all and")
         print("nothing was measured. Re-run and seek much further forward, past what")
-        print("Kodi has already buffered.")
+        print("Kodi has already buffered. Over loopback the whole file arrives almost")
+        print("instantly, so this is the common outcome with a local target — running")
+        print("with --target-url against a real remote URL avoids it.")
         return 2
 
     if red_new:
@@ -326,33 +373,56 @@ def main():
     ap.add_argument("--make-media", action="store_true", help="generate the test video with ffmpeg and exit")
     ap.add_argument("--minutes", type=float, default=10.0, help="length of the generated video (default 10)")
     ap.add_argument("--selftest", action="store_true", help="verify the harness without Kodi")
+    ap.add_argument(
+        "--target-url",
+        help="redirect to this URL instead of the local media server. Pass a live "
+             "OneDrive @microsoft.graph.downloadUrl to run the probe in its production "
+             "shape: a local 302 into a real remote host over https. Get one with "
+             "url_lifetime_probe.py --print-url",
+    )
     args = ap.parse_args()
 
     if args.make_media:
         make_media(args.media, args.minutes)
         return 0
 
-    if not os.path.exists(args.media):
+    remote = bool(args.target_url)
+
+    if not remote and not os.path.exists(args.media):
         print(f"No media file at {args.media}")
         print("Run:  python url_latch_probe.py --make-media")
         print("or:   python url_latch_probe.py --media <path to any video>")
+        print("or:   python url_latch_probe.py --target-url <a real downloadUrl>")
         return 1
 
     if args.selftest:
+        if remote:
+            print("--selftest exercises the local media server; drop --target-url.")
+            return 1
         return selftest(args.media)
 
-    start_servers(args.media)
+    start_servers(args.media, args.target_url)
     time.sleep(0.3)
     url = f"http://127.0.0.1:{REDIRECT_PORT}{STREAM_PATH}"
     with open(DEFAULT_STRM, "w", encoding="utf-8") as fh:
         fh.write(url + "\n")
 
     print("=" * 68)
-    print("URL LATCH PROBE")
+    print("URL LATCH PROBE" + ("  (production shape: real remote target)" if remote else "  (local target)"))
     print("=" * 68)
     print(f"Redirector : {url}")
-    print(f"Redirects to: http://127.0.0.1:{MEDIA_PORT}{MEDIA_PREFIX}{os.path.basename(args.media)}")
-    print(f"Media file : {args.media} ({os.path.getsize(args.media) / 1024 / 1024:.1f} MB)")
+    if remote:
+        shown = args.target_url if len(args.target_url) <= 96 else args.target_url[:93] + "..."
+        print(f"Redirects to: {shown}")
+        print("Byte requests go straight to that host, so they do not appear below.")
+        print("Only redirector hits are visible — which is exactly the signal wanted.")
+    else:
+        print(f"Redirects to: http://127.0.0.1:{MEDIA_PORT}{MEDIA_PREFIX}{os.path.basename(args.media)}")
+        print(f"Media file : {args.media} ({os.path.getsize(args.media) / 1024 / 1024:.1f} MB)")
+        print()
+        print("Local target: the file arrives over loopback almost instantly, so Kodi may")
+        print("buffer past any seek and the run returns INCONCLUSIVE. This configuration")
+        print("tests the latch mechanism; --target-url tests it in production shape.")
     print(f"Playlist   : {DEFAULT_STRM}")
     print()
     print("In Kodi: play that .strm, or Videos -> Files -> Add videos -> paste the")
@@ -371,7 +441,7 @@ def main():
     input("\n>> Press Enter once the seek has completed and playback resumed. ")
 
     time.sleep(1.0)
-    return verdict(before, snapshot())
+    return verdict(before, snapshot(), remote)
 
 
 if __name__ == "__main__":
