@@ -23,6 +23,7 @@ from resources.lib.vendor.clouddrive_common.utils import Utils
 import os
 from resources.lib.vendor.clouddrive_common.export import ExportManager
 import urllib
+import uuid
 
 class DialogProgressBG (xbmcgui.DialogProgressBG):
     _default_heading = None
@@ -123,7 +124,16 @@ class QRDialogProgress(xbmcgui.WindowXMLDialog):
     
     def onInit(self):
         import pyqrcode
-        self._image_path = os.path.join(Utils.unicode(KodiUtils.translate_path(KodiUtils.get_addon_info("profile", "script.module.clouddrive.common"))),"qr.png")
+        profile_path = Utils.unicode(KodiUtils.translate_path(KodiUtils.get_addon_info("profile")))
+        # A brand-new add-on id means a brand-new addon_data directory, which
+        # may not exist on first sign-in; without this the write raises before
+        # the dialog renders. Upstream never needed it: its profile always existed.
+        KodiUtils.mkdirs(profile_path)
+        # Kodi's texture cache is keyed by path, so one fixed name lets a second
+        # sign-in within the same session render the previous image against the
+        # new code - a dialog that looks right showing a code that will not
+        # authorise. A per-invocation name makes the question moot.
+        self._image_path = os.path.join(profile_path, "qr-%s.png" % uuid.uuid4().hex)
         qrcode = pyqrcode.create(self.qr_code)
         qrcode.png(self._image_path, scale=10)
         del qrcode

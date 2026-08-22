@@ -67,7 +67,7 @@ class ErrorReport(object):
             
         addonid = KodiUtils.get_addon_info('id')
         addon_version = KodiUtils.get_addon_info('version')
-        common_addon_version = KodiUtils.get_addon_info('version', 'script.module.clouddrive.common')
+        common_addon_version = KodiUtils.get_addon_info('version')
         report = '[%s] [%s]/[%s]\n\n%s\n%s\n%s\n\n%s' % (addonid, addon_version, common_addon_version, line1, line2, '', stacktrace)
         if rex:
             report += '\n\n%s\nResponse:\n%s' % (rex.request, rex.response)

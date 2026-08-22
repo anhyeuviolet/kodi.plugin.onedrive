@@ -29,7 +29,11 @@ from resources.lib.vendor.clouddrive_common.exception import ExceptionUtils
 class Signin(object):
     
     def get_addon_header(self):
-        return '%s %s/%s' % (KodiUtils.get_addon_info('id'), KodiUtils.get_addon_info('version'), KodiUtils.get_addon_info('version', 'script.module.clouddrive.common'))
+        # The third field was the module's own version. The module is vendored
+        # now and has no version of its own, so this add-on's version stands in
+        # and the three-field shape the sign-in server sees is unchanged.
+        version = KodiUtils.get_addon_info('version')
+        return '%s %s/%s' % (KodiUtils.get_addon_info('id'), version, version)
     
     def create_pin(self, provider_name, request_params=None):
         request_params = Utils.default(request_params, {})

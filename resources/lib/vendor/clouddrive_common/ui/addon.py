@@ -79,7 +79,7 @@ class CloudDriveAddon:
         self._addon_name = self._addon.getAddonInfo('name')
         self._addon_url = sys.argv[0]
         self._addon_version = self._addon.getAddonInfo('version')
-        self._common_addon_id = 'script.module.clouddrive.common'
+        self._common_addon_id = KodiUtils.common_addon_id
         self._common_addon = KodiUtils.get_addon(self._common_addon_id)
         self._common_addon_version = self._common_addon.getAddonInfo('version')
         self._dialog = xbmcgui.Dialog()

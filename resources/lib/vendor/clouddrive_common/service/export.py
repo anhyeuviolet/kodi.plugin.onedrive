@@ -37,7 +37,7 @@ class ExportService(object):
         self.provider = provider_class()
         self.addonid = KodiUtils.get_addon_info('id')
         self._addon_name = KodiUtils.get_addon_info('name')
-        self._common_addon_id = 'script.module.clouddrive.common'
+        self._common_addon_id = KodiUtils.common_addon_id
         self._common_addon = KodiUtils.get_addon(self._common_addon_id)
         self._profile_path = Utils.unicode(KodiUtils.translate_path(KodiUtils.get_addon_info('profile')))
         self._startup_type = Utils.str(ExportScheduleDialog._startup_type)

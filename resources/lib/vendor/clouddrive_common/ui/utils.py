@@ -30,7 +30,10 @@ class KodiUtils:
     LOGWARNING = 2
     LOGERROR = 3
     lock = Lock()
-    common_addon_id = 'script.module.clouddrive.common'
+    # None means "the calling add-on": get_addon() then constructs
+    # xbmcaddon.Addon() with no argument, so the common add-on and this
+    # add-on are the same object rather than two that happen to agree.
+    common_addon_id = None
     
     @staticmethod
     def get_addon(addonid=None):
