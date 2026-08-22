@@ -148,7 +148,7 @@ Full analysis in `.planning/research/` — `SUMMARY.md` carries the reconciled p
 - **Accounts**: OneDrive Personal and OneDrive for Business. Some Business tenants block third-party apps pending admin consent; the add-on cannot work around this, so a custom-`client_id` escape hatch is required.
 - **Dependencies**: No external OAuth broker, and after vendoring, no dependency on `script.module.clouddrive.common` from the Kodi repository.
 - **Security**: OAuth tokens stay on the device. No third party sees authorization codes or refresh tokens.
-- **Testing**: Kodi behavior cannot be fully unit-tested. Automated tests cover pure logic; every phase also carries a manual acceptance pass on real Windows and Android TV installs.
+- **Testing**: Kodi behavior cannot be fully unit-tested. Automated tests cover pure logic; every phase also carries a manual acceptance pass on Windows and on an Android phone running Kodi over `adb`. The Android TV box is the design authority, not a test device — it is exercised by use and checked before release. The phone is a sound proxy for OS-level behaviour (storage regime, mode bits, `O_EXCL`, loopback) because those follow the API level, which matches; it is not a proxy for D-pad focus, 10-foot readability, or low-end performance, and no test claims otherwise.
 
 ## Key Decisions
 

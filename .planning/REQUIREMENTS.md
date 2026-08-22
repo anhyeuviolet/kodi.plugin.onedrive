@@ -14,7 +14,7 @@ Scope note: this is a brownfield refactor. Requirements below describe the targe
 - [ ] **SETUP-03**: No client secret or certificate exists on the registration, and none appears anywhere in the repository
 - [ ] **SETUP-04**: A written registration runbook lives in the repo, including the `AADSTS7000218` symptom of skipping SETUP-02
 - [ ] **SETUP-05**: Two test accounts are available — one personal Microsoft account and one work/school account
-- [ ] **SETUP-06**: A clean test environment exists — a Kodi profile with no sibling cloud-drive add-ons installed, plus a real Android TV box on Wi-Fi with a real remote
+- [ ] **SETUP-06**: A clean test environment exists — a Kodi profile with no sibling cloud-drive add-ons installed, plus an Android phone running Kodi and reachable over `adb`, which is the Android test device. The Android TV box is the deployment target and the design authority for the 10-foot interface, but it is not a test device: it is exercised by use, and only at release (see CI-06)
 ### Vendoring
 
 - [ ] **VND-01**: `script.module.clouddrive.common` v1.4.0 is vendored into the repo from the `matrix` branch, not the `master` branch, which carries the Python 2 / Kodi 18 line
@@ -116,7 +116,7 @@ Scope note: this is a brownfield refactor. Requirements below describe the targe
 - [ ] **CI-03**: Graph fixtures are recorded from both a Personal and a Business drive and are labelled by source
 - [ ] **CI-04**: CI runs the test suite plus `kodi-addon-checker` against the nexus, omega, and piers branches
 - [ ] **CI-05**: CI fails on any occurrence of `client_secret`, `client_assertion`, `eval(`, or `script.module.clouddrive.common`
-- [ ] **CI-06**: Every phase carries a manual acceptance pass on Windows and on real Android TV hardware with a remote
+- [ ] **CI-06**: Every phase carries a manual acceptance pass on Windows and on Android, where Android means an Android phone running Kodi and reachable over `adb`. The phone is a valid proxy for every OS-level question — storage paths, file mode bits, `O_EXCL`, loopback binding — because those are API-level behaviours, not form-factor ones, and the phone matches the target box's Android 11/12 storage regime. It is **not** a proxy for the two things only the TV can answer: D-pad focus and 10-foot readability, and low-end box performance. Those are checked on the TV before release (CI-07), and by using it
 - [ ] **CI-07**: The release gate requires at least one full acceptance pass on a clean profile using a Business account
 
 ### Error handling
@@ -177,7 +177,7 @@ Mapped during roadmap creation. Every v1 requirement belongs to exactly one phas
 
 Phase names: 1 Vendor Lift · 2 Pure Core and CI Harness · 3 Authentication · 4 Browse · 5 Distribution · 6 Play · 7 Kodi Modernization · 8 Existing-User Migration and Release.
 
-Cross-cutting notes. `CI-06` (per-phase manual acceptance on Windows and real Android TV hardware) is established in Phase 1 and inherited as a standard by every later phase; `CI-07` is the release gate and sits in the final phase. `ERR-01` to `ERR-03` land in Phase 4, the first point at which the central HTTP layer, the auth error map, and the listing error paths all exist, so the failure states can be shown to be distinguishable from one another rather than asserted piecemeal. `SETUP-01` to `SETUP-04` are the Azure registration and appear as a maintainer prerequisite block on Phase 3, not as implementation work. `PLAY-10` sits in Phase 7 rather than Phase 6 because `KODI-03` requires the float-to-int duration fix to land in the same commit as the typed InfoTag setters.
+Cross-cutting notes. `CI-06` (per-phase manual acceptance on Windows and on an Android phone; the TV is release-only) is established in Phase 1 and inherited as a standard by every later phase; `CI-07` is the release gate and sits in the final phase. `ERR-01` to `ERR-03` land in Phase 4, the first point at which the central HTTP layer, the auth error map, and the listing error paths all exist, so the failure states can be shown to be distinguishable from one another rather than asserted piecemeal. `SETUP-01` to `SETUP-04` are the Azure registration and appear as a maintainer prerequisite block on Phase 3, not as implementation work. `PLAY-10` sits in Phase 7 rather than Phase 6 because `KODI-03` requires the float-to-int duration fix to land in the same commit as the typed InfoTag setters.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|

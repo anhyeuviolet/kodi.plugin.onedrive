@@ -4,7 +4,7 @@
 
 The add-on is dead in one specific place: sign-in went with a Heroku free dyno in November 2022. Everything else still works, sitting on top of an unmaintained external module with an unpinnable version constraint. The journey is therefore: take ownership of that module first and alone, prove the pure parsing logic against real Graph JSON while an Azure registration is being stood up in parallel, then build in-add-on device-code authentication until a user can sign in from a sofa with a remote. Those two tracks converge at a Graph client that browses drives, at which point the self-hosted repository goes up immediately — its auto-update test has multi-hour latency and must overlap later work rather than block a release. Playback follows and delivers the core value: a file from OneDrive plays and keeps playing across a long pause and a seek. Then the deferrable cleanups — typed InfoTag setters, the modern settings schema, the deletion of the unauthenticated directory-listing server — and finally a release gate: one clean pass on real hardware with both account types, and a decision on where the embedded `client_id` will live long term.
 
-The dominant risks here are silent, not hard. A discarded rotated refresh token works perfectly for 90 days and then kills every user at once. Vendoring while a sibling cloud-drive add-on is installed breaks only on clean installs. A stale repository index stops auto-updates for everyone except the maintainer. The success criteria below are written as mechanical checks — greps, log assertions, two-interpreter tests, a clean profile, a Business account, and a real Android TV box with a real remote — because vigilance does not catch this class of failure and structure does.
+The dominant risks here are silent, not hard. A discarded rotated refresh token works perfectly for 90 days and then kills every user at once. Vendoring while a sibling cloud-drive add-on is installed breaks only on clean installs. A stale repository index stops auto-updates for everyone except the maintainer. The success criteria below are written as mechanical checks — greps, log assertions, two-interpreter tests, a clean profile, a Business account, and a real Android device — because vigilance does not catch this class of failure and structure does.
 
 ## Phases
 
@@ -69,8 +69,8 @@ The identity change (`plugin.onedrive` becomes `plugin.onedrive.kn`) belongs her
 
 **Prerequisites** (maintainer, not code — do these before the first file is copied):
 
-  1. SETUP-06: provision a clean Kodi profile with `plugin.googledrive`, `plugin.dropbox` and `script.module.clouddrive.common` uninstalled, plus a real Android TV box on Wi-Fi with a real remote.
-  2. Decide the vendored package name. Reversing it later means redoing every import.
+  1. SETUP-06: provision a clean Kodi profile with `plugin.googledrive`, `plugin.dropbox` and `script.module.clouddrive.common` uninstalled, plus an Android phone running Kodi and reachable over `adb`. The Android TV box is the deployment target, not a test device — see CI-06.
+  2. Decide the vendored package name. Reversing it later means redoing every import. *(Decided: `resources/lib/vendor/clouddrive_common/`.)*
 
 **Success Criteria** (what must be TRUE):
 
@@ -78,7 +78,7 @@ The identity change (`plugin.onedrive` becomes `plugin.onedrive.kn`) belongs her
   2. Kodi 19 mechanically refuses to install the add-on; Kodi 20, 21 and 22 install it and load both the plugin and service entry points.
   3. On the clean profile from SETUP-06, with every sibling cloud-drive add-on and the external common module uninstalled, the add-on behaves as it did before the vendor commit (modulo the already-dead broker) and every dialog opens — including the one that writes `qr.png`, which is the one that lands on the sign-in screen.
   4. `VENDORED.md` records upstream URL, the `matrix` branch, version 1.4.0, the commit SHA, per-subtree licence and local modifications; both the GPL-3.0 and the Apache-2.0 licence files survive, and every outbound HTTP call in the vendored tree passes an explicit `timeout=`.
-  5. Manual acceptance pass on Windows and on the real Android TV box with a remote, on a clean profile — establishing the per-phase standard (CI-06) that every later phase inherits.
+  5. Manual acceptance pass on Windows and on the Android phone over `adb`, on a clean profile — establishing the per-phase standard (CI-06) that every later phase inherits. The Android TV box is the deployment target, not a test device; it is checked before release.
 
 **Plans**: 7 plans
 
@@ -118,7 +118,7 @@ Plans:
   2. Fixture tests, recorded from both a Personal and a Business drive and labelled by source, cover item extraction, paging, per-segment path encoding (`Ryan's Files` to `Ryan's%20Files`, `Break#Out` to `Break%23Out`, `estimate%s.docx` to `estimate%25s.docx`) and OData literal quoting.
   3. 1,500 fixture pages fed through the pager raise no `RecursionError`; cancelling mid-listing returns `[]` and never `None`; a search followed by a folder listing still returns folders; and a reshaped or truncated Graph response produces a handled error rather than a `KeyError`.
   4. CI runs pytest plus `kodi-addon-checker` against the nexus, omega and piers branches on every push, and is green.
-  5. Manual acceptance on Windows and on the real Android TV box: the add-on still installs and loads after the logic is extracted, with no user-visible change.
+  5. Manual acceptance on Windows and on the Android phone: the add-on still installs and loads after the logic is extracted, with no user-visible change.
 
 **Plans**: TBD (4 expected)
 
@@ -138,7 +138,7 @@ Plans:
 
 **Success Criteria** (what must be TRUE):
 
-  1. On real Android TV hardware, sign-in completes end to end against the project's own registration — once with a personal Microsoft account and once with a work/school account — by reading a code off the screen and entering it on a phone, with no URL, username or password typed on the remote. A blocking or consent-requiring tenant produces a message naming the cause and pointing at the Expert-level custom `client_id` setting, and the exact `AADSTS` code it returns is recorded.
+  1. On real Android TV hardware, sign-in completes end to end against the project's own registration — once with a personal Microsoft account and once with a work/school account — by reading a code off the screen and entering it on a phone, with no URL, username or password typed on the remote. A blocking or consent-requiring tenant produces a message naming the cause and pointing at the Expert-level custom `client_id` setting, and the exact `AADSTS` code it returns is recorded. **CI-06 exception — resolve when planning this phase:** the phone cannot proxy this one. "Read a code off the screen and enter it on a phone" is degenerate when the screen *is* the phone, and "no URL or password typed on the remote" is a remote-interaction claim. The token exchange and the `AADSTS` mapping are verifiable on the phone; the 10-foot flow itself is a TV check, so it either moves to release or becomes a use-and-report observation.
   2. The authorization request carries exactly `https://graph.microsoft.com/Files.Read offline_access openid profile`; a grep finds no `Files.Read.All`, no write scope, no `.default`, no `client_secret`, no `client_assertion`, and no reference to `sign-in-server` or any external broker anywhere in the tree.
   3. An automated test proves the persisted refresh token changed across two consecutive refreshes, and that a token response omitting `refresh_token` retains the previous one. A two-interpreter test shows the `O_EXCL` lock serialises refreshes and that a loser receiving `invalid_grant` re-reads the store and adopts the winner's token instead of signing the user out; no `threading.Lock` or `fcntl.lockf` appears in the auth package.
   4. The add-on root is the account list, with an "Add an account…" row and per-row re-authorise and remove. Labels come from Graph, Back or Esc during sign-in leaves no partially-created account, tokens and delta tokens and cache keys are isolated per account, and the background service never opens a sign-in dialog.
@@ -159,7 +159,7 @@ Plans:
   2. A request trace of an account load shows `/me/drives` and no bare `/drives` call; every outbound call carries a `timeout=`; a 429 is retried after exactly its `Retry-After`, slept via `Monitor.waitForAbort`; and a 401 retries exactly once.
   3. Every `ListItem` is constructed with `offscreen=True`, items are added in chunks, thumbnails come from `$expand=thumbnails` at the smallest useful size, and a test asserts `endOfDirectory` is called exactly once per invocation including on the error path.
   4. No network, expired token, tenant-blocked, admin-consent-required and rate-limited each render as a distinct actionable sentence on screen, distinguishable from one another with no log, console or keyboard available to the user.
-  5. Manual acceptance on real Android TV hardware: a 500-item folder lists at an acceptable speed with the timings recorded, and quitting Kodi with that listing in flight shuts down cleanly.
+  5. Manual acceptance on the Android phone: a 500-item folder lists at an acceptable speed with the timings recorded, and quitting Kodi with that listing in flight shuts down cleanly. **CI-06 exception — resolve when planning this phase:** the clean-shutdown half transfers to the phone, the *timing* half does not. A phone is far faster than a 1–2 GB TV box, so a green timing here is not evidence about the target device. Either record the phone timing as a floor and re-check on the TV before release, or state the acceptable-speed threshold as a bound the phone must beat by a stated margin.
 
 **Plans**: TBD (4 expected)
 **UI hint**: yes
@@ -194,7 +194,7 @@ Plans:
   2. Kodi is never handed a Graph URL: the URL passed to `setResolvedUrl` is `http://127.0.0.1:<dynamically allocated port>/<per-session random token>/…`, `setResolvedUrl` is called exactly once per playback invocation, and a grep of directory item URLs and of any exported `.strm` finds no `@microsoft.graph.downloadUrl`. A guessed item id alone is not sufficient to reach the redirector.
   3. The real download-URL lifetime is measured at T+1, +5, +15, +30 and +60 minutes separately on a Personal and a Business drive, and the numbers are recorded in the repo.
   4. Same-name subtitles are discovered across Kodi's full extension set including language suffixes and VOBsub `.idx`/`.sub` pairs, are served through the same redirector as media, and failure is silent.
-  5. Manual acceptance on real Android TV hardware: a file over two hours plays, is paused 20-30 minutes past the measured URL lifetime, resumes, and then seeks forward without error.
+  5. Manual acceptance on the Android phone: a file over two hours plays, is paused 20-30 minutes past the measured URL lifetime, resumes, and then seeks forward without error. This one transfers cleanly — what it exercises is Kodi's URL latch and Microsoft's URL lifetime, both platform-independent, and the deciding observation (does a seek produce a second request at the redirector?) is reproducible on Windows. Run PLAY-07 first: it decides whether this criterion is achievable with a redirector alone.
 
 **Plans**: TBD (4 expected)
 
