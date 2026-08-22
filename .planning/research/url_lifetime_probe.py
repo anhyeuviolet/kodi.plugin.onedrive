@@ -44,6 +44,7 @@ reports what it has established so far rather than discarding it.
 import argparse
 import datetime
 import json
+import os
 import sys
 import time
 import urllib.error
@@ -142,6 +143,26 @@ def probe(url):
         return False, type(e).__name__
 
 
+_out_fh = None
+
+
+def say(line=""):
+    """Print, and persist. A twelve-hour measurement whose only record is a terminal
+    scrollback is one closed window away from having to be re-run from zero."""
+    print(line, flush=True)
+    if _out_fh:
+        _out_fh.write(line + "\n")
+        _out_fh.flush()
+
+
+def open_out(path):
+    global _out_fh
+    _out_fh = open(path, "a", encoding="utf-8")
+    stamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    _out_fh.write(f"\n{'=' * 68}\nrun started {stamp}\n")
+    _out_fh.flush()
+
+
 def wait_visibly(seconds):
     """Sleep, but keep saying so.
 
@@ -161,6 +182,8 @@ def wait_visibly(seconds):
 
 
 def report(started, last_ok, first_fail, detail, interval):
+    # Every line of the verdict goes to the log file as well as the screen.
+    print = say  # noqa: A001 - deliberate local rebind, see say()
     print()
     print("=" * 68)
     print("RESULT — PLAY-07")
@@ -206,7 +229,14 @@ def main():
     ap.add_argument("--interval", type=float, default=5.0, help="minutes between polls (default 5)")
     ap.add_argument("--max-hours", type=float, default=12.0, help="give up after this long (default 12)")
     ap.add_argument("--print-url", action="store_true", help="print a live downloadUrl and exit")
+    ap.add_argument(
+        "--out",
+        default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "url-lifetime-results.log"),
+        help="append every poll line and the final verdict here (default: url-lifetime-results.log "
+             "beside this script). The run can outlive the terminal window it started in.",
+    )
     args = ap.parse_args()
+    open_out(args.out)
 
     token = sign_in(args.client_id, args.authority)
     item = pick_item(token, args.item_id)
@@ -235,7 +265,7 @@ def main():
             ok, detail = probe(url)
             mins = (time.time() - started) / 60.0
             stamp = datetime.datetime.now().strftime("%H:%M:%S")
-            print(f"  [{stamp}] +{mins:6.1f} min  {'ok ' if ok else 'FAIL'}  {detail}", flush=True)
+            say(f"  [{stamp}] +{mins:6.1f} min  {'ok ' if ok else 'FAIL'}  {detail}")
             if ok:
                 last_ok = time.time()
             else:
