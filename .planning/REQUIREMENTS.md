@@ -171,16 +171,127 @@ Deferred. Tracked, not in the current roadmap.
 
 ## Traceability
 
-Populated during roadmap creation.
+Mapped during roadmap creation. Every v1 requirement belongs to exactly one phase.
+
+Phase names: 1 Vendor Lift · 2 Pure Core and CI Harness · 3 Authentication · 4 Browse · 5 Distribution · 6 Play · 7 Kodi Modernization · 8 Existing-User Migration and Release.
+
+Cross-cutting notes. `CI-06` (per-phase manual acceptance on Windows and real Android TV hardware) is established in Phase 1 and inherited as a standard by every later phase; `CI-07` is the release gate and sits in the final phase. `ERR-01` to `ERR-03` land in Phase 4, the first point at which the central HTTP layer, the auth error map, and the listing error paths all exist, so the failure states can be shown to be distinguishable from one another rather than asserted piecemeal. `SETUP-01` to `SETUP-04` are the Azure registration and appear as a maintainer prerequisite block on Phase 3, not as implementation work. `PLAY-10` sits in Phase 7 rather than Phase 6 because `KODI-03` requires the float-to-int duration fix to land in the same commit as the typed InfoTag setters.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| — | — | Pending |
+| SETUP-01 | Phase 3 | Pending |
+| SETUP-02 | Phase 3 | Pending |
+| SETUP-03 | Phase 3 | Pending |
+| SETUP-04 | Phase 3 | Pending |
+| SETUP-05 | Phase 2 | Pending |
+| SETUP-06 | Phase 1 | Pending |
+| SETUP-07 | Phase 1 | Pending |
+| VND-01 | Phase 1 | Pending |
+| VND-02 | Phase 1 | Pending |
+| VND-03 | Phase 1 | Pending |
+| VND-04 | Phase 1 | Pending |
+| VND-05 | Phase 1 | Pending |
+| VND-06 | Phase 1 | Pending |
+| VND-07 | Phase 1 | Pending |
+| VND-08 | Phase 1 | Pending |
+| VND-09 | Phase 1 | Pending |
+| VND-10 | Phase 1 | Pending |
+| VND-11 | Phase 1 | Pending |
+| AUTH-01 | Phase 3 | Pending |
+| AUTH-02 | Phase 3 | Pending |
+| AUTH-03 | Phase 3 | Pending |
+| AUTH-04 | Phase 3 | Pending |
+| AUTH-05 | Phase 3 | Pending |
+| AUTH-06 | Phase 3 | Pending |
+| AUTH-07 | Phase 3 | Pending |
+| AUTH-08 | Phase 3 | Pending |
+| AUTH-09 | Phase 3 | Pending |
+| AUTH-10 | Phase 3 | Pending |
+| AUTH-11 | Phase 3 | Pending |
+| AUTH-12 | Phase 3 | Pending |
+| AUTH-13 | Phase 3 | Pending |
+| AUTH-14 | Phase 3 | Pending |
+| AUTH-15 | Phase 3 | Pending |
+| AUTH-16 | Phase 3 | Pending |
+| AUTH-17 | Phase 3 | Pending |
+| AUTH-18 | Phase 3 | Pending |
+| AUTH-19 | Phase 3 | Pending |
+| AUTH-20 | Phase 3 | Pending |
+| AUTH-21 | Phase 3 | Pending |
+| AUTH-22 | Phase 3 | Pending |
+| AUTH-23 | Phase 3 | Pending |
+| BROWSE-01 | Phase 4 | Pending |
+| BROWSE-02 | Phase 2 | Pending |
+| BROWSE-03 | Phase 2 | Pending |
+| BROWSE-04 | Phase 2 | Pending |
+| BROWSE-05 | Phase 4 | Pending |
+| BROWSE-06 | Phase 4 | Pending |
+| BROWSE-07 | Phase 2 | Pending |
+| BROWSE-08 | Phase 4 | Pending |
+| BROWSE-09 | Phase 4 | Pending |
+| BROWSE-10 | Phase 4 | Pending |
+| BROWSE-11 | Phase 4 | Pending |
+| BROWSE-12 | Phase 4 | Pending |
+| BROWSE-13 | Phase 4 | Pending |
+| BROWSE-14 | Phase 4 | Pending |
+| PLAY-01 | Phase 6 | Pending |
+| PLAY-02 | Phase 6 | Pending |
+| PLAY-03 | Phase 6 | Pending |
+| PLAY-04 | Phase 6 | Pending |
+| PLAY-05 | Phase 6 | Pending |
+| PLAY-06 | Phase 6 | Pending |
+| PLAY-07 | Phase 6 | Pending |
+| PLAY-08 | Phase 6 | Pending |
+| PLAY-09 | Phase 6 | Pending |
+| PLAY-10 | Phase 7 | Pending |
+| KODI-01 | Phase 1 | Pending |
+| KODI-02 | Phase 1 | Pending |
+| KODI-03 | Phase 7 | Pending |
+| KODI-04 | Phase 7 | Pending |
+| KODI-05 | Phase 7 | Pending |
+| KODI-06 | Phase 7 | Pending |
+| KODI-07 | Phase 7 | Pending |
+| KODI-08 | Phase 7 | Pending |
+| MIG-01 | Phase 8 | Pending |
+| MIG-02 | Phase 8 | Pending |
+| MIG-03 | Phase 8 | Pending |
+| MIG-04 | Phase 8 | Pending |
+| MIG-05 | Phase 8 | Pending |
+| MIG-06 | Phase 8 | Pending |
+| CI-01 | Phase 2 | Pending |
+| CI-02 | Phase 2 | Pending |
+| CI-03 | Phase 2 | Pending |
+| CI-04 | Phase 2 | Pending |
+| CI-05 | Phase 2 | Pending |
+| CI-06 | Phase 1 | Pending |
+| CI-07 | Phase 8 | Pending |
+| ERR-01 | Phase 4 | Pending |
+| ERR-02 | Phase 4 | Pending |
+| ERR-03 | Phase 4 | Pending |
+| DIST-01 | Phase 5 | Pending |
+| DIST-02 | Phase 5 | Pending |
+| DIST-03 | Phase 5 | Pending |
+| DIST-04 | Phase 5 | Pending |
+| DIST-05 | Phase 5 | Pending |
+
+**Coverage by phase:**
+
+| Phase | Requirements | Count |
+|-------|--------------|-------|
+| 1. Vendor Lift | VND-01..11, KODI-01, KODI-02, SETUP-06, SETUP-07, CI-06 | 16 |
+| 2. Pure Core and CI Harness | CI-01..05, BROWSE-02, BROWSE-03, BROWSE-04, BROWSE-07, SETUP-05 | 10 |
+| 3. Authentication | AUTH-01..23, SETUP-01..04 | 27 |
+| 4. Browse | BROWSE-01, BROWSE-05, BROWSE-06, BROWSE-08..14, ERR-01..03 | 13 |
+| 5. Distribution | DIST-01..05 | 5 |
+| 6. Play | PLAY-01..09 | 9 |
+| 7. Kodi Modernization | KODI-03..08, PLAY-10 | 7 |
+| 8. Existing-User Migration and Release | MIG-01..06, CI-07 | 7 |
 
 **Coverage:**
 - v1 requirements: 94 total
-- Mapped to phases: 0
-- Unmapped: 94 ⚠️
+- Mapped to phases: 94
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-08-22*
+*Traceability mapped: 2026-08-22*
