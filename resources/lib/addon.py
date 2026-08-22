@@ -214,7 +214,11 @@ class OneDriveAddon(CloudDriveAddon):
             Logger.error(ex)
         finally:
             try:
-                KodiUtils.rmdir(smoke_path, True)
+                # rmdir returns False rather than raising when the throwaway
+                # store's connections have not been released yet, so use the
+                # helper that waits and retries, and log what it returned
+                # rather than assuming it worked.
+                say('scratch store removed', Utils.remove_folder(smoke_path))
             except Exception as ex:
                 Logger.error('dialog-smoke: could not remove %s' % smoke_path)
                 Logger.error(ex)
