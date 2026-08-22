@@ -214,11 +214,16 @@ class OneDriveAddon(CloudDriveAddon):
             Logger.error(ex)
         finally:
             try:
-                # rmdir returns False rather than raising when the throwaway
-                # store's connections have not been released yet, so use the
-                # helper that waits and retries, and log what it returned
-                # rather than assuming it worked.
-                say('scratch store removed', Utils.remove_folder(smoke_path))
+                # rmdir will not remove a directory that still has files in
+                # it, and it reports that by returning False rather than by
+                # raising - so empty it first, then remove it, and log what
+                # the removal actually returned rather than assuming.
+                for name in xbmcvfs.listdir(smoke_path)[1]:
+                    xbmcvfs.delete(os.path.join(smoke_path, name))
+                # Kodi's VFS wants a trailing separator before it will treat
+                # the argument as a directory to remove.
+                say('scratch store removed',
+                    Utils.remove_folder(smoke_path + os.sep))
             except Exception as ex:
                 Logger.error('dialog-smoke: could not remove %s' % smoke_path)
                 Logger.error(ex)
