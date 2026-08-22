@@ -23,15 +23,15 @@ import time
 import urllib
 from urllib.error import HTTPError
 
-from clouddrive.common.account import AccountManager
-from clouddrive.common.exception import ExceptionUtils, RequestException
-from clouddrive.common.html import XHTML
-from clouddrive.common.remote.errorreport import ErrorReport
-from clouddrive.common.service.base import BaseServerService, BaseHandler
-from clouddrive.common.ui.logger import Logger
-from clouddrive.common.ui.utils import KodiUtils
-from clouddrive.common.utils import Utils
-from clouddrive.common.cache.cache import Cache
+from resources.lib.vendor.clouddrive_common.account import AccountManager
+from resources.lib.vendor.clouddrive_common.exception import ExceptionUtils, RequestException
+from resources.lib.vendor.clouddrive_common.html import XHTML
+from resources.lib.vendor.clouddrive_common.remote.errorreport import ErrorReport
+from resources.lib.vendor.clouddrive_common.service.base import BaseServerService, BaseHandler
+from resources.lib.vendor.clouddrive_common.ui.logger import Logger
+from resources.lib.vendor.clouddrive_common.ui.utils import KodiUtils
+from resources.lib.vendor.clouddrive_common.utils import Utils
+from resources.lib.vendor.clouddrive_common.cache.cache import Cache
 from urllib.parse import urlparse
 
 

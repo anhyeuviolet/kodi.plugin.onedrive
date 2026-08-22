@@ -24,9 +24,9 @@ import shutil
 import socket
 import threading
 
-from clouddrive.common.ui.logger import Logger
-from clouddrive.common.ui.utils import KodiUtils
-from clouddrive.common.utils import Utils
+from resources.lib.vendor.clouddrive_common.ui.logger import Logger
+from resources.lib.vendor.clouddrive_common.ui.utils import KodiUtils
+from resources.lib.vendor.clouddrive_common.utils import Utils
 
 class BaseServerService(object):
     _interface = '127.0.0.1'

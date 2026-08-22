@@ -21,8 +21,8 @@ import datetime
 import sqlite3
 import time
 
-from clouddrive.common.ui.logger import Logger
-from clouddrive.common.ui.utils import KodiUtils
+from resources.lib.vendor.clouddrive_common.ui.logger import Logger
+from resources.lib.vendor.clouddrive_common.ui.utils import KodiUtils
 
 
 class Cache(object):

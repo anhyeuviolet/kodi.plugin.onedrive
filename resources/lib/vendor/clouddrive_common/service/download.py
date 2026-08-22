@@ -17,13 +17,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 
-from clouddrive.common.account import AccountManager
-from clouddrive.common.exception import ExceptionUtils
-from clouddrive.common.remote.errorreport import ErrorReport
-from clouddrive.common.service.base import BaseServerService, BaseHandler
-from clouddrive.common.ui.logger import Logger
-from clouddrive.common.ui.utils import KodiUtils
-from clouddrive.common.utils import Utils
+from resources.lib.vendor.clouddrive_common.account import AccountManager
+from resources.lib.vendor.clouddrive_common.exception import ExceptionUtils
+from resources.lib.vendor.clouddrive_common.remote.errorreport import ErrorReport
+from resources.lib.vendor.clouddrive_common.service.base import BaseServerService, BaseHandler
+from resources.lib.vendor.clouddrive_common.ui.logger import Logger
+from resources.lib.vendor.clouddrive_common.ui.utils import KodiUtils
+from resources.lib.vendor.clouddrive_common.utils import Utils
 from urllib.error import HTTPError
 
 

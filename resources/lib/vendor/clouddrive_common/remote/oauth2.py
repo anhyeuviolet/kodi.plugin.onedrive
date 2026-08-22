@@ -22,9 +22,9 @@ import re
 import time
 import urllib
 
-from clouddrive.common.exception import ExceptionUtils, RequestException
-from clouddrive.common.remote.request import Request
-from clouddrive.common.utils import Utils
+from resources.lib.vendor.clouddrive_common.exception import ExceptionUtils, RequestException
+from resources.lib.vendor.clouddrive_common.remote.request import Request
+from resources.lib.vendor.clouddrive_common.utils import Utils
 from urllib.error import HTTPError
 
 

@@ -18,10 +18,10 @@
 #-------------------------------------------------------------------------------
 
 import xbmcgui, xbmcvfs
-from clouddrive.common.ui.utils import KodiUtils
-from clouddrive.common.utils import Utils
+from resources.lib.vendor.clouddrive_common.ui.utils import KodiUtils
+from resources.lib.vendor.clouddrive_common.utils import Utils
 import os
-from clouddrive.common.export import ExportManager
+from resources.lib.vendor.clouddrive_common.export import ExportManager
 import urllib
 
 class DialogProgressBG (xbmcgui.DialogProgressBG):

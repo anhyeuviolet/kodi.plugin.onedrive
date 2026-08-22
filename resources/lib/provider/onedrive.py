@@ -17,9 +17,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 
-from clouddrive.common.remote.provider import Provider
-from clouddrive.common.utils import Utils
-from clouddrive.common.exception import RequestException, ExceptionUtils
+from resources.lib.vendor.clouddrive_common.remote.provider import Provider
+from resources.lib.vendor.clouddrive_common.utils import Utils
+from resources.lib.vendor.clouddrive_common.exception import RequestException, ExceptionUtils
 
 import urllib
 from urllib.error import HTTPError

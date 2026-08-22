@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-from clouddrive.common.ui.logger import Logger
+from resources.lib.vendor.clouddrive_common.ui.logger import Logger
 from timeit import default_timer as timer
 
 class Utils:
@@ -131,7 +131,7 @@ class Utils:
 
     @staticmethod
     def remove_folder(folder_path, system_monitor=None):
-        from clouddrive.common.ui.utils import KodiUtils
+        from resources.lib.vendor.clouddrive_common.ui.utils import KodiUtils
         if not KodiUtils.rmdir(folder_path, True):
             if not system_monitor:
                 system_monitor=KodiUtils.get_system_monitor()

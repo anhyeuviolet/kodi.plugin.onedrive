@@ -20,12 +20,12 @@
 import threading
 import urllib
 
-from clouddrive.common.exception import ExceptionUtils, RequestException
-from clouddrive.common.remote.request import Request
-from clouddrive.common.ui.logger import Logger
-from clouddrive.common.ui.utils import KodiUtils
-from clouddrive.common.utils import Utils
-from clouddrive.common.account import DriveNotFoundException
+from resources.lib.vendor.clouddrive_common.exception import ExceptionUtils, RequestException
+from resources.lib.vendor.clouddrive_common.remote.request import Request
+from resources.lib.vendor.clouddrive_common.ui.logger import Logger
+from resources.lib.vendor.clouddrive_common.ui.utils import KodiUtils
+from resources.lib.vendor.clouddrive_common.utils import Utils
+from resources.lib.vendor.clouddrive_common.account import DriveNotFoundException
 from urllib.error import HTTPError
 
 

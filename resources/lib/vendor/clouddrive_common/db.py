@@ -19,9 +19,9 @@
 
 import sqlite3
 
-from clouddrive.common.ui.logger import Logger
-from clouddrive.common.ui.utils import KodiUtils
-from clouddrive.common.utils import Utils
+from resources.lib.vendor.clouddrive_common.ui.logger import Logger
+from resources.lib.vendor.clouddrive_common.ui.utils import KodiUtils
+from resources.lib.vendor.clouddrive_common.utils import Utils
 
 
 class SimpleKeyValueDb(object):

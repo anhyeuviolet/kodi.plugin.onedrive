@@ -25,23 +25,23 @@ import time
 import urllib
 from urllib.error import HTTPError, URLError
 
-from clouddrive.common.account import AccountManager, AccountNotFoundException, \
+from resources.lib.vendor.clouddrive_common.account import AccountManager, AccountNotFoundException, \
     DriveNotFoundException
-from clouddrive.common.exception import UIException, ExceptionUtils, RequestException
-from clouddrive.common.export import ExportManager
-from clouddrive.common.remote.errorreport import ErrorReport
-from clouddrive.common.remote.request import Request
-from clouddrive.common.service.download import DownloadServiceUtil
-from clouddrive.common.ui.dialog import DialogProgress, DialogProgressBG, \
+from resources.lib.vendor.clouddrive_common.exception import UIException, ExceptionUtils, RequestException
+from resources.lib.vendor.clouddrive_common.export import ExportManager
+from resources.lib.vendor.clouddrive_common.remote.errorreport import ErrorReport
+from resources.lib.vendor.clouddrive_common.remote.request import Request
+from resources.lib.vendor.clouddrive_common.service.download import DownloadServiceUtil
+from resources.lib.vendor.clouddrive_common.ui.dialog import DialogProgress, DialogProgressBG, \
     QRDialogProgress, ExportMainDialog
-from clouddrive.common.ui.logger import Logger
-from clouddrive.common.ui.utils import KodiUtils
-from clouddrive.common.utils import Utils
+from resources.lib.vendor.clouddrive_common.ui.logger import Logger
+from resources.lib.vendor.clouddrive_common.ui.utils import KodiUtils
+from resources.lib.vendor.clouddrive_common.utils import Utils
 import xbmcgui
 import xbmcplugin
 import xbmcvfs
 from datetime import timedelta, datetime
-from clouddrive.common.cache.cache import Cache
+from resources.lib.vendor.clouddrive_common.cache.cache import Cache
 
 
 class CloudDriveAddon:
@@ -577,7 +577,7 @@ class CloudDriveAddon:
                         list_item.setProperty('startoffset', Utils.str(resume['position']))
                         list_item.setProperty('totaltime', Utils.str(resume['total']))
         else:
-            from clouddrive.common.service.player import KodiPlayer
+            from resources.lib.vendor.clouddrive_common.service.player import KodiPlayer
             KodiPlayer.cleanup()
         if 'audio' in item:
             list_item.setInfo('music', item['audio'])

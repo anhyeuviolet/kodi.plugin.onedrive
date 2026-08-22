@@ -20,11 +20,11 @@
 import json
 import time
 
-from clouddrive.common.exception import RequestException
-from clouddrive.common.ui.logger import Logger
-from clouddrive.common.utils import Utils
+from resources.lib.vendor.clouddrive_common.exception import RequestException
+from resources.lib.vendor.clouddrive_common.ui.logger import Logger
+from resources.lib.vendor.clouddrive_common.utils import Utils
 from http.cookiejar import CookieJar
-from clouddrive.common.ui.utils import KodiUtils
+from resources.lib.vendor.clouddrive_common.ui.utils import KodiUtils
 from urllib.error import HTTPError
 import urllib
 

@@ -19,8 +19,8 @@
 
 import urllib
 
-from clouddrive.common.ui.addon import CloudDriveAddon
-from clouddrive.common.utils import Utils
+from resources.lib.vendor.clouddrive_common.ui.addon import CloudDriveAddon
+from resources.lib.vendor.clouddrive_common.utils import Utils
 from resources.lib.provider.onedrive import OneDrive
 
 class OneDriveAddon(CloudDriveAddon):

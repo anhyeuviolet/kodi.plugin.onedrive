@@ -20,20 +20,20 @@
 class Logger:
     @staticmethod
     def debug(msg):
-        from clouddrive.common.ui.utils import KodiUtils
+        from resources.lib.vendor.clouddrive_common.ui.utils import KodiUtils
         KodiUtils.log(msg, KodiUtils.LOGDEBUG)
     
     @staticmethod
     def notice(msg):
-        from clouddrive.common.ui.utils import KodiUtils
+        from resources.lib.vendor.clouddrive_common.ui.utils import KodiUtils
         KodiUtils.log(msg, KodiUtils.LOGNOTICE)
     
     @staticmethod
     def warning(msg):
-        from clouddrive.common.ui.utils import KodiUtils
+        from resources.lib.vendor.clouddrive_common.ui.utils import KodiUtils
         KodiUtils.log(msg, KodiUtils.LOGWARNING)
         
     @staticmethod
     def error(msg):
-        from clouddrive.common.ui.utils import KodiUtils
+        from resources.lib.vendor.clouddrive_common.ui.utils import KodiUtils
         KodiUtils.log(msg, KodiUtils.LOGERROR)

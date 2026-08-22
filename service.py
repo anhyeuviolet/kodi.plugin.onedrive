@@ -17,12 +17,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 
-from clouddrive.common.service.download import DownloadService
-from clouddrive.common.service.source import SourceService
-from clouddrive.common.service.utils import ServiceUtil
+from resources.lib.vendor.clouddrive_common.service.download import DownloadService
+from resources.lib.vendor.clouddrive_common.service.source import SourceService
+from resources.lib.vendor.clouddrive_common.service.utils import ServiceUtil
 from resources.lib.provider.onedrive import OneDrive
-from clouddrive.common.service.export import ExportService
-from clouddrive.common.service.player import PlayerService
+from resources.lib.vendor.clouddrive_common.service.export import ExportService
+from resources.lib.vendor.clouddrive_common.service.player import PlayerService
 
 
 if __name__ == '__main__':

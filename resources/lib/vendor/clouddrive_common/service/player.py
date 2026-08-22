@@ -21,16 +21,16 @@ import re
 import threading
 import urllib
 
-from clouddrive.common.ui.logger import Logger
-from clouddrive.common.ui.utils import KodiUtils
-from clouddrive.common.utils import Utils
+from resources.lib.vendor.clouddrive_common.ui.logger import Logger
+from resources.lib.vendor.clouddrive_common.ui.utils import KodiUtils
+from resources.lib.vendor.clouddrive_common.utils import Utils
 
 
 class PlayerService(object):
     name = 'player'
 
     def __init__(self, provider_class):
-        from clouddrive.common.service.source import SourceService
+        from resources.lib.vendor.clouddrive_common.service.source import SourceService
         self.abort = False
         self._system_monitor = KodiUtils.get_system_monitor()
         self.provider = provider_class()
@@ -149,8 +149,8 @@ class KodiPlayer(KodiUtils.kodi_player_class()):
 
     def get_subtitles(self):
         try:
-            from clouddrive.common.remote.request import Request
-            from clouddrive.common.service.download import DownloadServiceUtil
+            from resources.lib.vendor.clouddrive_common.remote.request import Request
+            from resources.lib.vendor.clouddrive_common.service.download import DownloadServiceUtil
             response = Request(self.getPlayingFile()+'?subtitles', None).request_json()
             if response and 'driveid' in response and 'subtitles' in response:
                 driveid = response['driveid']
@@ -161,5 +161,5 @@ class KodiPlayer(KodiUtils.kodi_player_class()):
                     self.setSubtitles(url)
         except Exception as e:
             Logger.error(e)
-            from clouddrive.common.remote.errorreport import ErrorReport
+            from resources.lib.vendor.clouddrive_common.remote.errorreport import ErrorReport
             ErrorReport.handle_exception(e)

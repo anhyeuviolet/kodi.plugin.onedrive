@@ -16,15 +16,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-from clouddrive.common.ui.logger import Logger
-from clouddrive.common.ui.utils import KodiUtils
+from resources.lib.vendor.clouddrive_common.ui.logger import Logger
+from resources.lib.vendor.clouddrive_common.ui.utils import KodiUtils
 import datetime
-from clouddrive.common.utils import Utils, timeit
-from clouddrive.common.ui.dialog import ExportScheduleDialog, DialogProgressBG
+from resources.lib.vendor.clouddrive_common.utils import Utils, timeit
+from resources.lib.vendor.clouddrive_common.ui.dialog import ExportScheduleDialog, DialogProgressBG
 from calendar import weekday
-from clouddrive.common.remote.errorreport import ErrorReport
-from clouddrive.common.export import ExportManager
-from clouddrive.common.account import AccountManager
+from resources.lib.vendor.clouddrive_common.remote.errorreport import ErrorReport
+from resources.lib.vendor.clouddrive_common.export import ExportManager
+from resources.lib.vendor.clouddrive_common.account import AccountManager
 from _collections import deque
 import os
 

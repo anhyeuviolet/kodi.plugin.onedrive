@@ -19,7 +19,7 @@
 
 from threading import Thread
 
-from clouddrive.common.ui.utils import KodiUtils
+from resources.lib.vendor.clouddrive_common.ui.utils import KodiUtils
 
 
 class ServiceUtil(object):

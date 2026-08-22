@@ -45,7 +45,7 @@ class KodiUtils:
     
     @staticmethod
     def get_common_addon_path():
-        from clouddrive.common.utils import Utils
+        from resources.lib.vendor.clouddrive_common.utils import Utils
         return Utils.unicode(KodiUtils.get_addon_info("path", KodiUtils.common_addon_id))
     
     @staticmethod
@@ -60,7 +60,7 @@ class KodiUtils:
     @staticmethod
     def create_list_item(id, label):
         import xbmcgui
-        from clouddrive.common.utils import Utils
+        from resources.lib.vendor.clouddrive_common.utils import Utils
         list_item = xbmcgui.ListItem(label)
         list_item.setProperty('id', Utils.str(id))
         return list_item
@@ -165,7 +165,7 @@ class KodiUtils:
     
     @staticmethod
     def set_addon_setting(setting_id, value, addonid=None):
-        from clouddrive.common.utils import Utils
+        from resources.lib.vendor.clouddrive_common.utils import Utils
         addon = KodiUtils.get_addon(addonid)
         setting = addon.setSetting(setting_id, Utils.str(value))
         del addon
@@ -182,7 +182,7 @@ class KodiUtils:
     @staticmethod
     def show_notification(msg, time=5000):
         import xbmcgui
-        from clouddrive.common.utils import Utils
+        from resources.lib.vendor.clouddrive_common.utils import Utils
         xbmcgui.Dialog().notification(KodiUtils.get_addon_info('name'), msg, Utils.unicode(KodiUtils.get_addon_info('path') + '/icon.png'), time)
     
     @staticmethod
@@ -193,7 +193,7 @@ class KodiUtils:
 
     @staticmethod
     def set_service_port(service, port, addonid=None):
-        from clouddrive.common.utils import Utils
+        from resources.lib.vendor.clouddrive_common.utils import Utils
         with KodiUtils.lock:
             KodiUtils.set_addon_setting('%s.service.port' % service, Utils.str(port), addonid)
     
@@ -203,13 +203,13 @@ class KodiUtils:
     
     @staticmethod
     def get_cache_expiration_time(addonid=None):
-        from clouddrive.common.utils import Utils
+        from resources.lib.vendor.clouddrive_common.utils import Utils
         return int(Utils.default(KodiUtils.get_addon_setting('cache-expiration-time', addonid), '5'))
     
     @staticmethod
     def log(msg, level):
         import xbmc
-        from clouddrive.common.utils import Utils
+        from resources.lib.vendor.clouddrive_common.utils import Utils
         if level == 0:
             level = xbmc.LOGDEBUG
         elif level == 1:

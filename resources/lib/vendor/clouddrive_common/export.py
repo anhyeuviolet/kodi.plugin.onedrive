@@ -23,13 +23,13 @@ import json
 import os
 import urllib
 
-from clouddrive.common.remote.request import Request
-from clouddrive.common.ui.logger import Logger
-from clouddrive.common.ui.utils import KodiUtils
-from clouddrive.common.utils import Utils, timeit
-from clouddrive.common.db import SimpleKeyValueDb
+from resources.lib.vendor.clouddrive_common.remote.request import Request
+from resources.lib.vendor.clouddrive_common.ui.logger import Logger
+from resources.lib.vendor.clouddrive_common.ui.utils import KodiUtils
+from resources.lib.vendor.clouddrive_common.utils import Utils, timeit
+from resources.lib.vendor.clouddrive_common.db import SimpleKeyValueDb
 from _collections import deque
-from clouddrive.common.remote.errorreport import ErrorReport
+from resources.lib.vendor.clouddrive_common.remote.errorreport import ErrorReport
 
 
 class ExportManager(object):

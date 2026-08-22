@@ -19,9 +19,9 @@
 
 import time
 
-from clouddrive.common.remote.oauth2 import OAuth2
-from clouddrive.common.remote.signin import Signin
-from clouddrive.common.utils import Utils
+from resources.lib.vendor.clouddrive_common.remote.oauth2 import OAuth2
+from resources.lib.vendor.clouddrive_common.remote.signin import Signin
+from resources.lib.vendor.clouddrive_common.utils import Utils
 
 
 class Provider(OAuth2):

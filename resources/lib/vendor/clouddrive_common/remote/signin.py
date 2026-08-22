@@ -20,10 +20,10 @@
 import base64
 import urllib
 
-from clouddrive.common.remote.request import Request
-from clouddrive.common.ui.utils import KodiUtils
-from clouddrive.common.utils import Utils
-from clouddrive.common.exception import ExceptionUtils
+from resources.lib.vendor.clouddrive_common.remote.request import Request
+from resources.lib.vendor.clouddrive_common.ui.utils import KodiUtils
+from resources.lib.vendor.clouddrive_common.utils import Utils
+from resources.lib.vendor.clouddrive_common.exception import ExceptionUtils
 
 
 class Signin(object):

@@ -32,7 +32,7 @@ See the end of the source file for the license of use.
 XHTML support was contributed by Michael Haubenwallner.
 '''
 
-from clouddrive.common.utils import Utils
+from resources.lib.vendor.clouddrive_common.utils import Utils
 
 __version__ = '1.16'
 

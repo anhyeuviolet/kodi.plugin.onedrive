@@ -20,10 +20,10 @@
 import json
 import os
 
-from clouddrive.common.db import SimpleKeyValueDb
-from clouddrive.common.ui.logger import Logger
-from clouddrive.common.ui.utils import KodiUtils
-from clouddrive.common.utils import Utils
+from resources.lib.vendor.clouddrive_common.db import SimpleKeyValueDb
+from resources.lib.vendor.clouddrive_common.ui.logger import Logger
+from resources.lib.vendor.clouddrive_common.ui.utils import KodiUtils
+from resources.lib.vendor.clouddrive_common.utils import Utils
 
 
 class AccountManager(object):
