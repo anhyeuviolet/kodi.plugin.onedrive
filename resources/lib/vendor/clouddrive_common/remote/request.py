@@ -31,6 +31,25 @@ import urllib
 
 class Request(object):
     _DEFAULT_RESPONSE = '{}'
+    # Bounds the single outbound call below. Without it the call inherits the
+    # global socket default of none and can block forever; on marginal Android
+    # TV Wi-Fi that is a spinner the user cannot escape.
+    #
+    # The value applies per socket operation, not to a whole transfer: it bounds
+    # how long one read may block, not how long a large file may take. That is
+    # why one constant correctly serves both the metadata path and the chunked
+    # download path further down, which share this one call site.
+    #
+    # Unmeasured. 15-30 seconds is the recommended range for metadata calls;
+    # too low causes spurious failures on slow Wi-Fi, too high reproduces the
+    # hang this exists to remove. Confirm on a real device before relying on it.
+    #
+    # Worst-case wall time of the retry loop below is tries * this timeout plus
+    # the waits between attempts. At this class's defaults (tries=4, delay=5,
+    # backoff=2) that is 4*30 + 5 + 10 + 20 = 155 seconds. Bounding it is not
+    # this change's job; the wait goes through an injected function and belongs
+    # with the abort-aware sleep work.
+    HTTP_TIMEOUT_SECONDS = 30
     DOWNLOAD_CHUNK_SIZE = 16 * 1024
     download_progress = 0
     url = None
@@ -129,7 +148,7 @@ class Request(object):
             try:
                 Logger.debug(request_report)
                 req = urllib.request.Request(self.url, self.data, self.headers)
-                response = urllib.request.urlopen(req)
+                response = urllib.request.urlopen(req, timeout=self.HTTP_TIMEOUT_SECONDS)
                 self.response_code = response.getcode()
                 self.response_info = response.info()
                 self.response_url = response.geturl()
