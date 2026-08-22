@@ -204,6 +204,14 @@ None — this plan installs nothing. `pytest` 8.3.5 on CPython 3.11.9 was alread
 - Phase 2 lifts `tests/test_vendor_gates.py` and `pytest.ini` into CI unchanged (CI-05).
 - **Carry-forward for 01-04:** running the gate immediately after the verbatim copy will show `test_no_eval` flip from green to red. That is the copy landing three `eval(` sites, not a regression in the gate — 01-06 Task 1 clears it.
 
+## Self-Check: PASSED
+
+- `pytest.ini` — found
+- `tests/test_vendor_gates.py` — found
+- `.planning/phases/01-vendor-lift/01-02-SUMMARY.md` — found
+- `d94b2be`, `f97ace1`, `c4a0444` — all present in git history
+- No tracked file was deleted across the three commits
+
 ---
 *Phase: 01-vendor-lift*
 *Completed: 2026-08-22*

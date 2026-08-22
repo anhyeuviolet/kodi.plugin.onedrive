@@ -2,19 +2,18 @@
 gsd_state_version: 1.0
 milestone: v1.4.0
 milestone_name: milestone
-current_phase: 1
-current_phase_name: Vendor Lift
+current_phase: 01
+current_phase_name: vendor-lift
 status: executing
-stopped_at: Migration phase dropped; 94 of 94 v1 requirements mapped across 8 phases
-last_updated: "2026-08-22T11:37:34.527Z"
+stopped_at: Completed 01-02-PLAN.md
+last_updated: "2026-08-22T13:45:40.992Z"
 last_activity: 2026-08-22
-last_activity_desc: Device code spike passed for both account classes; drive-enumeration requirement corrected
+last_activity_desc: Phase 01 execution started
 progress:
   total_phases: 1
   completed_phases: 0
   total_plans: 7
-  completed_plans: 0
-  percent: 0
+  completed_plans: 1
 ---
 
 # Project State
@@ -24,16 +23,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-08-22)
 
 **Core value:** Sign in from the couch with a remote, and play a file from OneDrive.
-**Current focus:** Phase 1 — Vendor Lift
+**Current focus:** Phase 01 — vendor-lift
 
 ## Current Position
 
-Phase: 1 of 8 (Vendor Lift)
-Plan: 0 of 0 in current phase
+Phase: 01 (vendor-lift) — EXECUTING
+Plan: 2 of 7
 Status: Ready to execute
-Last activity: 2026-08-22 — Device code spike passed for both account classes; drive-enumeration requirement corrected
+Last activity: 2026-08-22 — Phase 01 execution started
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [█░░░░░░░░░] 14%
 
 ## Performance Metrics
 
@@ -55,6 +54,11 @@ Progress: [░░░░░░░░░░] 0%
 - Trend: —
 
 *Updated after each plan completion*
+**Per-Plan Metrics:**
+
+| Plan | Duration | Tasks | Files |
+|------|----------|-------|-------|
+| Phase 01 P02 | 30min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -73,6 +77,8 @@ Load-bearing choices for current work:
 - `SourceService` and the port 8586 directory listing are deleted, not defaulted off
 - The loopback 302 redirector is playback infrastructure, not a deferrable download service
 - InfoTag migration is deferred behind auth and playback, but must land in the same commit as the integer-duration fix
+- [Phase 1]: Phase 1 gates live in one pytest file written before any change; the exclusion set is defined once and every sweep carries a non-vacuity guard
+- [Phase 1]: The string-id gate asserts 30012 absent and 32012 present: 32012 is the vendored module's own string and stays, only this add-on's copy is deleted
 
 ### Pending Todos
 
@@ -105,6 +111,6 @@ Open concerns:
 
 ## Session Continuity
 
-Last session: 2026-08-22
-Stopped at: Migration phase dropped; 94 of 94 v1 requirements mapped across 8 phases
+Last session: 2026-08-22T13:45:32.852Z
+Stopped at: Completed 01-02-PLAN.md
 Resume file: None

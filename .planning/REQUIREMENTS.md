@@ -15,6 +15,7 @@ Scope note: this is a brownfield refactor. Requirements below describe the targe
 - [ ] **SETUP-04**: A written registration runbook lives in the repo, including the `AADSTS7000218` symptom of skipping SETUP-02
 - [ ] **SETUP-05**: Two test accounts are available — one personal Microsoft account and one work/school account
 - [ ] **SETUP-06**: A clean test environment exists — a Kodi profile with no sibling cloud-drive add-ons installed, plus an Android phone running Kodi and reachable over `adb`, which is the Android test device. The Android TV box is the deployment target and the design authority for the 10-foot interface, but it is not a test device: it is exercised by use, and only at release (see CI-06)
+
 ### Vendoring
 
 - [ ] **VND-01**: `script.module.clouddrive.common` v1.4.0 is vendored into the repo from the `matrix` branch, not the `master` branch, which carries the Python 2 / Kodi 18 line
@@ -33,7 +34,7 @@ Scope note: this is a brownfield refactor. Requirements below describe the targe
 
 - [ ] **ID-01**: The add-on id becomes `plugin.onedrive.kn`, and every `plugin://` reference, profile path, and internal id lookup follows it — so this is a genuinely separate add-on that can never collide with the official `plugin.onedrive` in the Kodi repository
 - [ ] **ID-02**: `provider-name` in `addon.xml` names the current maintainer, and the display name distinguishes this add-on from the original in the Kodi UI
-- [ ] **ID-03**: `LICENSE.txt` (GPL-3.0-or-later) is retained unchanged and every existing copyright notice is preserved — the code is a derivative work and the licence requires this
+- [x] **ID-03**: `LICENSE.txt` (GPL-3.0-or-later) is retained unchanged and every existing copyright notice is preserved — the code is a derivative work and the licence requires this
 - [ ] **ID-04**: A `CREDITS.md` (or a README section) states that the add-on originates from `plugin.onedrive` by Carlos Guzman (cguZZman) and bundles `script.module.clouddrive.common`, with licences named
 - [ ] **ID-05**: The repository no longer belongs to the upstream fork network, and its commit history is preserved rather than squashed — squashing would destroy the attribution record while keeping the code
 
@@ -200,7 +201,7 @@ Cross-cutting notes. `CI-06` (per-phase manual acceptance on Windows and on an A
 | VND-11 | Phase 1 | Pending |
 | ID-01 | Phase 1 | Pending |
 | ID-02 | Phase 1 | Pending |
-| ID-03 | Phase 1 | Pending |
+| ID-03 | Phase 1 | Complete |
 | ID-04 | Phase 1 | Pending |
 | ID-05 | Phase 1 | Pending |
 | AUTH-01 | Phase 3 | Pending |
@@ -290,6 +291,7 @@ Cross-cutting notes. `CI-06` (per-phase manual acceptance on Windows and on an A
 | 8. Release Readiness | CI-07, REL-01 | 2 |
 
 **Coverage:**
+
 - v1 requirements: 94 total
 - Mapped to phases: 94
 - Unmapped: 0 ✓
