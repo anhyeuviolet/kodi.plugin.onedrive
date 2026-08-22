@@ -157,7 +157,10 @@ Full analysis in `.planning/research/` — `SUMMARY.md` carries the reconciled p
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Device code flow for OAuth | Only flow that is genuinely usable on a TV with a remote; needs no redirect URI, no local HTTP server, and no client secret | — Pending |
+| Device code flow for OAuth | Only flow that is genuinely usable on a TV with a remote; needs no redirect URI, no local HTTP server, and no client secret | ✓ Good — verified end to end against a live registration for both account classes, 2026-08-22 |
+| `/common` as the single authority | Verified to admit both a work/school account and a personal Microsoft account with this project's own `client_id`; no `/consumers` + `/organizations` split is needed | ✓ Good |
+| Use `GET /me/drive`, not `/me/drives` | `/me/drives` returns 403 on personal accounts and `/drives` returns 403 on both. `/me/drive` is the only endpoint that works for both, and since SharePoint is out of scope the default drive suffices — so no account-type branch is needed at all | ✓ Good |
+| Host the `client_id` in the E5 Developer tenant | Convenient and already available. Accepted risk: Developer tenants renew on activity, and if this one lapses the embedded `client_id` dies for every installed copy at once. A personal Microsoft account registration would not expire | ⚠️ Revisit before first public release |
 | Embed a maintainer-registered public `client_id` | Public-client flows carry no secret, so embedding is safe and standard (rclone and others do the same). Gives users zero-config sign-in — strictly less work than the broker they have today | — Pending |
 | Advanced setting for a custom `client_id` | Some Business tenants block third-party apps; unavoidable from the add-on's side, so provide an escape hatch that 99% of users never open | — Pending |
 | Vendor `script.module.clouddrive.common` into the repo | Upstream is unmaintained, the version constraint is unpinnable, and the auth rewrite replaces its OAuth layer anyway. Owning it removes the dependency risk and unblocks the rewrite | — Pending |

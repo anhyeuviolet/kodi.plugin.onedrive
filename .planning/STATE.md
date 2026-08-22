@@ -23,7 +23,7 @@ See: .planning/PROJECT.md (updated 2026-08-22)
 Phase: 1 of 8 (Vendor Lift)
 Plan: 0 of 0 in current phase
 Status: Ready to plan
-Last activity: 2026-08-22 — Project initialized: research, requirements and roadmap complete
+Last activity: 2026-08-22 — Device code spike passed for both account classes; drive-enumeration requirement corrected
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -69,10 +69,15 @@ None yet.
 
 ### Blockers/Concerns
 
-- **Azure app registration is a maintainer prerequisite blocking Phase 3.** SETUP-01 through SETUP-04 are portal work, not code. `allowPublicClient` left at its `false` default returns `AADSTS7000218`, an error that actively misdirects toward embedding a client secret. Phases 1 and 2 run in parallel and are not blocked by this.
-- **The project's load-bearing unknown:** whether this project's own (non-first-party) `client_id` behaves on the `/common` authority for both a personal and a work account. The live probes during research used a Microsoft first-party client. Everything downstream inherits the answer. Tested first in Phase 3.
-- **A Business account and real Android TV hardware are required for release**, not optional. A Personal-only, desktop-only pass cannot find the reserved-character, consent, or performance classes of bug.
+**Resolved 2026-08-22 — the load-bearing unknown is settled.** The `/common` authority works with this project's own `client_id` for both a work/school account and a personal Microsoft account, verified end-to-end before any code was written. Conditional Access on the E5 Developer tenant did not block device code flow. Evidence and the full endpoint matrix: `.planning/research/SPIKE-DEVICE-CODE.md`. Registration in use: `efe197b3-5c14-4d67-810f-e10406742a06`, SETUP-01 through SETUP-03 satisfied.
+
+Open concerns:
+
+- **The E5 Developer tenant hosting the `client_id` may not last.** Microsoft 365 Developer tenants renew on activity and the programme has tightened. If that tenant lapses, the embedded `client_id` dies for every installed copy simultaneously — the worst possible failure distribution. Registering under a personal Microsoft account instead would remove the expiry entirely. Decide before the first public release.
+- **AUTH-18 cannot be fully verified yet.** No tenant that actually blocks third-party apps has been tested, so the exact `AADSTS` code that should trigger the custom `client_id` escape hatch is still unknown. The escape hatch is worthless if the user is never told it exists.
+- **Real Android TV hardware is required for release**, not optional. Nothing about a 10-foot interface is verifiable from a desktop.
 - **Existing users cannot be carried across.** Refresh tokens are bound to a `client_id`; the old ones belong to the broker's registration. Phase 8 makes the re-auth proactive and explained rather than avoidable.
+- **Graph fixtures must be recorded from both drive classes.** The spike found real material worth capturing: Vietnamese names with diacritics and spaces on both drives, and the OneDrive Personal Vault, which Graph returns without a `folder` facet so naive detection renders it as a file (BROWSE-16).
 
 ## Deferred Items
 
@@ -85,5 +90,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-08-22
-Stopped at: Roadmap created and committed; 94 of 94 v1 requirements mapped across 8 phases
+Stopped at: Auth spike verified against a live registration; 95 of 95 v1 requirements mapped across 8 phases
 Resume file: None

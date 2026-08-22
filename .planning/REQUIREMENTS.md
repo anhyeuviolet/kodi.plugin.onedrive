@@ -66,13 +66,14 @@ Scope note: this is a brownfield refactor. Requirements below describe the targe
 - [ ] **BROWSE-05**: Names containing `#`, spaces, and literal `%` resolve correctly, verified on both a Personal and a Business drive because the reserved-character sets differ
 - [ ] **BROWSE-06**: Search queries containing a single quote succeed
 - [ ] **BROWSE-07**: Graph responses are read defensively; a missing or reshaped field produces a handled error, not a `KeyError` traceback
-- [ ] **BROWSE-08**: Drive enumeration uses `/me/drives` only; the bare `/drives` call is gone
+- [ ] **BROWSE-08**: Drive access uses `GET /me/drive`, the only endpoint verified to work for both account classes — `/me/drives` returns 403 on personal accounts and `/drives` returns 403 on both. See `.planning/research/SPIKE-DEVICE-CODE.md`
 - [ ] **BROWSE-09**: One central HTTP layer honours `Retry-After` on 429, sleeps via `Monitor.waitForAbort`, and retries once on 401
 - [ ] **BROWSE-10**: Every `ListItem` is constructed with `offscreen=True`, and items are added in chunks
 - [ ] **BROWSE-11**: `endOfDirectory` is called exactly once per invocation, including on the error path
 - [ ] **BROWSE-12**: Thumbnails are fetched via `$expand=thumbnails` at the smallest useful size
 - [ ] **BROWSE-13**: Existing pseudo-folders (Recent, Shared with me, Camera Roll) keep working
 - [ ] **BROWSE-14**: A 500-item folder lists at an acceptable speed on real Android TV hardware
+- [ ] **BROWSE-16**: `extract_item()` correctly classifies the OneDrive Personal Vault, which Graph returns without a `folder` facet and which naive folder detection therefore renders as a file
 
 ### Playback
 
@@ -234,6 +235,7 @@ Cross-cutting notes. `CI-06` (per-phase manual acceptance on Windows and real An
 | BROWSE-12 | Phase 4 | Pending |
 | BROWSE-13 | Phase 4 | Pending |
 | BROWSE-14 | Phase 4 | Pending |
+| BROWSE-16 | Phase 2 | Pending |
 | PLAY-01 | Phase 6 | Pending |
 | PLAY-02 | Phase 6 | Pending |
 | PLAY-03 | Phase 6 | Pending |
@@ -279,7 +281,7 @@ Cross-cutting notes. `CI-06` (per-phase manual acceptance on Windows and real An
 | Phase | Requirements | Count |
 |-------|--------------|-------|
 | 1. Vendor Lift | VND-01..11, KODI-01, KODI-02, SETUP-06, SETUP-07, CI-06 | 16 |
-| 2. Pure Core and CI Harness | CI-01..05, BROWSE-02, BROWSE-03, BROWSE-04, BROWSE-07, SETUP-05 | 10 |
+| 2. Pure Core and CI Harness | CI-01..05, BROWSE-02, BROWSE-03, BROWSE-04, BROWSE-07, BROWSE-16, SETUP-05 | 11 |
 | 3. Authentication | AUTH-01..23, SETUP-01..04 | 27 |
 | 4. Browse | BROWSE-01, BROWSE-05, BROWSE-06, BROWSE-08..14, ERR-01..03 | 13 |
 | 5. Distribution | DIST-01..05 | 5 |
@@ -288,8 +290,8 @@ Cross-cutting notes. `CI-06` (per-phase manual acceptance on Windows and real An
 | 8. Existing-User Migration and Release | MIG-01..06, CI-07 | 7 |
 
 **Coverage:**
-- v1 requirements: 94 total
-- Mapped to phases: 94
+- v1 requirements: 95 total
+- Mapped to phases: 95
 - Unmapped: 0 ✓
 
 ---

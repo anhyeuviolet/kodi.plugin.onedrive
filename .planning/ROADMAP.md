@@ -80,7 +80,7 @@ The project config has `parallelization: true`, and two of these tracks are genu
 ### Phase 2: Pure Core and CI Harness
 **Goal**: The extraction, paging and path logic is correct and proven against real Graph JSON, and CI enforces the boundaries that keep it that way.
 **Depends on**: Phase 1 (the greps cannot go green until the vendor commit lands). Runs concurrently with Phase 3.
-**Requirements**: BROWSE-02, BROWSE-03, BROWSE-04, BROWSE-07, CI-01, CI-02, CI-03, CI-04, CI-05, SETUP-05
+**Requirements**: BROWSE-02, BROWSE-03, BROWSE-04, BROWSE-07, BROWSE-16, CI-01, CI-02, CI-03, CI-04, CI-05, SETUP-05
 
 **Prerequisites** (maintainer, not code):
   1. SETUP-05: one personal Microsoft account and one work/school account. Fixtures must be recorded from both drive types — a suite green against one drive type proves nothing about the other, and reserved characters differ between them.
