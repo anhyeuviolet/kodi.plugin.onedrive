@@ -270,13 +270,21 @@ def test_a_contender_that_cannot_acquire_adopts_the_winners_token(
     """
     winner = new_lock(lock_file)
     assert winner.acquire(1) is True
-    try:
+    post = RecordingPost()              # any call at all fails the test
+
+    def wait_during_which_the_winner_writes(seconds):
+        # The winner finishes while this contender is inside its wait, which is
+        # what waiting for a refresh already in flight actually looks like.
+        # Doing it before the call instead would mean this contender never held
+        # the old token, and the test would prove nothing about re-reading.
         store.write(token_file, dict(signed_in, access_token='access-token-9',
                                      refresh_token='refresh-token-9'))
-        post = RecordingPost()          # any call at all fails the test
+        return False
 
+    try:
         result = refresh_module.refresh(profile, ACCOUNT, new_lock(lock_file),
-                                        post, no_wait,
+                                        post,
+                                        wait_during_which_the_winner_writes,
                                         acquire_timeout=REFUSED_TIMEOUT)
     finally:
         winner.release()
@@ -560,6 +568,7 @@ def test_two_threads_in_one_process_produce_exactly_one_exchange(
 CHILD_SOURCE = textwrap.dedent('''
     """Spawned by test_two_processes_adopt_rather_than_both_exchange."""
     import json
+    import os
     import sys
     import time
 
@@ -580,11 +589,18 @@ CHILD_SOURCE = textwrap.dedent('''
 
 
     def sleep(seconds):
+        # The signal goes here rather than before the call, and that ordering
+        # is the whole reliability of this test. Every wait in the refresh
+        # happens AFTER it has read the store, so a parent that waits for this
+        # flag knows the child is holding the old blob and is contending. A
+        # flag raised before the call would let the parent's write land first,
+        # and the child would then be refreshing an already-fresh token --
+        # correct behaviour, but not the behaviour under test.
+        if not os.path.exists(ready_flag):
+            open(ready_flag, 'w').close()
         time.sleep(min(seconds, 0.02))
         return False
 
-
-    open(ready_flag, 'w').close()
 
     lock = RefreshLock(store.lock_path(profile, account), session, sleep)
     result = refresh_module.refresh(profile, account, lock, post, sleep,
