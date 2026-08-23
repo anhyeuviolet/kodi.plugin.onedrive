@@ -172,14 +172,14 @@ Plans:
   - **KODI-08** — third-party error reporting. Not a choice: AUTH-23 removes the accessor supplying the reporter's only URL, so the reporter either goes or is left with a broken reference.
   - **BROWSE-08, sign-in path only** — `get_account()` and `get_drives()`. Sign-in calls both, `GET /me` cannot answer under AUTH-04's locked scope set, and `/drives` is measured 403 on both account classes. The rest of the drive work stays in Phase 4.
 
-**Plans**: 3/14 plans executed
+**Plans**: 4/14 plans executed
 
 Plans:
 
 - [x] 03-01-PLAN.md — Tracer: device code requested, token merged, stored atomically and read back, with no Kodi in the path
 - [x] 03-02-PLAN.md — The installable zip, built from the git index (DIST-01)
 - [x] 03-03-PLAN.md — One gate harness, the auth gate file red by construction, and the registration runbook (SETUP-04)
-- [ ] 03-04-PLAN.md — The `O_EXCL` refresh lock, its two-signal stale breaker, and per-account isolation on disk
+- [x] 03-04-PLAN.md — The `O_EXCL` refresh lock, its two-signal stale breaker, and per-account isolation on disk
 - [ ] 03-05-PLAN.md — The AADSTS error map, and every string this phase will show
 - [ ] 03-06-PLAN.md — The sign-in dialog: a code control at a font that resolves, a countdown that does not steal focus, a second button
 - [ ] 03-07-PLAN.md — Refresh under the lock, the loser adopts the winner, and the startup threshold
@@ -293,7 +293,7 @@ Phases execute in numeric order, with two concurrent pairs: {1, 2} runs alongsid
 |-------|----------------|--------|-----------|
 | 1. Vendor Lift | 7/7 | Complete    | 2026-08-23 |
 | 2. Pure Core and CI Harness | 0/4 | Not started | - |
-| 3. Authentication | 3/14 | In Progress|  |
+| 3. Authentication | 4/14 | In Progress|  |
 | 4. Browse | 0/4 | Not started | - |
 | 5. Distribution | 0/3 | Not started | - |
 | 6. Play | 0/4 | Not started | - |

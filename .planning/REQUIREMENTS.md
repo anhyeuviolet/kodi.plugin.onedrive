@@ -63,13 +63,13 @@ This narrowing is known to cost no future work on the one place it could have. `
 - [x] **AUTH-11**: Refresh tokens are stored as atomically-written JSON under `special://profile/addon_data/`, never in a Kodi setting
 - [x] **AUTH-12**: Every token response is written back in full; when a response omits `refresh_token`, the previous one is retained
 - [ ] **AUTH-13**: An automated test proves the persisted refresh token changes across two consecutive refreshes
-- [ ] **AUTH-14**: Concurrent refresh across the plugin and the service is serialised by an `os.open(..., O_CREAT|O_EXCL)` lock with a stale-lock breaker; neither `threading.Lock` nor `fcntl.lockf` is used for this
+- [x] **AUTH-14**: Concurrent refresh across the plugin and the service is serialised by an `os.open(..., O_CREAT|O_EXCL)` lock with a stale-lock breaker; neither `threading.Lock` nor `fcntl.lockf` is used for this
 - [ ] **AUTH-15**: A refresh that loses the race and receives `invalid_grant` re-reads the store and adopts the winner's token rather than signing the user out
 - [ ] **AUTH-16**: A proactive refresh runs on Kodi startup well inside the 90-day refresh-token lifetime
 - [ ] **AUTH-17**: The background service never opens a sign-in dialog; only the plugin may prompt interactively
 - [ ] **AUTH-18**: A tenant that blocks the app produces a specific message naming the cause and pointing at the custom `client_id` setting — not a generic failure
 - [ ] **AUTH-19**: A custom `client_id` setting exists at Expert level, empty by default
-- [ ] **AUTH-20**: Multiple accounts are supported, with tokens, delta tokens, and cache keys isolated per account
+- [x] **AUTH-20**: Multiple accounts are supported, with tokens, delta tokens, and cache keys isolated per account
 - [x] **AUTH-21**: Account labels come from Graph; no account name is ever typed on a remote
 - [ ] **AUTH-22**: The add-on root is the account list, with an "Add an account…" row and a per-row context menu offering re-authorise and remove
 - [ ] **AUTH-23**: The `sign-in-server` setting and every code path referencing an external OAuth broker are gone
@@ -228,13 +228,13 @@ Cross-cutting notes. `CI-06` (per-phase manual acceptance on the TCL Android TV 
 | AUTH-11 | Phase 3 | Complete |
 | AUTH-12 | Phase 3 | Complete |
 | AUTH-13 | Phase 3 | Pending |
-| AUTH-14 | Phase 3 | Pending |
+| AUTH-14 | Phase 3 | Complete |
 | AUTH-15 | Phase 3 | Pending |
 | AUTH-16 | Phase 3 | Pending |
 | AUTH-17 | Phase 3 | Pending |
 | AUTH-18 | Phase 3 | Pending |
 | AUTH-19 | Phase 3 | Pending |
-| AUTH-20 | Phase 3 | Pending |
+| AUTH-20 | Phase 3 | Complete |
 | AUTH-21 | Phase 3 | Complete |
 | AUTH-22 | Phase 3 | Pending |
 | AUTH-23 | Phase 3 | Pending |

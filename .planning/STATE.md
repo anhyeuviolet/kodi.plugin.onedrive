@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 03
 current_phase_name: authentication
 status: executing
-stopped_at: Completed 03-03-PLAN.md
-last_updated: "2026-08-23T03:20:18.119Z"
+stopped_at: Completed 03-04-PLAN.md
+last_updated: "2026-08-23T03:39:38.102Z"
 last_activity: 2026-08-23
 last_activity_desc: Phase 03 execution started
 progress:
   total_phases: 2
   completed_phases: 1
   total_plans: 21
-  completed_plans: 10
+  completed_plans: 11
 ---
 
 # Project State
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-08-22)
 ## Current Position
 
 Phase: 03 (authentication) — EXECUTING
-Plan: 4 of 14
+Plan: 5 of 14
 Status: Ready to execute
 stands, its Windows rows were descoped because Windows is not a target. Phase criterion 2 (the Kodi
 19/20/21/22 install matrix) is therefore **unmet by decision, not satisfied**, and KODI-02 stays unchecked.
@@ -38,7 +38,7 @@ against the tree, KODI-01 and SETUP-06 carry inline qualifications, and the ROAD
 broker" parenthetical was corrected to the measurement.
 Last activity: 2026-08-23 — Phase 03 execution started
 
-Progress: [█████░░░░░] 48%
+Progress: [█████░░░░░] 52%
 
 ## Performance Metrics
 
@@ -74,6 +74,7 @@ Progress: [█████░░░░░] 48%
 | Phase 03 P01 | 25min | 3 tasks | 6 files |
 | Phase 03 P02 | 12min | 2 tasks | 3 files |
 | Phase 03 P03 | 30 min | 3 tasks | 5 files |
+| Phase 03 P04 | 20min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -130,6 +131,9 @@ Load-bearing choices for current work:
 - [Phase 03]: docs/AZURE-REGISTRATION.md is the fifth entry in EXCLUDED_DOCS and is paid for by test_runbook_contains_aadsts7000218; the credential pattern is never softened to let a required quote through
 - [Phase 03]: The unanswerable-endpoint gate matches the whole parsed path, never a prefix: /me/ normalises to /me and is the call sign-in makes first, so a prefix test written against /me/drives would miss the only failure that breaks sign-in outright
 - [Phase 03]: tests/test_auth_gates.py is written once in plan 03-03 and is not edited again by any later plan in this phase; a plan that wants to change an assertion rather than satisfy it must raise it instead
+- [Phase 03]: The refresh lock lifetime is 90s, set against the 65s worst case of the tries=2 refresh profile plan 03-08 installs; the transport's 155s default-profile figure is recorded beside it and a test fails if the arithmetic or the owning plan leaves the source
+- [Phase 03]: An unsafe account key is rejected, never sanitised: a sanitiser maps two different keys onto one filename, which is the cross-account leak AUTH-20 exists to prevent
+- [Phase 03]: RefreshLock.release unlinks only when that instance actually holds the lock; the research sketch's unconditional unlink turns a loser's finally block into a silent second breaker of the winner's lock
 
 ### Pending Todos
 
@@ -173,6 +177,6 @@ Open concerns:
 
 ## Session Continuity
 
-Last session: 2026-08-23T03:19:09.957Z
-Stopped at: Completed 03-03-PLAN.md
+Last session: 2026-08-23T03:39:38.085Z
+Stopped at: Completed 03-04-PLAN.md
 Resume file: None
