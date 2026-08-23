@@ -1559,3 +1559,387 @@ def test_refresh_transport_is_built_from_the_pinned_profile():
         'On the transport defaults the worst case is 155 seconds against a lock '
         'lifetime of 90, so a slow network lets a second contender break a LIVE '
         'lock:\n%s' % report(missing))
+
+
+# ---------------------------------------------------------------------------
+# The code font (AUTH-05)
+# ---------------------------------------------------------------------------
+#
+# WHAT THESE FOUR GATES PROVE, AND WHAT THEY CANNOT.
+#
+# They prove the layout's INTENT and its geometry: that the code label names
+# the largest entry of a recorded chain of fonts, that the chain really is
+# ordered by size, that every font the dialog names is one the stock skin
+# defines, and that each box is tall and wide enough to hold the glyphs of the
+# font it names without clipping them.
+#
+# They cannot prove what appeared on a television, and nothing in this
+# repository can. Kodi resolves a font name against the ACTIVE skin at render
+# time and substitutes font13 in silence when it cannot -- no exception, no log
+# line, no return value. A layout that satisfies every assertion below is
+# byte-identical whether the name resolved at 120px or fell back to 30, so
+# these gates cannot distinguish the requirement being met from the exact
+# failure the requirement is about.
+#
+# That is why AUTH-05 forbids recording itself as met from the layout, and
+# these gates do not discharge that prohibition. What they buy is falsifiable
+# intent: after a person has read the code off a screen once, a later edit
+# cannot quietly walk the font back down, shrink the box under the glyphs, or
+# name a font the skin does not define, without one of them going red.
+
+PIN_DIALOG = 'resources/skins/default/1080i/pin-dialog.xml'
+
+# The code label, and the body block whose last line is the expiry countdown.
+CODE_CONTROL = '1005'
+BODY_CONTROL = '1002'
+
+# The panel is the one control textured with the dialog background. Identified
+# by its texture rather than by its size, so the gate does not restate a number
+# it is meant to be checking.
+PANEL_TEXTURE = 'dialog-bg.png'
+
+# The chain the layout's header comment records, with the sizes read out of
+# skin.estuary's xml/Font.xml on xbmc/xbmc's Omega (Kodi 21) branch. Measured,
+# not recalled. Descending: the order to walk if a code is too big for the
+# panel on a real device. The head of it is what AUTH-05's "largest font the
+# skin offers" resolves to on the stock skin.
+#
+# Kodi's skin XML has no fallback operator, so this chain is not something the
+# renderer will walk. It is a chain for a human, kept here so that "the layout
+# names a large font" is an assertion rather than a claim.
+CODE_FONT_CHAIN = (
+    ('WeatherTemp', 120),
+    ('font_clock', 70),
+    ('font60', 60),
+    ('font52_title', 52),
+    ('font45', 45),
+)
+
+# Every font id Estuary defines, in both the Default and the Arial fontsets,
+# transcribed in 03-RESEARCH.md from xbmc/addons/skin.estuary/xml/Font.xml.
+ESTUARY_FONTS = frozenset({
+    'font10', 'font12', 'font13', 'font14', 'font23_narrow', 'font25_narrow',
+    'font27', 'font27_narrow', 'font32', 'font37', 'font45', 'font60',
+    'font_clock', 'font_flag', 'font20_title', 'font25_title', 'font30_title',
+    'font32_title', 'font36_title', 'font40_title', 'font45_title',
+    'font52_title', 'font_MainMenu', 'WeatherTemp', 'Mono26',
+})
+
+# One uppercase alphanumeric costs about 0.59 of the nominal font size in this
+# face -- from 03-06's measurement of roughly 320px for a nine-character code
+# at font60. Used for mixed-case body text as well, where it OVER-estimates:
+# lowercase is narrower, so a wrap count computed with it is a ceiling and the
+# gate errs towards demanding a bigger box.
+ADVANCE_EM = 0.59
+
+# A rendered line occupies more vertical space than the nominal size. 1.2 is a
+# floor for a single label's glyph box and 1.4 a floor for stacked lines in a
+# textbox; both are conservative for the Noto face Estuary ships.
+GLYPH_BOX_RATIO = 1.2
+LINE_HEIGHT_RATIO = 1.4
+
+# The longest user code the provider has been observed to issue is nine
+# characters (03-RESEARCH.md, three spike runs).
+LONGEST_CODE = 9
+
+# The address the server actually returns, measured 2026-08-22 and recorded in
+# 03-RESEARCH.md. It is not the one most documentation cites, and it is the
+# longest single unwrappable token in the body block.
+VERIFICATION_URI = 'https://login.microsoft.com/device'
+
+# The catalogue ids the body block renders: the instruction, the sentence that
+# stops a personal account abandoning halfway, and the countdown template.
+BODY_STRING_IDS = (30037, 30041, 30038)
+
+
+def _pin_dialog_root():
+    assert PIN_DIALOG in tracked_files(), (
+        '%s is missing; there is no sign-in layout to check and every '
+        'assertion in this section would certify nothing' % PIN_DIALOG)
+    return ET.parse(str(REPO / PIN_DIALOG)).getroot()
+
+
+def _box(control):
+    """(left, top, width, height) from a control's direct children."""
+    values = []
+    for tag in ('left', 'top', 'width', 'height'):
+        node = control.find(tag)
+        if node is None:
+            values.append(None)
+            continue
+        try:
+            values.append(int((node.text or '').strip()))
+        except ValueError:
+            values.append(None)
+    return tuple(values)
+
+
+def _font_of(control):
+    node = control.find('font')
+    return (node.text or '').strip() if node is not None else None
+
+
+def _controls_by_id(root):
+    return {control.get('id'): control for control in root.iter('control')
+            if control.get('id')}
+
+
+def _line_of(contents, needle):
+    """1-based line of the first occurrence, or 0 when it is not there."""
+    for lineno, line in enumerate(contents.splitlines(), start=1):
+        if needle in line:
+            return lineno
+    return 0
+
+
+def _line_of_control(contents, control_id):
+    """1-based line where one control opens.
+
+    Located by its id attribute rather than by one of its values, because
+    <width>1150</width> is true of the panel and of the code label both, and a
+    hit that points at the wrong control is worse than one that points nowhere.
+    """
+    return _line_of(contents, 'id="%s"' % control_id)
+
+
+def _catalogue_string(string_id):
+    """The msgid for one id, read out of the shipped en_gb catalogue."""
+    match = re.search(r'msgctxt "#%d"\s*\nmsgid "([^"]*)"' % string_id,
+                      read(EN_GB_STRINGS))
+    return match.group(1) if match else None
+
+
+def test_the_code_font_chain_is_ordered_by_measured_size():
+    """The recorded chain is a chain: strictly descending, all real names.
+
+    Proves the list the next gate compares against is trustworthy. Proves
+    nothing about any screen -- a correctly ordered list of fonts that no skin
+    resolves would pass this untouched.
+    """
+    assert len(CODE_FONT_CHAIN) >= 2, (
+        'CODE_FONT_CHAIN has fewer than two entries, so "walk down it" names '
+        'nothing and the gate below degenerates into comparing one string to '
+        'itself')
+
+    out_of_order = [
+        (PIN_DIALOG, 0, '%s (%d) is not larger than %s (%d), so the chain is '
+                        'not ordered by size and "the largest" does not mean '
+                        'the head of it'
+         % (name, size, next_name, next_size))
+        for (name, size), (next_name, next_size)
+        in zip(CODE_FONT_CHAIN, CODE_FONT_CHAIN[1:])
+        if next_size >= size
+    ]
+    assert not out_of_order, (
+        'the code font chain is not ordered by measured size:\n%s'
+        % report(out_of_order))
+
+    unknown = [(PIN_DIALOG, 0, '%s is not a font Estuary defines' % name)
+               for name, _ in CODE_FONT_CHAIN if name not in ESTUARY_FONTS]
+    assert not unknown, (
+        'the code font chain names a font the stock skin does not define, so '
+        'stepping down to it would substitute font13 in silence:\n%s'
+        % report(unknown))
+
+
+def test_the_code_label_names_the_head_of_the_code_font_chain():
+    """The code is set in the largest font of the chain, not merely a large one.
+
+    Proves the layout asks for the largest size the stock skin defines. It
+    cannot prove the ACTIVE skin defines that name: WeatherTemp is
+    special-purpose and is the entry of the chain most likely to be absent from
+    a third-party skin, where Kodi drops to font13 without logging it.
+    """
+    root = _pin_dialog_root()
+    contents = read(PIN_DIALOG)
+    control = _controls_by_id(root).get(CODE_CONTROL)
+    assert control is not None, (
+        '%s: control %s is gone. That control IS the code; without it there '
+        'is no font for AUTH-05 to be about'
+        % (PIN_DIALOG, CODE_CONTROL))
+
+    named = _font_of(control)
+    largest = CODE_FONT_CHAIN[0][0]
+    assert named == largest, (
+        '%s:%d: control %s is set in %r. AUTH-05 asks for the largest font the '
+        'skin offers and the chain records that as %r (%dpx). If %r was chosen '
+        'deliberately -- because the largest clipped on a real device, or '
+        'because a skin did not define it -- record what was seen in the '
+        'header comment and move the head of CODE_FONT_CHAIN with it.'
+        % (PIN_DIALOG, _line_of(contents, '<font>%s</font>' % named),
+           CODE_CONTROL, named, largest, CODE_FONT_CHAIN[0][1], named))
+
+
+def test_every_font_the_sign_in_dialog_names_is_one_estuary_defines():
+    """No name in the layout falls back to font13 on the stock skin.
+
+    Proves resolution against the STOCK skin only, and only against a
+    transcribed list. It says nothing about whichever skin is running on the
+    device, which is the skin that decides what a person actually sees.
+    """
+    root = _pin_dialog_root()
+    contents = read(PIN_DIALOG)
+    named = [(node.text or '').strip() for node in root.iter('font')]
+    assert len(named) >= 4, (
+        '%s names %d fonts. The layout has a heading, a code, a body block and '
+        'two buttons, so a count this low means the sweep is reading a '
+        'different file or a rewritten one, and it certifies nothing'
+        % (PIN_DIALOG, len(named)))
+
+    unknown = [(PIN_DIALOG, _line_of(contents, '<font>%s</font>' % name),
+                '%s is not defined by Estuary; Kodi renders it as font13 '
+                '(30px) and logs nothing' % name)
+               for name in named if name not in ESTUARY_FONTS]
+    assert not unknown, (
+        'the sign-in dialog names a font the stock skin does not define. This '
+        'is how the file shipped with font12_title on its body text and '
+        'rendered at the fallback for the whole of its life:\n%s'
+        % report(unknown))
+
+
+def test_the_sign_in_boxes_can_hold_the_fonts_they_name():
+    """Every box is large enough for its glyphs, and the panel holds them all.
+
+    Proves the arithmetic: a 120px code cannot clip in a 152-high box, nine
+    characters fit the width, the body block has room for the lines it will be
+    given, and the whole dialog stays inside the 1080-line space. This is the
+    half of "the code is legible" that IS checkable. The other half -- whether
+    the glyphs that arrived in those boxes were 120px or 30px -- is not.
+    """
+    root = _pin_dialog_root()
+    contents = read(PIN_DIALOG)
+    controls = _controls_by_id(root)
+    sizes = dict(CODE_FONT_CHAIN)
+    sizes.update({'font37': 37, 'font30_title': 30, 'font25_title': 25,
+                  'font27': 27, 'font32': 32})
+
+    too_small = []
+
+    # The code label.
+    code = controls.get(CODE_CONTROL)
+    assert code is not None, (
+        '%s: control %s is gone' % (PIN_DIALOG, CODE_CONTROL))
+    code_font = _font_of(code)
+    assert code_font in sizes, (
+        '%s: control %s names %r, whose size is not recorded here, so this '
+        'gate cannot check the box around it. Add it to CODE_FONT_CHAIN or to '
+        'the sizes map, with the value read out of Font.xml'
+        % (PIN_DIALOG, CODE_CONTROL, code_font))
+    _, _, code_width, code_height = _box(code)
+    code_size = sizes[code_font]
+    needed_height = int(code_size * GLYPH_BOX_RATIO)
+    needed_width = int(LONGEST_CODE * code_size * ADVANCE_EM)
+    code_line = _line_of_control(contents, CODE_CONTROL)
+    if code_height is None or code_height < needed_height:
+        too_small.append((PIN_DIALOG, code_line,
+                          'control %s is %s high for a %dpx font; %d is the '
+                          'floor. A clipped code is worse than a small one'
+                          % (CODE_CONTROL, code_height, code_size,
+                             needed_height)))
+    if code_width is None or code_width < needed_width:
+        too_small.append((PIN_DIALOG, code_line,
+                          'control %s is %s wide; %d characters at %dpx need '
+                          '%d and a code that overruns its label is truncated'
+                          % (CODE_CONTROL, code_width, LONGEST_CODE,
+                             code_size, needed_width)))
+
+    # The body block, whose last line is the countdown. This is the assertion
+    # that would have been red before the 03-14 fix: font27 in a 156-high box
+    # could not hold the five wrapped lines it was given, and the line pushed
+    # out of view was the countdown.
+    body = controls.get(BODY_CONTROL)
+    assert body is not None, (
+        '%s: control %s is gone; the instruction, the address and the '
+        'countdown have nowhere to render' % (PIN_DIALOG, BODY_CONTROL))
+    body_font = _font_of(body)
+    assert body_font in sizes, (
+        '%s: control %s names %r, whose size is not recorded here'
+        % (PIN_DIALOG, BODY_CONTROL, body_font))
+    _, _, body_width, body_height = _box(body)
+    body_size = sizes[body_font]
+    per_line = max(1, int(body_width / (body_size * ADVANCE_EM)))
+
+    rendered = []
+    for string_id in BODY_STRING_IDS:
+        text = _catalogue_string(string_id)
+        assert text, (
+            'string %d is not in %s, so the body block\'s height is being '
+            'checked against text the add-on does not ship'
+            % (string_id, EN_GB_STRINGS))
+        # The countdown template renders with a clock substituted in.
+        rendered.append(text.replace('%s', '00:00'))
+    rendered.append(VERIFICATION_URI)
+
+    lines = sum(max(1, -(-len(text) // per_line)) for text in rendered)
+    needed_body = int(lines * body_size * LINE_HEIGHT_RATIO)
+    if body_height is None or body_height < needed_body:
+        too_small.append((PIN_DIALOG, _line_of_control(contents, BODY_CONTROL),
+                          'control %s is %s high. At %dpx in a %s-wide box the '
+                          'shipped text wraps to %d lines and needs %d. The '
+                          'line that goes over the edge is the last one, which '
+                          'is the countdown'
+                          % (BODY_CONTROL, body_height, body_size, body_width,
+                             lines, needed_body)))
+
+    assert not too_small, (
+        'a control in the sign-in dialog is smaller than the text it is given:'
+        '\n%s' % report(too_small))
+
+    # Everything with an id lives inside the panel, and the panel lives inside
+    # the coordinate space. The full-screen dimmer has no id and is meant to
+    # overhang, which is why the sweep is over id'd controls.
+    panel = None
+    for control in root.iter('control'):
+        if any(PANEL_TEXTURE in (node.text or '')
+               for node in control.iter('texture')):
+            panel = control
+            break
+    assert panel is not None, (
+        '%s: no control is textured with %s, so the panel cannot be located '
+        'and nothing below is being bounded by anything'
+        % (PIN_DIALOG, PANEL_TEXTURE))
+    _, _, panel_width, panel_height = _box(panel)
+
+    origin = root.find('coordinates')
+    assert origin is not None, (
+        '%s: the window declares no <coordinates>' % PIN_DIALOG)
+    left = int((origin.find('left').text or '0').strip())
+    top = int((origin.find('top').text or '0').strip())
+
+    origin_line = _line_of(contents, '<coordinates>')
+    outside = []
+    if left < 0 or left + panel_width > 1920:
+        outside.append((PIN_DIALOG, origin_line,
+                        'the panel spans %d..%d horizontally, outside the '
+                        '1920-wide space' % (left, left + panel_width)))
+    if top < 0 or top + panel_height > 1080:
+        outside.append((PIN_DIALOG, origin_line,
+                        'the panel spans %d..%d vertically, outside the '
+                        '1080-line space' % (top, top + panel_height)))
+
+    assert len(controls) >= 5, (
+        '%s declares %d controls with ids; the dialog has a heading, a QR, a '
+        'body block, two buttons and a code, so the sweep below is reading '
+        'the wrong file' % (PIN_DIALOG, len(controls)))
+    for control_id, control in sorted(controls.items()):
+        box_left, box_top, box_width, box_height = _box(control)
+        if None in (box_left, box_top, box_width, box_height):
+            continue
+        control_line = _line_of_control(contents, control_id)
+        if box_left < 0 or box_left + box_width > panel_width:
+            outside.append((PIN_DIALOG, control_line,
+                            'control %s spans %d..%d horizontally, outside '
+                            'the %d-wide panel'
+                            % (control_id, box_left, box_left + box_width,
+                               panel_width)))
+        if box_top < 0 or box_top + box_height > panel_height:
+            outside.append((PIN_DIALOG, control_line,
+                            'control %s spans %d..%d vertically, outside the '
+                            '%d-high panel'
+                            % (control_id, box_top, box_top + box_height,
+                               panel_height)))
+
+    assert not outside, (
+        'the sign-in dialog does not fit the space it is drawn in. A control '
+        'past the panel edge is drawn over the background, and a panel past '
+        'the screen edge is cropped by the compositor:\n%s' % report(outside))

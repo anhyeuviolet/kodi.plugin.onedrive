@@ -8,25 +8,70 @@
     a body block is therefore the wrong shape: the code is the thing a person
     has to read across a room and type on a phone, and the QR is a convenience
     that saves them typing the address. The code gets the full panel width and
-    the QR is shrunk to suit.
+    its own control; the QR is sized by what is left over.
 
     Fonts must be names the ACTIVE SKIN defines. Kodi falls back to font13
     silently when it cannot resolve a font name - no error, no log line - which
     is how this file shipped naming `font12_title`, a font Estuary does not
     define, with its body text rendering at the fallback ever since.
 
-    font60 is the code font: 60px in these 1080-line coordinates, present in
-    both of Estuary's fontsets. A nine-character code at that size is roughly
-    320px wide, well inside the 1150px panel. If a real code proves too wide on
-    the television, the fallbacks in descending order are font52_title then
-    font45 - both also defined in both fontsets. Do NOT reach for WeatherTemp
-    (120px): it is Estuary-specific in a way font60 is not, and a name that
-    resolves nowhere else substitutes silently.
+    THE CODE FONT, and the chain behind it.
+
+    Measured from skin.estuary's xml/Font.xml on the Omega (Kodi 21) branch of
+    xbmc/xbmc - these are sizes read out of that file, not sizes recalled:
+
+        WeatherTemp    120   <- named below by control 1005
+        font_clock      70
+        font60          60
+        font52_title    52
+        font45          45
+
+    Read downward, that is the order to walk if a real code proves too wide or
+    too tall on a television. Read upward, it is the answer to AUTH-05, which
+    asks for "the largest font the skin offers": 120 is the largest size
+    Estuary defines anywhere, so on the stock skin the top of the chain is the
+    literal answer and there is nothing above it to reach for.
+
+    This supersedes the instruction that stood here between 345999a and now,
+    which named font60 and said "do NOT reach for WeatherTemp". The caution
+    behind that instruction is still true and is restated in the next
+    paragraph; only the verdict changed. font60 was read on a TCL Android TV 12
+    (Kodi 21.2, stock Estuary) during the 03-14 acceptance run and reported too
+    small from a normal seat, with exactly 2x of unused headroom above it.
+
+    Kodi's skin XML has NO font-fallback operator: one name is named, and it
+    either resolves or silently becomes font13. So the chain above is a chain
+    for a human reader, not for the renderer. Of the five names, the lower four
+    are ordinary Estuary names; `WeatherTemp` is special-purpose - it exists to
+    put a temperature on a weather pane - and it is therefore the one of the
+    five most likely to be ABSENT from a third-party skin, where it will
+    substitute down to font13 (30px) without a word in the log. If this dialog
+    is ever reported tiny on a non-stock skin, that is the first thing to
+    suspect, and the repair is to step down to font60, which skins define in
+    practice.
+
+    Nothing in this repository can tell you which of those two happened. A gate
+    can read the name out of this file, check it against the recorded chain,
+    and check the box around it is big enough to hold the glyphs. Only a person
+    looking at a screen can say what rendered. That distinction is exactly why
+    AUTH-05 forbids recording the requirement as met on the strength of this
+    file. The gates are in tests/test_auth_gates.py under "the code font".
+
+    Box sizing. At 120px the Estuary face runs about 71px per uppercase
+    alphanumeric - from 03-06's measurement of ~320px for nine characters at
+    60px, i.e. 0.59em - so the 1150-wide control holds sixteen characters and
+    the provider's codes are eight or nine. The 152-high box clears a 120px
+    line height with room over. A 120px glyph in the 96-high box this control
+    used to have would have been clipped top and bottom, and a clipped code is
+    worse than a small one.
 -->
 <window>
     <coordinates>
+        <!-- The panel grew from 450 to 750 to seat a 120px code, a body block
+             that no longer overflows, and a larger QR. 165 keeps it centred in
+             the 1080-line space: (1080 - 750) / 2. Bottom edge 915. -->
         <left>385</left>
-        <top>315</top>
+        <top>165</top>
     </coordinates>
     <!-- The only input device is a directional pad, so the initial focus is a
          decision rather than an accident. Cancel takes it: the second button
@@ -55,7 +100,7 @@
             <left>0</left>
             <top>0</top>
             <width>1150</width>
-            <height>450</height>
+            <height>750</height>
             <texture border="2">dialog-bg.png</texture>
         </control>
         <!-- Title bar -->
@@ -79,33 +124,54 @@
             <shadowcolor>FF000000</shadowcolor>
         </control>
         <!-- The code. The largest element on the panel, and the reason the
-             panel exists. Filled from Python; see QRDialogProgress.set_code. -->
+             panel exists. WeatherTemp is 120px and this box is 152 high, so
+             the glyphs cannot clip. Filled from Python; see
+             QRDialogProgress.set_code. Read the header before changing the
+             font name: there is a measured chain to step down, and no
+             fallback the renderer will apply on your behalf. -->
         <control type="label" id="1005">
             <left>0</left>
-            <top>76</top>
+            <top>78</top>
             <width>1150</width>
-            <height>96</height>
-            <font>font60</font>
+            <height>152</height>
+            <font>WeatherTemp</font>
             <textcolor>FFFFFFFF</textcolor>
             <align>center</align>
             <aligny>center</aligny>
             <shadowcolor>FF000000</shadowcolor>
         </control>
-        <!-- QR image, now secondary: it carries the address only. -->
+        <!-- QR image, still secondary: it carries the address only, for the
+             reason at the top of this file. 150x150 was smaller than it needed
+             to be. 280 is what the width allows, and the width is what binds:
+             the panel is 1150, the text column needs 798 to hold the address
+             on one unwrapped line at font37, and 24 of padding each side plus
+             a 24 gutter leaves exactly 280. Top 292 centres it in the 364-high
+             body row. -->
         <control type="image" id="1001">
             <left>24</left>
-            <top>182</top>
-            <width>150</width>
-            <height>150</height>
+            <top>292</top>
+            <width>280</width>
+            <height>280</height>
             <aspectratio aligny="center" align="center">keep</aspectratio>
         </control>
-        <!-- Text panel -->
+        <!-- Text panel: the instruction, the address, and the countdown, in
+             that order, joined by the dialog's _render_text.
+
+             font37 rather than font27, because the last of those three lines
+             is the expiry countdown and it is read from the same seat as the
+             code. The height went with it, and by more than the font did: at
+             font27 in a 156-high box this control was ALREADY overflowing -
+             five wrapped lines of roughly 38px against 156 of room - so the
+             countdown was the line being pushed out of view. At font37 the
+             same content wraps to six lines of roughly 52px, which is 312 in a
+             box of 364. The line left spare is the margin a longer
+             translation gets to use. -->
         <control type="textbox" id="1002">
-            <left>200</left>
-            <top>178</top>
-            <width>926</width>
-            <height>156</height>
-            <font>font27</font>
+            <left>328</left>
+            <top>250</top>
+            <width>798</width>
+            <height>364</height>
+            <font>font37</font>
             <align>left</align>
             <aligny>top</aligny>
             <shadowcolor>FF000000</shadowcolor>
@@ -115,7 +181,7 @@
              set from Python so the words live in the catalogue, not here. -->
         <control type="button" id="1004">
             <left>520</left>
-            <top>340</top>
+            <top>630</top>
             <width>300</width>
             <height>96</height>
             <font>font25_title</font>
@@ -132,7 +198,7 @@
              there are always two ways out of this dialog. -->
         <control type="button" id="1003">
             <left>840</left>
-            <top>340</top>
+            <top>630</top>
             <width>290</width>
             <height>96</height>
             <font>font25_title</font>
