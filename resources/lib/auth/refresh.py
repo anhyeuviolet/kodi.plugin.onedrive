@@ -277,7 +277,20 @@ def refresh(profile_path, account_key, lock, post, sleep,
             # In a finally, so a raised exchange cannot hold the lock for a
             # whole lifetime -- ninety seconds in which the add-on looks wedged
             # for a reason nobody watching it can see.
-            lock.release()
+            #
+            # The answer is read rather than dropped. A release can genuinely
+            # fail to remove the file, and the orphan it leaves carries THIS
+            # session's identifier, so `_staleness` reads it as fresh and no
+            # contender will break it: exactly the ninety wedged seconds the
+            # `finally` above is here to prevent, arriving by the other door.
+            # Without this line it is invisible until somebody wonders why
+            # refreshes are taking their whole acquire timeout.
+            #
+            # No path in the message. The lock sits beside the token file, and
+            # a log on this platform is a file users paste into forums whole.
+            if not lock.release() and log is not None:
+                log('the refresh lock could not be removed; other contenders '
+                    'in this session will wait it out')
 
     return Refreshed(TRANSIENT, store.read(token_file), None, False, False)
 

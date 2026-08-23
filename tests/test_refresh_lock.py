@@ -243,6 +243,145 @@ def test_release_tolerates_a_lock_someone_else_broke(monkeypatch, lock_file):
     lock.release()
 
 
+def test_release_reports_the_break_as_success(monkeypatch, lock_file):
+    """Broken-and-gone is the outcome release wants, so it says True.
+
+    The companion to the test above: that one asserts release does not raise,
+    this one asserts it does not report a failure either. An absent file is not
+    something a caller should be able to mistake for one this instance could not
+    remove.
+    """
+    lock = RefreshLock(str(lock_file), SESSION, cheap_sleep)
+    lock.acquire(1)
+
+    def already_gone(path):
+        raise FileNotFoundError(path)
+
+    monkeypatch.setattr(os, 'unlink', already_gone)
+
+    assert lock.release() is True
+
+
+def test_release_retries_a_removal_that_fails_and_then_succeeds(monkeypatch,
+                                                                lock_file):
+    """The defect this method was rewritten for.
+
+    A contender reading the session identifier out of the lock has the file open
+    for a few microseconds, and on Windows an unlink against an open file is
+    refused with a sharing violation. The condition clears itself the instant
+    the reader closes, so the removal has to be *retried* rather than abandoned.
+
+    Injected rather than staged, because staging it means holding a real handle
+    open and asking the platform to refuse -- which Windows does and POSIX does
+    not, so a staged version would prove the platform on one machine and nothing
+    on the other. The staged form exists below, restricted to where the refusal
+    is real.
+    """
+    lock = RefreshLock(str(lock_file), SESSION, cheap_sleep)
+    lock.acquire(1)
+
+    real_unlink = os.unlink
+    attempts = []
+
+    def refuse_once(path):
+        attempts.append(path)
+        if len(attempts) == 1:
+            raise PermissionError(13, 'in use by another process')
+        real_unlink(path)
+
+    monkeypatch.setattr(os, 'unlink', refuse_once)
+
+    assert lock.release() is True
+    assert len(attempts) == 2, \
+        'the removal was not retried; one refusal ended it'
+    assert not lock_file.exists()
+
+
+def test_release_says_false_when_the_lock_file_outlives_the_grace(monkeypatch,
+                                                                  lock_file):
+    """A release that removed nothing must not report success.
+
+    This is the whole reason the method returns a value. The previous version
+    swallowed every OSError and returned None, so an orphan carrying the current
+    session id -- which no contender will break, because `_staleness` reads it as
+    fresh -- was indistinguishable from a clean release.
+    """
+    lock = RefreshLock(str(lock_file), SESSION, cheap_sleep)
+    # A refusal that never clears means this test spends the whole grace, which
+    # is a wall-clock second in production. Shortened on the instance: the
+    # assertion is that expiry is reported, not how long expiry takes, and the
+    # comment on REFUSED above applies word for word to this number.
+    lock.RELEASE_GRACE_SECONDS = 0.02
+    lock.acquire(1)
+
+    def always_refuse(path):
+        raise PermissionError(13, 'in use by another process')
+
+    monkeypatch.setattr(os, 'unlink', always_refuse)
+
+    assert lock.release() is False
+    assert lock_file.exists(), 'the premise of this test did not hold'
+
+
+def test_release_gives_up_on_a_shutdown(monkeypatch, lock_file):
+    """The retry uses the injected, abort-aware wait, and honours the abort.
+
+    Kodi closing must not be held up removing a file, and giving up costs
+    nothing: an orphan left at shutdown carries a session identifier the next
+    run does not share, so the next contender breaks it on sight rather than
+    waiting out its lifetime.
+    """
+    lock = RefreshLock(str(lock_file), SESSION, aborting_sleep)
+    lock.acquire(1)
+
+    attempts = []
+
+    def always_refuse(path):
+        attempts.append(path)
+        raise PermissionError(13, 'in use by another process')
+
+    monkeypatch.setattr(os, 'unlink', always_refuse)
+
+    assert lock.release() is False
+    assert len(attempts) == 1, \
+        'the abort was reported and the retry continued anyway'
+
+
+@pytest.mark.skipif(sys.platform != 'win32',
+                    reason='POSIX unlinks a file that is still open; only '
+                           'Windows refuses, and the refusal is the condition '
+                           'under test')
+def test_release_removes_the_lock_while_a_contender_holds_it_open(lock_file):
+    """The same defect, staged rather than injected, where it is real.
+
+    No monkeypatching: a second handle on the file is opened exactly as
+    `_recorded_session` opens one, and the platform refuses the unlink for
+    itself. Closing the handle from inside the injected wait is what makes the
+    retry observable -- it is the seam where a real reader would have finished.
+
+    Before the retry existed this returned with the file still on disk, and said
+    nothing about it.
+    """
+    lock = RefreshLock(str(lock_file), SESSION, cheap_sleep)
+    lock.acquire(1)
+
+    reader = open(str(lock_file), 'r', encoding='utf-8')
+    try:
+        assert json.load(reader)['session'] == SESSION, \
+            'the staged reader is not reading what a contender reads'
+
+        def close_the_reader(seconds):
+            reader.close()
+            return False
+
+        lock._sleep = close_the_reader
+
+        assert lock.release() is True
+        assert not lock_file.exists()
+    finally:
+        reader.close()
+
+
 def test_release_is_safe_to_call_twice(lock_file):
     lock = RefreshLock(str(lock_file), SESSION, cheap_sleep)
     lock.acquire(1)

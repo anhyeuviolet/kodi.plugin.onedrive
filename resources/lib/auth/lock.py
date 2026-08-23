@@ -109,6 +109,32 @@ class RefreshLock(object):
     # A second is far below the lifetime, so it costs the age signal nothing.
     FUTURE_TOLERANCE_SECONDS = 1.0
 
+    # How long `release` keeps trying to remove its own lock file, and how long
+    # it waits between attempts.
+    #
+    # The removal can fail for a reason that clears itself. A contender running
+    # `_recorded_session` has the file OPEN for the few microseconds it takes to
+    # read a session identifier out of it, and Windows refuses to unlink a file
+    # that any handle still refers to unless that handle was opened for delete
+    # sharing -- which CPython's `open` does not ask for. The failure is a
+    # sharing violation, errno 13 / WinError 32, and it is gone as soon as the
+    # reader closes.
+    #
+    # A grace far shorter than POLL_SECONDS would be no grace at all, since the
+    # reader may be descheduled; a grace approaching LIFETIME_SECONDS would make
+    # release the slow operation instead of the refresh. One second is two
+    # orders of magnitude above the window it covers and two below the lifetime.
+    #
+    # The wait is the INJECTED one, not `time.sleep`, for the same reason as
+    # everywhere else in this class: it reports a shutdown, and a Kodi that is
+    # closing must not be held up removing a file. Giving up on abort is also
+    # harmless, which is the second half of the argument -- an orphan left at
+    # shutdown carries a session identifier that the next Kodi run does not
+    # share, so `_staleness` calls it stale on sight and the next contender
+    # breaks it without waiting.
+    RELEASE_GRACE_SECONDS = 1.0
+    RELEASE_RETRY_SECONDS = 0.05
+
     def __init__(self, lock_path, session_id, sleep, lifetime=None):
         self._path = os.fspath(lock_path)
         self._session = session_id
@@ -303,11 +329,29 @@ class RefreshLock(object):
             pass
 
     def release(self):
-        """Let go. Safe to call twice, and safe to call having never acquired.
+        """Let go, and say whether the lock file is actually gone.
 
-        The unlink tolerates an absent file: somebody may have judged this lock
-        stale and broken it, and that is a case the design accepts rather than
-        an error.
+        Safe to call twice, and safe to call having never acquired.
+
+        TRUE means no lock file of this instance's remains at the path. That
+        includes the case where somebody judged this lock stale and broke it
+        before the release: an absent file is the outcome this wants, not an
+        error, and the design accepts being broken.
+
+        FALSE means the file is still there and this instance could not remove
+        it. The caller is not expected to do anything with that -- there is
+        nothing useful to do -- but it must be *sayable*, because the previous
+        version of this method could not say it. It ended in a bare
+        `except OSError: pass`, so a release that removed nothing was
+        indistinguishable from one that worked.
+
+        What that cost is worth stating, because it looked like flakiness rather
+        than a defect. The orphan carries the CURRENT session's identifier, so
+        `_staleness` reads it as fresh and no contender will break it; every
+        contender then waits out its whole acquire timeout and gives up. In the
+        suite that surfaced as an occasional slow run, and the slowness was the
+        failure rather than a cause of it -- the extra seconds were exactly the
+        acquire timeout being burned.
         """
         if self._fd is not None:
             try:
@@ -319,10 +363,24 @@ class RefreshLock(object):
         if not self._held:
             # Never held it, or already let go. Unlinking here would remove a
             # lock belonging to somebody else.
-            return
+            return True
         self._held = False
 
-        try:
-            os.unlink(self._path)
-        except OSError:
-            pass
+        # Our own descriptor is closed above, so anything still holding the file
+        # open is somebody else's reader and is about to let go. Retry until it
+        # does. FileNotFoundError is not retried: it is the answer, not a
+        # failure.
+        deadline = time.time() + self.RELEASE_GRACE_SECONDS
+        while True:
+            try:
+                os.unlink(self._path)
+                return True
+            except FileNotFoundError:
+                return True
+            except OSError:
+                pass
+
+            if time.time() >= deadline:
+                return False
+            if self._sleep(self.RELEASE_RETRY_SECONDS):
+                return False

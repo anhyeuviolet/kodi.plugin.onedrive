@@ -501,6 +501,44 @@ def test_the_rotation_log_shows_eight_leading_characters_and_no_more(
     assert written[:9] not in joined
 
 
+def test_a_release_that_removed_nothing_is_logged(monkeypatch, profile,
+                                                  token_file, lock_file,
+                                                  signed_in):
+    """The orphan is invisible from inside the add-on unless this says so.
+
+    A lock file that survives its release carries the current session id, so no
+    contender breaks it and every one of them waits out its whole acquire
+    timeout instead. That looks like slowness, and slowness gets blamed on the
+    network. One line makes it name itself.
+    """
+    lines = []
+    post = RecordingPost(rotated(1))
+
+    def always_refuse(path):
+        raise PermissionError(13, 'in use by another process')
+
+    monkeypatch.setattr(os, 'unlink', always_refuse)
+
+    lock = new_lock(lock_file)
+    # The grace is a wall-clock second in production and this test spends all
+    # of it, since the refusal never clears. Shortened on the instance rather
+    # than the class: what is under test is that expiry is reported, not how
+    # long expiry takes, and a second here would make this the slowest test in
+    # the file by an order of magnitude.
+    lock.RELEASE_GRACE_SECONDS = 0.02
+
+    result = refresh_module.refresh(profile, ACCOUNT, lock, post,
+                                    no_wait, log=lines.append)
+
+    assert result.outcome == refresh_module.SUCCEEDED, \
+        'the refresh itself must still succeed; the lock is not its job'
+    joined = '\n'.join(lines)
+    assert 'lock could not be removed' in joined, \
+        'the failed release said nothing:\n%s' % joined
+    assert str(lock_file) not in joined and 'lock' in joined, \
+        'the message names the path, which sits beside the token file'
+
+
 def test_the_fingerprint_of_an_absent_token_is_not_an_index_error():
     """A blob with no refresh token reaches the logger on the needs-
     reauthorisation path, and a crash in a log line is a crash."""
