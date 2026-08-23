@@ -118,7 +118,19 @@ class Request(object):
         # goes through the same redactor the bodies do.
         return self.get_body_for_report(url)
     
-    def get_headers_for_report(self, headers):
+    @classmethod
+    def get_headers_for_report(cls, headers):
+        """The headers with the bearer token taken out.
+
+        A classmethod, and total in `headers`, for the same reason
+        `get_body_for_report` is: the OAuth2 layer reports a failure before any
+        Request exists to report it through, and one of its call sites has no
+        headers to speak of and passes a plain string instead. Iterating that
+        would report a dictionary of single characters, and building a report
+        is not allowed to be the thing that goes wrong.
+        """
+        if not isinstance(headers, dict):
+            return headers
         headers_report = {}
         for header in headers:
             if header == 'authorization':

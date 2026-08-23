@@ -1264,6 +1264,191 @@ def test_transport_report_redacts_credential_fields():
 
 
 # ---------------------------------------------------------------------------
+# Credential redaction in what an exception says (the second delivery path)
+# ---------------------------------------------------------------------------
+#
+# The sweep above covers reports: strings assigned to a name containing
+# "report" and handed to the logger. That is one of the two ways a credential
+# reaches a person, and the other one is worse, because it does not stop at the
+# log.
+#
+# An exception message is rendered onto the television.
+# CloudDriveAddon._handle_exception puts a UIException's root exception on line
+# two of a Kodi dialog, and _identify wraps every failure of
+# provider.get_account in a UIException. So the text an exception carries is a
+# user-visible string by construction.
+#
+# OAuth2._validate_access_tokens built its message as
+# 'Access tokens provided are not valid: ' + Utils.str(access_tokens), and on
+# hardware that printed a live token blob on screen -- token_type, scope,
+# expires_in, then the access token itself. The report sweep could not see it:
+# it was a raise, not an assignment, and the value was a local name rather than
+# one of the raw-body attributes.
+#
+# This is the same rule stated over raises. It does not replace the sweep above
+# and it does not narrow it.
+
+# Names that hold a credential, or a whole body or blob that contains one, in
+# this tree. `body` is here because that is what a token response is called in
+# resources/lib/auth/refresh.py, and a token response IS the credential.
+CREDENTIAL_BEARING_NAMES = frozenset({
+    'access_token', 'refresh_token', 'id_token', 'device_code', 'user_code',
+    'access_tokens', 'tokens_info', 'token_response', 'blob', 'merged',
+    'body', 'response', 'response_text', 'payload', 'data', 'text',
+    'headers', 'request_headers', 'fields',
+})
+
+# The one exception class allowed to be handed such a name. It is not an
+# exclusion in the usual sense -- it is paid for by
+# test_the_exempt_exception_keeps_its_body_out_of_its_message below, which
+# reads the class and asserts the body never reaches the message. Widening this
+# set without a matching positive assertion is how this gate stops checking.
+EXEMPT_EXCEPTIONS = frozenset({'TransportError'})
+
+
+def _redacting_call(node):
+    """True if `node` is a call that hands back a redacted value."""
+    if not isinstance(node, ast.Call):
+        return False
+    name = _func_name(node.func)
+    tail = name.split('.')[-1]
+    # The naming convention the transport established: *_for_report returns a
+    # value fit to print. `fingerprint` is refresh.py's eight-character token
+    # digest, and `len` is a measurement rather than a disclosure.
+    return (tail.endswith('_for_report') or 'redact' in name.lower()
+            or tail in ('fingerprint', 'len'))
+
+
+def _credentials_in_raises():
+    """(hits, visited) for every raise that carries a credential-bearing name.
+
+    `visited` is the non-vacuity count. A tree with no raises in it is a tree
+    this sweep certifies nothing about.
+    """
+    hits = []
+    visited = 0
+    for rel in python_sources():
+        contents = read(rel)
+        for node in ast.walk(_parse(rel)):
+            if not isinstance(node, ast.Raise) or node.exc is None:
+                continue
+            visited += 1
+
+            if (isinstance(node.exc, ast.Call)
+                    and _func_name(node.exc.func).split('.')[-1]
+                    in EXEMPT_EXCEPTIONS):
+                continue
+
+            # Everything underneath a redacting call is already safe.
+            covered = set()
+            for child in ast.walk(node.exc):
+                if _redacting_call(child):
+                    covered.update(id(sub) for sub in ast.walk(child))
+
+            carried = sorted({
+                child.id for child in ast.walk(node.exc)
+                if isinstance(child, ast.Name)
+                and child.id in CREDENTIAL_BEARING_NAMES
+                and id(child) not in covered})
+            if carried:
+                hits.append((rel, node.lineno, '%s -> %s' % (
+                    carried,
+                    ' '.join((ast.get_source_segment(contents, node)
+                              or '').split())[:160])))
+    return hits, visited
+
+
+def test_no_exception_message_carries_a_credential():
+    hits, visited = _credentials_in_raises()
+    assert visited, (
+        'the sweep found no raise anywhere in shipped source, so it certifies '
+        'nothing. The tree raises well over a hundred times; a count of zero '
+        'means the file list moved, not that the tree is clean.')
+    assert not hits, (
+        'an exception is constructed from a credential-bearing value without '
+        'going through a redactor. An exception message is not log-only: '
+        '_handle_exception renders it onto a Kodi dialog, and _identify wraps '
+        'every get_account failure in a UIException that reaches one. This is '
+        'the construct that printed a live access token on a television:\n%s'
+        % report(hits))
+
+
+def test_the_invalid_token_message_is_built_from_field_names():
+    """The positive half, at the site the defect was found.
+
+    A sweep can say the blob is no longer stringified. It cannot say the
+    message is still worth reading, and a redaction that reduces a failure to
+    "not valid" costs a maintainer the one fact they need: which of the four
+    required fields was absent.
+    """
+    oauth2 = 'resources/lib/vendor/clouddrive_common/remote/oauth2.py'
+    assert oauth2 in tracked_files(), '%s is missing' % oauth2
+
+    validator = _function(oauth2, '_validate_access_tokens')
+    assert validator is not None, (
+        '%s has no _validate_access_tokens; this sweep certifies nothing'
+        % oauth2)
+
+    source = ast.get_source_segment(read(oauth2), validator) or ''
+    assert 'Utils.str(access_tokens)' not in source, (
+        'the validator stringifies the whole blob into its message again. That '
+        'message is rendered onto a Kodi dialog: it printed a live access '
+        'token on a television once already')
+    assert 'missing' in source, (
+        'the validator no longer names which required field was absent, so the '
+        'message says only that something was wrong. `date` missing means a '
+        'response never went through store.merge_token_response, and that is '
+        'the whole diagnosis')
+
+
+def test_the_exempt_exception_keeps_its_body_out_of_its_message():
+    """What buys TransportError its place in EXEMPT_EXCEPTIONS.
+
+    device_code.poll_once raises it as `TransportError(status, body)`, and by
+    the sweep's rule `body` is credential-bearing. It is safe for a reason that
+    is a property of the class rather than of the call site: the message is
+    built from `status` alone and `body` is only ever bound to an attribute. If
+    that stops being true the exemption stops being paid for, and this fails.
+    """
+    tree = _parse(DEVICE_CODE)
+    cls = next((node for node in ast.walk(tree)
+                if isinstance(node, ast.ClassDef)
+                and node.name == 'TransportError'), None)
+    assert cls is not None, (
+        '%s has no TransportError, so its entry in EXEMPT_EXCEPTIONS buys '
+        'nothing and should go' % DEVICE_CODE)
+
+    init = next((node for node in cls.body
+                 if isinstance(node, ast.FunctionDef)
+                 and node.name == '__init__'), None)
+    assert init is not None, 'TransportError has no __init__ to read'
+
+    message_calls = [node for node in ast.walk(init)
+                     if isinstance(node, ast.Call)
+                     and _func_name(node.func).endswith('Exception.__init__')]
+    assert message_calls, (
+        'TransportError does not build a message through Exception.__init__, '
+        'so this assertion cannot see what it says and the exemption is unpaid')
+
+    for call in message_calls:
+        carried = [child.id for child in ast.walk(ast.Tuple(elts=call.args,
+                                                            ctx=ast.Load()))
+                   if isinstance(child, ast.Name)
+                   and child.id in CREDENTIAL_BEARING_NAMES]
+        assert not carried, (
+            'TransportError now formats %r into its own message. The sweep '
+            'exempts every raise of it on the strength of that not happening, '
+            'so either the formatting goes or the exemption does.' % (carried,))
+
+    assigned = {target.attr
+                for node in ast.walk(init) if isinstance(node, ast.Assign)
+                for target in node.targets if isinstance(target, ast.Attribute)}
+    assert 'body' in assigned, (
+        'TransportError no longer keeps the body as an attribute, so this '
+        'assertion is reading a class that has changed shape')
+
+
+# ---------------------------------------------------------------------------
 # The refresh transport profile (the three-way coupling nothing else can see)
 # ---------------------------------------------------------------------------
 #

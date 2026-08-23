@@ -60,6 +60,10 @@ class _Probe(OAuth2):
     def _get_request_headers(self):
         return {}
 
+    def get_access_tokens(self):
+        """Nothing stored, which is what the store returns before a sign-in."""
+        return {}
+
     def refresh_access_tokens(self, request_params=None):
         self.refreshed += 1
         raise AssertionError(
@@ -137,3 +141,129 @@ def test_the_stamped_expiry_is_not_already_past(token_response):
     """
     blob = store.merge_token_response({}, token_response)
     assert blob['date'] + blob['expires_in'] - 600 > time.time()
+
+
+# ---------------------------------------------------------------------------
+# What that rejection is allowed to say
+# ---------------------------------------------------------------------------
+#
+# The rejection above reached a Kodi dialog on a television, and what it put on
+# screen was the token blob rendered whole -- token_type, scope, expires_in and
+# then the access token itself. CloudDriveAddon._handle_exception renders a
+# UIException's root exception as line 2 of the dialog, and _identify wraps
+# every failure of provider.get_account in one, so this message is a
+# user-visible string by construction rather than by accident.
+#
+# The same raise embedded the request data, which for a token exchange is a
+# form body carrying the refresh token, the device code and the client id.
+#
+# These drive the real message. The gate in tests/test_auth_gates.py stops the
+# construct coming back anywhere in shipped source; these say what the message
+# has to be instead.
+
+def _rejection(probe, **kwargs):
+    """The RequestException prepare_request raises for an invalid blob."""
+    with pytest.raises(RequestException) as caught:
+        probe.prepare_request('post', '/token', **kwargs)
+    return caught.value
+
+
+def test_the_rejection_does_not_print_the_token(token_response):
+    error = _rejection(_Probe(), access_tokens=dict(token_response))
+
+    message = str(error)
+    for field in ('access_token', 'refresh_token', 'id_token'):
+        value = token_response.get(field)
+        if not value:
+            continue
+        assert value not in message, (
+            'the rejection prints the %s. This message is rendered into a Kodi '
+            'dialog by _handle_exception and written to the Kodi log, which '
+            'users paste into forum posts verbatim -- and for a live blob the '
+            'token IS the credential, there is nothing else to steal.' % field)
+
+
+def test_the_rejection_names_the_missing_field_and_the_ones_present(token_response):
+    error = _rejection(_Probe(), access_tokens=dict(token_response))
+
+    message = str(error)
+    assert 'date' in message, (
+        'the rejection does not say which required field is missing. `date` is '
+        'the answer nine times out of ten -- it means a response reached the '
+        'OAuth2 layer without going through store.merge_token_response -- and '
+        'a maintainer who is not told it cannot act on this message at all')
+    for name in ('token_type', 'scope', 'expires_in'):
+        assert name in message, (
+            'the rejection does not say that %r arrived. Field names are not '
+            'credentials, and knowing which ones turned up is what separates '
+            'an unmerged response from an empty blob from a truncated one'
+            % name)
+
+
+def test_an_empty_blob_says_so_rather_than_printing_a_brace():
+    error = _rejection(_Probe(), access_tokens=None)
+    assert 'no token blob at all' in str(error)
+
+
+def test_the_rejection_redacts_the_request_data():
+    """The third argument, which _handle_exception appends to the log report."""
+    error = _rejection(_Probe(), access_tokens={'access_token': 'a'},
+                       parameters={
+                           'grant_type': 'refresh_token',
+                           'refresh_token': 'synthetic-refresh-token-long-enough',
+                           'client_id': 'synthetic-client-id',
+                       })
+
+    report = str(error.request)
+    assert 'synthetic-refresh-token-long-enough' not in report, (
+        'the rejection embeds the request body unredacted. A token exchange '
+        'sends the refresh token in that body:\n%s' % report)
+    assert 'refresh_token=' in report, (
+        'the request data is not reported at all. Redaction means cutting the '
+        'value short, not dropping the field: which field was sent is the '
+        'diagnostically useful half\n%s' % report)
+
+
+def test_a_short_credential_in_the_request_data_goes_entirely():
+    """03-08's rule, reached through this path.
+
+    Keeping a fixed prefix of a nine-character user code is not a fingerprint,
+    it is the code with a typo, and it is live for as long as the dialog is on
+    screen. A value shorter than twice the prefix is dropped whole.
+    """
+    error = _rejection(_Probe(), access_tokens={'access_token': 'a'},
+                       parameters={'device_code': 'K7QF3NBXZ'})
+
+    report = str(error.request)
+    assert 'K7QF3NBXZ' not in report
+    assert 'K7QF3NB' not in report, (
+        'a short credential was half-masked rather than removed:\n%s' % report)
+
+
+def test_the_rejection_redacts_the_bearer_header():
+    error = _rejection(_Probe(), access_tokens={'access_token': 'a'},
+                       headers={'content-type': 'application/json',
+                                'authorization': 'Bearer synthetic-access-token-1'})
+
+    report = str(error.request)
+    assert 'synthetic-access-token-1' not in report, (
+        'the rejection reports the authorization header in the clear:\n%s'
+        % report)
+    assert 'content-type' in report, (
+        'no header reached the report at all, so this assertion certifies '
+        'nothing:\n%s' % report)
+
+
+def test_the_rejection_survives_a_report_it_cannot_render():
+    """Reporting is not allowed to be the thing that fails.
+
+    prepare_request calls the validator a second time with the plain strings
+    'refresh_access_tokens' and 'Unknown' in place of a URL and headers.
+    Iterating that string as a mapping would report a dictionary of single
+    characters; raising over it would lose the original failure entirely.
+    """
+    probe = _Probe()
+    with pytest.raises(RequestException) as caught:
+        probe._validate_access_tokens({}, 'refresh_access_tokens', 'Unknown',
+                                      'Unknown')
+    assert 'Unknown' in str(caught.value.request)

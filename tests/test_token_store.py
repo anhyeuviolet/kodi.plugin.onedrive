@@ -309,8 +309,23 @@ def _keys_the_vendored_reader_requires():
     with open(source, 'r', encoding='utf-8') as handle:
         text = handle.read()
 
+    # Two shapes, because the validator has had two. The names were written
+    # inline as a chain of `'x' in access_tokens` tests until the message it
+    # raises was rebuilt around them -- that message used to print the whole
+    # blob -- and they now live in a class-level tuple that both the check and
+    # the message read. Both shapes are read and the union taken: taking only
+    # the newer one would make this parse go silently vacuous the moment
+    # anybody vendored an upstream update over it.
+    required = set()
+
     body = text.split('def _validate_access_tokens')[1].split('\n    def ')[0]
-    return set(re.findall(r"'(\w+)' in access_tokens", body))
+    required.update(re.findall(r"'(\w+)' in access_tokens", body))
+
+    declared = re.search(r'REQUIRED_ACCESS_TOKEN_FIELDS\s*=\s*\(([^)]*)\)', text)
+    if declared:
+        required.update(re.findall(r"'(\w+)'", declared.group(1)))
+
+    return required
 
 
 def test_the_written_blob_satisfies_the_reader_that_already_exists(store_path):
