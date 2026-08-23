@@ -1,8 +1,27 @@
 ---
 phase: 01-vendor-lift
 verified: 2026-08-23T00:21:11Z
-status: gaps_found
-score: 16/18 must-haves verified
+status: passed
+gaps_resolved: 2026-08-23
+score: 16/18 must-haves verified at the time of the report; all four recorded gaps closed afterwards
+resolution: |
+  Every gap below was in the record, not in the code — the verifier re-derived the
+  load-bearing claims independently and all of them survived: the 38-file verbatim copy
+  matched by git object id, the vendored diffs contained no non-import change, the QR
+  encoder zip reproduced by sha256 and byte count, and the 22 gates were confirmed green
+  in a separate process with no assertion weakened or made vacuous.
+
+  The four gaps were closed in three documentation-only commits:
+    - 40f5990 — the QR encoder's artefact identity added to VENDORED.md (add-on id,
+      version, URL, zip sha256, byte count, file mapping, per-file hash table);
+      CREDITS.md corrected to name both the original project and the actual source of
+      the copy; the two miscounts in the modification table fixed against the tree.
+    - 5f6271b — KODI-01 and SETUP-06 given inline qualifications matching their SUMMARYs.
+    - c1cd19b — the "already-dead broker" premise replaced by the measurement that the
+      broker answers.
+
+  No application code and no test was changed while closing them; the suite remained
+  22/22 throughout.
 behavior_unverified: 0
 overrides_applied: 1
 overrides:
