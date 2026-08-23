@@ -57,6 +57,18 @@ eight seconds; the predicate has held on each occasion it has been available to
 check, which is what turns it from a description into something worth acting on.
 Suite otherwise green at 256 passed, 1 skipped.
 
+*Two more, during the early Phase 5 repository work on 2026-08-23, and the
+predicate held again.* Failures on runs of 9.26s and 13.51s; passes on five runs
+of 3.5-4.5s around them, with no file touched between a failure and the passes
+that followed. **Nine failures now, and nine runs over eight seconds, with no
+failure ever seen on a run under it.** Both of these were on runs that had just
+built one or more archives, which is the same shape of cause as the `compileall`
+below — and the second was a 13.5s run, the slowest yet, on the run that also
+built the whole repository tree. Nothing about this changes the item: the knob is
+still the five-second `acquire` timeout in the test. It is recorded because a
+predicate that has held on nine occasions and failed on none is worth the two
+lines it costs to keep confirming.
+
 *Three more, during the post-verification gap closure, and the predicate held on
 every one.* Failures on runs of 8.38s, 8.66s and 8.47s; passes on six runs of
 3.30-3.68s interleaved with them, with no file touched between a failure and the
@@ -357,3 +369,47 @@ is the part that is Phase 2's.
 Also recorded against `CI-01` in `.planning/REQUIREMENTS.md` and as an inherited
 constraint on Phase 2 in `.planning/ROADMAP.md`, so it is visible from the
 requirement and from the phase as well as from this file.
+
+## Found during the early Phase 5 repository landing (2026-08-23)
+
+This file belongs to Phase 3 and the work below does not. The two items are here
+because this is where the project keeps items that have no owning plan, and the
+repository slice had none — it was built at the owner's request outside any plan,
+with Phase 5 still unplanned. The substantive record of that work is in
+`ROADMAP.md`'s Phase 5 entry.
+
+**18. The archive still ships four files that are not add-on code, and Phase 5
+was supposed to decide that here.**
+
+03-02 recorded that `.github/`, `pytest.ini`, `.project` and `.pydevproject` ship
+inside the add-on archive because the exclusion list is deliberately short, and
+left the question to "phase 5 ... with the hosted repository's size in view".
+That view now exists and **the question was still not decided**: the exclusion
+list gained exactly one rule, and it was a derived one — a top-level directory
+holding an `addon.xml` of its own is another add-on, which is what keeps
+`repository.onedrive.kn/` out of the plugin's archive. Nothing was removed by
+taste.
+
+That was deliberate. The archive is 74 members and the four files are a rounding
+error against the vendored tree, so "size in view" turns out not to be the
+argument 03-02 expected it to be; the real argument for removing them would be
+tidiness, and tidiness is not a reason to shorten a list whose whole design
+rationale is that it must not grow by opinion. **Belongs to whoever plans Phase 5**,
+with the observation that the premise the deferral rested on did not survive
+contact — if they ship, they should ship on purpose, and this is the note that
+says nobody has yet said so.
+
+**19. The repository add-on's `icon.png` is a byte-for-byte copy of the plugin's.**
+
+`repository.onedrive.kn/icon.png` and `icon.png` are the same 24,988 bytes. A
+repository add-on with no icon renders as a blank tile in the add-on browser,
+which reads as broken on a television, so it has one; making a distinct one is a
+design task and not an execution task, and inventing artwork inside a build
+commit is not reviewable.
+
+Harmless, and recorded so it is not later read as an oversight or as an accident
+of a copy command. **Belongs to whoever next touches the add-on's artwork.** Note
+that `tests/test_vendor_gates.py::test_license_unmodified` is the model for the
+concern if it ever becomes one — it asserts exactly one tracked `LICENSE.txt` —
+and no equivalent assertion exists for icons, deliberately: two add-ons sharing
+an icon is legal and is what is wanted until somebody draws a second one.

@@ -34,6 +34,8 @@ The goal is that this add-on runs on the owner's own **TCL Android TV 12**. The 
 
 Pulled forward out of Phase 5: **DIST-01 alone**, the build that produces an installable zip — and only at the point where the add-on first has to be installed on the TV. This is not distribution work and it is not a "public" concern: **installing an add-on on Android TV requires a zip to install from.** That is a constraint of the device, not a release decision. The rest of Phase 5 — the hosted repository, the unattended N to N+1 update — waits.
 
+*Amended 2026-08-23.* The sentence above is now half out of date and is left standing because it records what was decided at the time. **The hosted repository was also built early**, at the owner's request and outside any plan, on the same day Phase 3 finished. Phase 5 has still not been planned. What landed and what did not is written into the Phase 5 entry below; the short version is that the *mechanism* exists and **nothing has been installed on a television**, so the unattended N to N+1 update — which is the criterion Phase 5 exists for and the one with multi-hour latency — is untouched.
+
 **Deferred:** Phase 7, Phase 8, and the CI harness (CI-01 to CI-05). Two items inside that deferred set are exceptions, because they hit the owner directly:
 
 - **REL-01** — where the embedded `client_id` lives. The Microsoft 365 E5 Developer tenant renews on activity; if it lapses, the `client_id` dies for every installed copy at once, including the one on the owner's own television. That is an availability problem for the primary user, not a release formality.
@@ -222,15 +224,32 @@ Plans:
 
 **Note**: the builds published in this phase are maintainer test artifacts. The first release intended for existing v2.3.0 users is gated on Phase 8, because an existing user must not receive a build that cannot migrate their profile.
 
+**Landed early, outside any plan (2026-08-23)** — at the owner's request, on the day Phase 3 finished. This phase is still **not planned**, and this block exists so that planning it does not rebuild what is already here. Same convention as Phase 3's "Pulled forward into this phase" block, pointing the other way.
+
+  **What was delivered:**
+
+  - `repository.onedrive.kn/` — the repository add-on. Its `xbmc.addon.repository` block was written against Kodi rather than from memory: the wiki page (marked updated for v19), and Kodi's own Omega branch — `Repository.cpp` (`ParseDirConfiguration`, `FetchIndex`, `ResolvePathAndHash`), `AddonInfoBuilder.cpp`, and `addons/repository.xbmc.org/addon.xml`, Team Kodi's own repository add-on as it ships in Omega. It declares `<dir>` with `<info>`, `<checksum verify="sha256">`, `<datadir>` and `<hashes>sha256</hashes>` at `https://anhyeuviolet.github.io/kodi.plugin.onedrive/repo`. No `compressed=` and no `zip=` attributes: both appear in the wiki's examples and Omega reads neither.
+  - `tools/build_repo.py` — writes the publishable tree into `dist/pages/`. The manifest is the only place the URLs are written; every output path is derived from it. Archives come from `tools/build_addon_zip.py` with `repo=` pointed at each add-on's source root, so there is no second archive builder and DIST-01's install contract holds for the repository add-on too. Two runs from the same commit are byte-identical, measured.
+  - `tests/test_build_repo.py` — thirty tests over a real tree read back off disk, each property confirmed by mutation. Plus five in `test_build_zip.py` for the sibling-add-on exclusion and the parameterised member floor, and one in `test_vendor_gates.py` holding the URL exemption the Pages hostname required.
+  - `README.md` — the install path in the order the owner will take it, opening with the fact that a repository does **not** remove the USB trip, only every trip after it, and carrying both Android TV 12 findings.
+
+  **What remains, and it is the part this phase exists for:**
+
+  - **Nothing has been installed on a television.** Every claim above is a claim about files. DIST-02's "is published" clause is unmet: the tree is generated and not served, and no Kodi has ever fetched it.
+  - **DIST-04 is untouched** — the unattended N to N+1 update, waited out rather than force-refreshed. This is the criterion with multi-hour latency and the reason this phase is scheduled early; none of it was started.
+  - **DIST-03's premise is contradicted by a measurement and must be settled when planning.** See criterion 3.
+  - **Publication itself.** GitHub Pages is not configured, `dist/` is gitignored so the tree is not in the index, and no decision has been recorded about which branch Pages serves.
+  - **The archive-size question 03-02 left to this phase.** `.github/`, `pytest.ini` and the two Eclipse project files still ship inside the add-on archive; 03-02 recorded that deliberately, "so that phase 5 can decide it with the hosted repository in view". It was not decided here. The exclusion list gained one derived rule (a sibling add-on's source) and nothing by taste.
+
 **Success Criteria** (what must be TRUE):
 
-  1. A build produces `plugin.onedrive-<version>.zip` containing exactly one top-level `plugin.onedrive/` directory, and it installs from the Kodi file manager.
-  2. The published repository is served over HTTPS, uses the `<dir>` schema with `<checksum verify="sha256">` and `<hashes>sha256</hashes>`, and contains no MD5 hash and no flat pre-Gotham layout.
-  3. Installing the repository on the Android TV box takes exactly one URL entry with the remote and no further manual steps. **CI-06 exception — resolve when planning this phase:** the phone cannot make this claim. "One URL entry with the remote" is a remote-interaction assertion, and it is the whole point of the self-hosted repository, so it cannot be quietly dropped either. It either moves to release under CI-07 or becomes a use-and-report observation on the box.
-  4. A throwaway N to N+1 pair published to that repository is confirmed to arrive on the box without anyone pressing "Check for updates" — verified by waiting out Kodi's periodic check, not by force-refreshing, since a maintainer who always force-refreshes is structurally unable to reproduce the failure users see.
-  5. Every published version number is plain, with no pre-release suffix, because Kodi's Debian-style comparison sorts `3.0.0-beta` below `3.0.0`.
+  1. A build produces `plugin.onedrive-<version>.zip` containing exactly one top-level `plugin.onedrive/` directory, and it installs from the Kodi file manager. *(Stale as written: the id is `plugin.onedrive.kn`, corrected in `REQUIREMENTS.md` by plan 03-02 because Kodi refuses an install whose top-level directory disagrees with the manifest id. Left here rather than silently rewritten, flagged so the correction is applied once, when this phase is planned.)* **MET 2026-08-23 by 03-14** for the add-on archive, on the TCL from a USB drive.
+  2. The published repository is served over HTTPS, uses the `<dir>` schema with `<checksum verify="sha256">` and `<hashes>sha256</hashes>`, and contains no MD5 hash and no flat pre-Gotham layout. **PARTLY MET 2026-08-23 — the produced tree, not a published one.** Every clause about *shape* is met and asserted by test: `<dir>`, `verify="sha256"`, `<hashes>sha256</hashes>`, https throughout, and MD5 refused by name rather than merely not chosen — a manifest edited to `<hashes>true</hashes>`, which is Kodi's deprecated alias for MD5, stops the build. **The clause about being *served* is not met**: nothing is hosted, so no assertion here has been made against an HTTP response.
+  3. Installing the repository on the Android TV box takes exactly one URL entry with the remote and no further manual steps. **This criterion's premise is contradicted by a measurement and cannot be planned as written.** Deferred item 16 records that installing by URL was attempted on the TCL and does not work — Kodi's *add source* browse needs a directory listing and a plain file URL provides none — and that pointing it at a repository is not a way round it, because **adding a repository is itself a zip install**. So "exactly one URL entry" describes something that did not happen and, on the route currently available, cannot. Two ways out, and **choosing between them is planning work, not execution work**: either restate the criterion as *one zip install, then no further manual steps ever*, which is what the repository actually buys and what `README.md` now says plainly; or make the URL route work by publishing an HTML index at the repository path, since Kodi's HTTP directory reader parses `<a href>` links out of a page — **untested, and offered as a lead rather than a solution.** The CI-06 exception below is unchanged and still applies to whichever wording survives. **CI-06 exception — resolve when planning this phase:** the phone cannot make this claim. "One URL entry with the remote" is a remote-interaction assertion, and it is the whole point of the self-hosted repository, so it cannot be quietly dropped either. It either moves to release under CI-07 or becomes a use-and-report observation on the box.
+  4. A throwaway N to N+1 pair published to that repository is confirmed to arrive on the box without anyone pressing "Check for updates" — verified by waiting out Kodi's periodic check, not by force-refreshing, since a maintainer who always force-refreshes is structurally unable to reproduce the failure users see. **NOT STARTED.** Nothing about the early landing touches this, and it is the criterion with the latency this phase's scheduling was built around.
+  5. Every published version number is plain, with no pre-release suffix, because Kodi's Debian-style comparison sorts `3.0.0-beta` below `3.0.0`. **Mechanism in place 2026-08-23, criterion not met.** `tools/build_repo.py` refuses to publish a version that is not plain dotted numerals, and a test drives a `4.5.6~beta1` manifest through it and asserts the refusal. The criterion says *published*, and nothing is published, so it stands open.
 
-**Plans**: TBD (3 expected)
+**Plans**: TBD (3 expected — the early landing was not one of them and consumed none of them)
 
 ### Phase 6: Play
 
@@ -297,7 +316,7 @@ Phases execute in numeric order, with two concurrent pairs: {1, 2} runs alongsid
 | 2. Pure Core and CI Harness | 0/4 | Not started | - |
 | 3. Authentication | 14/14 | Executed — awaiting verification | 2026-08-23 |
 | 4. Browse | 0/4 | Not started | - |
-| 5. Distribution | 0/3 | Not started | - |
+| 5. Distribution | 0/3 | Not started — one slice landed early (see the phase entry) | - |
 | 6. Play | 0/4 | Not started | - |
 | 7. Kodi Modernization | 0/3 | Not started | - |
 | 8. Release Readiness | 0/2 | Not started | - |
