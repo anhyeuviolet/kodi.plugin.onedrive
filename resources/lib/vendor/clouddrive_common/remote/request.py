@@ -18,6 +18,7 @@
 #-------------------------------------------------------------------------------
 
 import json
+import re
 import time
 
 from resources.lib.vendor.clouddrive_common.exception import RequestException
@@ -112,7 +113,10 @@ class Request(object):
             if index > -1:
                 url_report += url[index:]
             return url_report
-        return url
+        # The clause above only knows one field name and only the first
+        # occurrence of it. A query string can carry any of the five, so it
+        # goes through the same redactor the bodies do.
+        return self.get_body_for_report(url)
     
     def get_headers_for_report(self, headers):
         headers_report = {}
@@ -122,7 +126,78 @@ class Request(object):
             else:
                 headers_report[header] = headers[header]
         return headers_report
-    
+
+    # -- credential redaction in the report ------------------------------
+    #
+    # The bearer header and one query parameter were already covered. Neither
+    # is where the device-code flow puts its credentials: a token exchange
+    # sends the device code in a form BODY and gets three tokens back in a JSON
+    # body, and both bodies were being concatenated into a report string that
+    # goes straight to the Kodi log.
+    #
+    # A Kodi log is a file users paste into forum posts and attach to issues
+    # verbatim. A successful token response IS the credential -- there is
+    # nothing else to steal -- and the two codes are worth a session to whoever
+    # reads them before the user has finished typing them into their phone.
+    #
+    # All five, in both directions. Covering four is publishing the fifth.
+    REDACTED_FIELDS = ('access_token', 'refresh_token', 'id_token',
+                       'device_code', 'user_code')
+
+    # Enough to correlate two log lines -- did the stored token change between
+    # refreshes -- and not enough to use. The same eight the refresh module's
+    # fingerprint keeps, so the two are comparable by eye.
+    REDACTED_PREFIX_CHARACTERS = 8
+    REDACTED_MARKER = '...*removed*'
+
+    # Two shapes, because these bodies come in two: JSON on the way back and
+    # form encoding on the way out. Both are built from REDACTED_FIELDS rather
+    # than written out, so adding a field name to the tuple above is the whole
+    # of adding it to the redactor.
+    _REDACT_ALTERNATION = '|'.join(re.escape(f) for f in REDACTED_FIELDS)
+    _REDACT_JSON = re.compile(
+        r'("(?:%s)"\s*:\s*")([^"]*)(")' % _REDACT_ALTERNATION)
+    _REDACT_FORM = re.compile(
+        r'((?:^|[?&])(?:%s)=)([^&\s"\']*)' % _REDACT_ALTERNATION)
+
+    @classmethod
+    def _keep_prefix(cls, value):
+        """At most eight leading characters, and nothing at all if that would
+        be most of the value.
+
+        The three tokens are hundreds of characters long, so eight correlates
+        two log lines and discloses nothing usable. `user_code` is nine
+        characters. Keeping eight of those nine is not a fingerprint, it is the
+        code with a typo -- and it is live for as long as the dialog is on
+        screen. So a value that is not at least twice the prefix goes entirely.
+        """
+        if not value:
+            return value
+        if len(value) <= 2 * cls.REDACTED_PREFIX_CHARACTERS:
+            return cls.REDACTED_MARKER
+        return value[:cls.REDACTED_PREFIX_CHARACTERS] + cls.REDACTED_MARKER
+
+    @classmethod
+    def get_body_for_report(cls, body):
+        """A request or response body with every credential field cut short.
+
+        Never raises. This runs inside the logging path, including the logging
+        path of a failure, and an exception thrown while reporting an exception
+        loses the original -- so an unreadable body reports as unreadable
+        rather than taking the report down with it.
+        """
+        if body is None:
+            return Utils.str(body)
+        try:
+            text = Utils.str(body)
+        except Exception:
+            return '<possible binary content>'
+        text = cls._REDACT_JSON.sub(
+            lambda m: m.group(1) + cls._keep_prefix(m.group(2)) + m.group(3),
+            text)
+        return cls._REDACT_FORM.sub(
+            lambda m: m.group(1) + cls._keep_prefix(m.group(2)), text)
+
     def request(self):
         self.response_text = self._DEFAULT_RESPONSE
         if not self.exceptions:
@@ -139,7 +214,7 @@ class Request(object):
             if self.cancel_operation and self.cancel_operation():
                 break
             request_report = 'Request URL: ' + self.get_url_for_report(self.url)
-            request_report += '\nRequest data: ' + Utils.str(self.data)
+            request_report += '\nRequest data: ' + self.get_body_for_report(self.data)
             request_report += '\nRequest headers: ' + Utils.str(self.get_headers_for_report(self.headers))
             response_report = '<response_not_set>'
             response = None
@@ -175,7 +250,7 @@ class Request(object):
                 response_report = '\nResponse Headers:\n%s' % Utils.str(self.response_info)
                 response_report += '\nResponse (%d) content-length=%s, len=<%s>:\n' % (self.response_code, content_length, len(self.response_text),)
                 try:
-                    response_report += Utils.str(self.response_text)
+                    response_report += self.get_body_for_report(self.response_text)
                 except:
                     response_report += '<possible binary content>'
                 self.success = True
@@ -187,7 +262,10 @@ class Request(object):
                 if isinstance(e, HTTPError):
                     self.response_code = e.code
                     self.response_text = Utils.str(e.read())
-                    response_report += self.response_text
+                    # This is the one that matters most. A failing token
+                    # exchange answers 400 with a JSON body, and that body is
+                    # what an error report carries into the log.
+                    response_report += self.get_body_for_report(self.response_text)
                 else:
                     response_report += Utils.str(e)
                 rex = RequestException(Utils.str(e), root_exception, request_report, response_report)

@@ -739,9 +739,17 @@ REFRESH_PROFILE_ARGUMENTS = {
     'backoff': 'REQUEST_BACKOFF',
 }
 
+# What "building the transport" looks like in this file: either the transport
+# itself, or the factory that wraps it into the `post(url, fields)` port the
+# pure package takes. Both are named, because a provider with one factory and
+# three call sites is better code than a provider with three copies of the same
+# closure, and a gate that only recognised the raw construction would be
+# pressure towards the worse one.
+TRANSPORT_BUILDERS = frozenset({'Request', '_post_port'})
+
 
 def _refresh_transport_constructions():
-    """Every Request(...) built inside the provider's refresh path.
+    """Every transport built inside the provider's refresh path.
 
     "Inside the refresh path" is decided by the enclosing function's name,
     because that is what a reader can check by eye. A construction moved out of
@@ -756,7 +764,7 @@ def _refresh_transport_constructions():
             continue
         for call in ast.walk(node):
             if isinstance(call, ast.Call) and \
-                    _func_name(call.func).split('.')[-1] == 'Request':
+                    _func_name(call.func).split('.')[-1] in TRANSPORT_BUILDERS:
                 found.append((node.name, call))
     return found
 
