@@ -218,6 +218,69 @@ that no documentation supplies: the granted scope string verbatim including its 
 the identity token carries a `name` claim, the drive owner's display name that the label path falls
 back to when it does not, and the `expires_in` of each of the three tokens.
 
+### What it returned — measured, 2026-08-23
+
+Both checks were run against this registration with a **work or school** account in the E5 tenant.
+The reference implementation reported `refresh_token: YES`. The harness authorized in 34 seconds
+and completed both refreshes. These are readings, not expectations; anything written against them
+later has to match what is here rather than what the documentation implies.
+
+| What | Measured |
+|---|---|
+| granted scope, verbatim | `openid profile email https://graph.microsoft.com/Files.Read` |
+| `name` claim | present — `Kei NAS` |
+| `sub` claim | 43 characters, URL-safe base64, so filename-safe as issued |
+| `tid` claim | present |
+| drive owner `displayName` | `Kei NAS` |
+| `driveType` | `business` |
+| failure codes seen | none, at any point, in either run |
+
+**The granted scope is not the requested scope, in two separate ways, and both matter.**
+
+- `email` came back **although it was never requested**. The requested string is
+  `https://graph.microsoft.com/Files.Read offline_access openid profile`.
+- `offline_access` is **absent although a refresh token was issued**. It is absent from the granted
+  string every time; the refresh token is real regardless.
+
+The ordering differs from the requested string as well. So a granted scope may only ever be tested
+by **membership of the scope you actually care about** — never by equality with the requested
+string, never by prefix, and never by position. A check written the obvious way passes on the
+account the author tested and fails on somebody else's.
+
+**Token lifetimes are randomised, and six readings prove it.** Two runs of three tokens each:
+
+```
+[5091, 4919, 4189]    and    [4637, 4326, 4211]
+```
+
+All six differ. Any constant anywhere in the codebase for this value would be wrong by
+measurement, not by taste. Expiry comes from the response and from nowhere else.
+
+**Rotation, proven against the live provider through the shipped store:**
+
+```
+#1  sha256:bf92b757a58b
+#2  sha256:1b8a11103c33
+#3  sha256:b0dc7a23cd00
+```
+
+Three digests over three whole tokens, all different — so the provider rotates the refresh token on
+every use, and the rotated value reaches disk through `store.write`. The automated test asserts the
+same property against a scripted endpoint; this is the half that only the live provider can answer.
+
+**That rotation reading comes from a second grant, and the reason is worth more than the reading.**
+The first run's rotation check compared `refresh.fingerprint()` values — the eight-character log
+redactor. Every refresh token this registration issues begins `1.AXEAuM`, so the check rendered
+three different tokens identically and reported a confident FAIL. Nothing was wrong with the
+add-on; the instrument could not tell the two cases apart, which means its FAIL carried no
+information and a PASS from it would have been unearned in exactly the same way. The measurement
+was retaken with a digest over the whole token. Everything else in this section is from the first
+run, which measured all of it correctly.
+
+**No failure code appeared in either run, and no capture file was written.** That is a measured
+absence and it is recorded as one: the capture path exists and works, and nothing exercised it,
+because this tenant permits the grant. It is not a gap in the checking.
+
 ### What the acceptance check cannot tell you
 
 **A tenant that blocks device code flow is not reproducible here, and the requirement covering it is
@@ -226,7 +289,22 @@ error message and a custom-identifier escape hatch for exactly that case — but
 this registration *permits* device code flow, so the blocking response cannot be produced on demand
 and the handling has never been observed against a real refusal. This is written down rather than
 claimed as passing. If you ever do get a tenant that blocks, capture the failing response body
-before you do anything else; it is the only chance to see it.
+before you do anything else; it is the only chance to see it. The scripts now do that for you: the
+whole response goes to a `device-code-failure-*.json` and the path is printed.
+
+**The account-label fallback was not exercised, and that is the good outcome rather than a pass.**
+The account name comes from the `name` claim, and falls back to the drive owner's `displayName`
+when it is absent. This account carries `name`, so the label path ran and the fallback did not.
+That closes the design question — the fallback has a real source on this account, `Kei NAS`, and
+both agree — but the branch itself is still untested against an account that genuinely lacks
+`name`. Closing a design question is not the same as testing a branch, and nobody should read the
+table above as evidence that the fallback works.
+
+**Only a work/school account was run through the shipped package.** A personal Microsoft account
+acquired a token against this same registration during the original spike, so the authority choice
+is settled by measurement; what has not been done is a second live pass through
+`resources/lib/auth/` with a personal account. That is deferred, not dropped, and it is the half a
+maintainer testing with their own account never covers by accident.
 
 ---
 
