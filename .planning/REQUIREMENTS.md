@@ -50,14 +50,14 @@ This narrowing is known to cost no future work on the one place it could have. `
 
 ### Authentication
 
-- [ ] **AUTH-01**: A user signs in by reading a code off the TV and entering it on a phone, without typing a URL, username, or password on the remote
+- [x] **AUTH-01**: A user signs in by reading a code off the TV and entering it on a phone, without typing a URL, username, or password on the remote. **Observed by 03-14 on the TCL Android TV 12** (Android 12, Kodi 21.2, stock Estuary): a work/school account was added end to end from the television — the code was read off the screen and entered on a phone, and nothing was typed on the remote. This is the project's core value, seen for the first time on the hardware it exists for
 - [x] **AUTH-02**: The add-on ships a public `client_id` and requires no Azure setup, no server, and no token copy-paste from the user. **Verified live by 03-13**: the harness took the built-in `CLIENT_ID` with no argument and acquired a real token from the live provider through the shipped auth package. No registration was made, no broker or server was contacted — `AUTH-23` removed the last of that — and the user's only input was a code typed on a phone, which is not a token
-- [ ] **AUTH-03**: Sign-in works for both a personal Microsoft account and a work/school account against the chosen authority — verified end-to-end with the project's own registration, not a first-party client
+- [ ] **AUTH-03**: Sign-in works for both a personal Microsoft account and a work/school account against the chosen authority — verified end-to-end with the project's own registration, not a first-party client. **Still Pending after 03-14, and now half done twice over**: the work/school half was proven live through the shipped package by 03-13 and again on the television by 03-14. The personal-account half remains a **deferred second run** — the spike already acquired a token on a personal account against this registration, so what is outstanding is a run, not a design question. The requirement says both, and both is not what has happened
 - [x] **AUTH-04**: The requested scope set is `https://graph.microsoft.com/Files.Read offline_access openid profile`, fully qualified, with no `Files.Read.All`, no write scope, and no `.default`
-- [ ] **AUTH-05**: The device-code dialog renders the code at the largest font the skin offers, legible from a sofa
-- [ ] **AUTH-06**: The dialog shows a live expiry countdown and, on expiry, offers a focused "Get a new code" action
-- [ ] **AUTH-07**: Cancelling sign-in with Back or Esc leaves no partially-created account behind
-- [ ] **AUTH-08**: Any QR code shown encodes only the server-supplied `verification_uri`; the verification URI is never hardcoded, because it differs per authority
+- [x] **AUTH-05**: The device-code dialog renders the code at the largest font the skin offers, legible from a sofa. **Settled by 03-14 by a person reading a screen**, which is the only instrument that exists — a skin resolves a font name at render time and substitutes silently. **It failed on the first build**: at `font60` the code was legible but small from a normal seat, and `font60` was never the largest font Estuary offers. It passes at `WeatherTemp` (120px) after `24702ff`, read on stock Estuary so no substitution is in play. A requirement that needed a fix to pass is a different fact from one that passed first time, and the failing reading is kept for that reason
+- [ ] **AUTH-06**: The dialog shows a live expiry countdown and, on expiry, offers a focused "Get a new code" action. **Left Pending by 03-14, deliberately.** The countdown clause passed on the television, and only after `24702ff` — control 1002 had been overflowing its box since 03-06 and the line pushed out of view was the countdown itself, so it had never been visible on any device. **The focus clause was not observed at all**: the expiry path was skipped, so nobody has yet seen "Get a new code" arrive already focused, and nobody has moved the directional pad between the two buttons. The requirement is a conjunction and half of it is unmeasured
+- [x] **AUTH-07**: Cancelling sign-in with Back or Esc leaves no partially-created account behind. **Observed by 03-14**: leaving sign-in with Back returned an account list exactly as it was. The remote has no Esc key, so Back is the only form the acceptance device can produce. The code half is pinned independently by `tests/test_auth_gates.py::test_the_signin_flow_stamps_without_writing_anything` from `c768699`, which holds the no-write property at the seam that fix touched so the cheap repair cannot be taken later. The repeat form — a second sign-in cancelled part-way — was not separately reported
+- [x] **AUTH-08**: Any QR code shown encodes only the server-supplied `verification_uri`; the verification URI is never hardcoded, because it differs per authority. **Observed by 03-14**: the image was scanned with a phone camera and resolved to the address the dialog showed. It scans at **280x280** after `24702ff`; at the shipped 150x150 it was readable but small. The "encodes only the `verification_uri`" half is structural and already proven — the provider returns no `verification_uri_complete`, the encoder is fed the provider's own address and nothing else, and an insecure source is refused
 - [x] **AUTH-09**: The token-polling loop is an allow-list — it continues only on `authorization_pending` and `slow_down`, and stops on anything else
 - [x] **AUTH-10**: Pending polls arriving as HTTP 400 with a JSON body are parsed as protocol responses, not treated as transport failures
 - [x] **AUTH-11**: Refresh tokens are stored as atomically-written JSON under `special://profile/addon_data/`, never in a Kodi setting
@@ -66,12 +66,12 @@ This narrowing is known to cost no future work on the one place it could have. `
 - [x] **AUTH-14**: Concurrent refresh across the plugin and the service is serialised by an `os.open(..., O_CREAT|O_EXCL)` lock with a stale-lock breaker; neither `threading.Lock` nor `fcntl.lockf` is used for this
 - [x] **AUTH-15**: A refresh that loses the race and receives `invalid_grant` re-reads the store and adopts the winner's token rather than signing the user out
 - [x] **AUTH-16**: A proactive refresh runs on Kodi startup well inside the 90-day refresh-token lifetime
-- [ ] **AUTH-17**: The background service never opens a sign-in dialog; only the plugin may prompt interactively
+- [x] **AUTH-17**: The background service never opens a sign-in dialog; only the plugin may prompt interactively. **Code half proven by 03-10; observable half seen by 03-14** — no dialog appeared over the home screen at boot on the television. **Named weakness, recorded rather than smoothed over**: that is a negative observation from ordinary use, reported as "nothing unusual seen", and the separate checklist row "the background service starts at login" was not reported, so the premise that the service ran at all is unconfirmed on this device. It is the weakest of the marks 03-14 made
 - [ ] **AUTH-18**: A tenant that blocks the app produces a specific message naming the cause and pointing at the custom `client_id` setting — not a generic failure
 - [x] **AUTH-19**: A custom `client_id` setting exists at Expert level, empty by default
 - [x] **AUTH-20**: Multiple accounts are supported, with tokens, delta tokens, and cache keys isolated per account
 - [x] **AUTH-21**: Account labels come from Graph; no account name is ever typed on a remote
-- [ ] **AUTH-22**: The add-on root is the account list, with an "Add an account…" row and a per-row context menu offering re-authorise and remove
+- [ ] **AUTH-22**: The add-on root is the account list, with an "Add an account…" row and a per-row context menu offering re-authorise and remove. **Left Pending by 03-14.** The root is the account list and the add-account row works — the television sign-in went through it. **The per-row context menu was never opened**, so neither re-authorise nor remove has been seen on any device, and re-authorising without creating a second row is likewise unobserved. That clause is half the requirement's sentence and no reading exists for it
 - [x] **AUTH-23**: The `sign-in-server` setting and every code path referencing an external OAuth broker are gone
 
 ### Browsing
@@ -215,14 +215,14 @@ Cross-cutting notes. `CI-06` (per-phase manual acceptance on the TCL Android TV 
 | ID-03 | Phase 1 | Complete |
 | ID-04 | Phase 1 | Complete |
 | ID-05 | Phase 1 | Complete |
-| AUTH-01 | Phase 3 | Pending |
+| AUTH-01 | Phase 3 | Complete — set by 03-14. A work/school account was added end to end from the TCL Android TV 12 by reading the code off the screen and entering it on a phone; nothing was typed on the remote |
 | AUTH-02 | Phase 3 | Complete — built-in `client_id` acquired a live token, no setup and no server |
-| AUTH-03 | Phase 3 | Pending — half done. 03-13 verified a work/school account end-to-end through the project's own registration and the shipped package. The personal-account pass through that package is deferred; the spike already acquired a token on a personal account against this registration, so what is outstanding is a second live run, not a design question. 03-14 also declares this id |
+| AUTH-03 | Phase 3 | Pending — half done. 03-13 verified a work/school account end-to-end through the project's own registration and the shipped package. The personal-account pass through that package is deferred; the spike already acquired a token on a personal account against this registration, so what is outstanding is a second live run, not a design question. **03-14 did not close it either**: the work/school half is now proven on the television as well, and no personal account was signed in there |
 | AUTH-04 | Phase 3 | Complete |
-| AUTH-05 | Phase 3 | Pending |
-| AUTH-06 | Phase 3 | Pending |
-| AUTH-07 | Phase 3 | Pending |
-| AUTH-08 | Phase 3 | Pending |
+| AUTH-05 | Phase 3 | Complete — set by 03-14, by a person reading the screen. Failed the first reading at `font60`; passes at `WeatherTemp` (120px) after `24702ff`, on stock Estuary |
+| AUTH-06 | Phase 3 | Pending — countdown clause passed on the television after `24702ff` (it had never been visible before: control 1002 overflowed since 03-06 and the countdown was the line pushed out). The **focused expiry action was not observed** — 03-14 skipped the expiry path and the d-pad row. Conjunction, half unmeasured, not marked |
+| AUTH-07 | Phase 3 | Complete — set by 03-14. Back out of sign-in left the account list unchanged on the device; the remote has no Esc. Held at the code seam by `test_the_signin_flow_stamps_without_writing_anything` (`c768699`) |
+| AUTH-08 | Phase 3 | Complete — set by 03-14. Scanned with a phone camera and resolved to the address the dialog showed, at 280x280 after `24702ff`; the encodes-only-the-address half is structural and was already proven |
 | AUTH-09 | Phase 3 | Complete |
 | AUTH-10 | Phase 3 | Complete |
 | AUTH-11 | Phase 3 | Complete |
@@ -231,12 +231,12 @@ Cross-cutting notes. `CI-06` (per-phase manual acceptance on the TCL Android TV 
 | AUTH-14 | Phase 3 | Complete |
 | AUTH-15 | Phase 3 | Complete |
 | AUTH-16 | Phase 3 | Complete |
-| AUTH-17 | Phase 3 | Pending |
+| AUTH-17 | Phase 3 | Complete — set by 03-14, and the weakest of its marks. No dialog appeared over the home screen at boot ("nothing unusual seen"), on top of 03-10's code proof. The "service starts at login" row was not reported, so the premise of the negative observation is unconfirmed on this device |
 | AUTH-18 | Phase 3 | Pending — UNVERIFIABLE HERE. The message and the escape hatch exist and the error table is tested, but no tenant available to this project blocks the grant, so the refusal cannot be produced on demand. Recorded as a gap on purpose: a pass claimed here is one nobody would ever go back and check |
 | AUTH-19 | Phase 3 | Complete |
 | AUTH-20 | Phase 3 | Complete |
 | AUTH-21 | Phase 3 | Complete |
-| AUTH-22 | Phase 3 | Pending |
+| AUTH-22 | Phase 3 | Pending — the root is the account list and the add-account row was used to sign in on the television. **The per-row context menu was never opened** in 03-14, so re-authorise and remove remain unobserved on any device. Half the sentence has no reading |
 | AUTH-23 | Phase 3 | Complete |
 | BROWSE-01 | Phase 4 | Pending |
 | BROWSE-02 | Phase 2 | Pending |
@@ -276,13 +276,13 @@ Cross-cutting notes. `CI-06` (per-phase manual acceptance on the TCL Android TV 
 | CI-03 | Phase 2 | Pending |
 | CI-04 | Phase 2 | Pending |
 | CI-05 | Phase 2 | Pending |
-| CI-06 | Phase 1 | Complete |
+| CI-06 | Phase 1 | Complete — standing obligation, discharged for Phase 3 by 03-14's run on the TCL Android TV 12 itself. No stand-in was substituted and every row that could not be run is recorded as not run rather than omitted; the transparency prohibition held |
 | CI-07 | Phase 8 | Pending |
 | REL-01 | Phase 8 | Pending |
 | ERR-01 | Phase 4 | Pending |
 | ERR-02 | Phase 4 | Pending |
 | ERR-03 | Phase 4 | Pending |
-| DIST-01 | Phase 3 | Complete |
+| DIST-01 | Phase 3 | Complete — **confirmed by 03-14 and 03-12's flag discharged.** 03-12 recorded that 03-02 had marked this while 03-14 still declared it, and asked 03-14 to confirm rather than alter it. The archive the build wrote installed through Kodi's own file manager on the television, from a USB drive, so the mark is now earned rather than merely defensible. Installing by URL does not work on that device — a Phase 5 problem, recorded as deferred item 16, and not a DIST-01 failure |
 | DIST-02 | Phase 5 | Pending |
 | DIST-03 | Phase 5 | Pending |
 | DIST-04 | Phase 5 | Pending |

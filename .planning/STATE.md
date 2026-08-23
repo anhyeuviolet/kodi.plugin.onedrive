@@ -4,16 +4,16 @@ milestone: v1.4.0
 milestone_name: milestone
 current_phase: 03
 current_phase_name: authentication
-status: executing
-stopped_at: Completed 03-13-PLAN.md
-last_updated: "2026-08-23T06:37:19.843Z"
+status: verifying
+stopped_at: Completed 03-14-PLAN.md - Phase 03 fully executed, awaiting verification
+last_updated: "2026-08-23T09:04:33.955Z"
 last_activity: 2026-08-23
 last_activity_desc: Phase 03 execution started
 progress:
   total_phases: 2
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 21
-  completed_plans: 20
+  completed_plans: 21
 ---
 
 # Project State
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-08-22)
 
 Phase: 03 (authentication) — EXECUTING
 Plan: 14 of 14
-Status: Ready to execute
+Status: Phase complete — ready for verification
 stands, its Windows rows were descoped because Windows is not a target. Phase criterion 2 (the Kodi
 19/20/21/22 install matrix) is therefore **unmet by decision, not satisfied**, and KODI-02 stays unchecked.
 Verification found four record-accuracy gaps and no functional blocker; all four are now closed — the
@@ -38,7 +38,7 @@ against the tree, KODI-01 and SETUP-06 carry inline qualifications, and the ROAD
 broker" parenthetical was corrected to the measurement.
 Last activity: 2026-08-23 — Phase 03 execution started
 
-Progress: [██████████] 95%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -84,6 +84,7 @@ Progress: [██████████] 95%
 | Phase 03 P11 | 26m | 2 tasks | 3 files |
 | Phase 03 P12 | 45m | 3 tasks | 5 files |
 | Phase 3 P13 | ~1h | 3 tasks | 6 files |
+| Phase 03 P14 | ~2h | 3 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -177,6 +178,11 @@ Load-bearing choices for current work:
 - [Phase ?]: Only AUTH-23 was marked Complete by 03-12. AUTH-02 is declared by 03-13 and DIST-01 by 03-14, so neither is 03-12's to close; VND-09 was already Complete and is now true again
 - [Phase ?]: A granted scope may only be tested by membership, never by equality, prefix or position: the live provider returned 'openid profile email https://graph.microsoft.com/Files.Read' - email unrequested, offline_access absent despite a refresh token
 - [Phase ?]: A value chosen to redact cannot be reused to discriminate: comparing refresh.fingerprint output reported a false rotation FAIL, and a PASS from it would have been equally unearned
+- [Phase ?]: [Phase 03]: The add-on ran on the TCL Android TV 12 for the first time and signed in from the sofa; AUTH-01 is observed rather than argued. Android 12, Kodi 21.2, stock Estuary, installed from a USB drive through Kodi's own file manager with no network debugging channel ever opened
+- [Phase ?]: [Phase 03]: AUTH-05 passes only after 24702ff took the code to WeatherTemp (120px); it failed at font60. The largest font a skin offers is a fact about the skin's Font.xml, not about the number in the layout
+- [Phase ?]: [Phase 03]: AUTH-06 and AUTH-22 are left Pending at the end of the phase because a clause of each was never observed - the focused expiry action and the per-row context menu. A conjunction with an unmeasured half is not marked
+- [Phase ?]: [Phase 03]: A credential reached a television screen, not a log: OAuth2._validate_access_tokens built its message from the token blob and _handle_exception renders that onto a Kodi dialog. The redaction rule now covers every raise in shipped source, not just assignments to report names
+- [Phase ?]: [Phase 03]: Installing by URL does not work on Android TV - add-source browse needs a directory listing and a repository install is itself a zip install - so every device re-test costs a USB round trip. Phase 5's problem, recorded rather than worked around
 
 ### Pending Todos
 
@@ -220,6 +226,6 @@ Open concerns:
 
 ## Session Continuity
 
-Last session: 2026-08-23T06:37:19.827Z
-Stopped at: Completed 03-13-PLAN.md
+Last session: 2026-08-23T09:04:33.933Z
+Stopped at: Completed 03-14-PLAN.md - Phase 03 fully executed, awaiting verification
 Resume file: None
