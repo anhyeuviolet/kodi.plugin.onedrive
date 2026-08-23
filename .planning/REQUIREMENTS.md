@@ -72,7 +72,7 @@ This narrowing is known to cost no future work on the one place it could have. `
 - [x] **AUTH-20**: Multiple accounts are supported, with tokens, delta tokens, and cache keys isolated per account
 - [x] **AUTH-21**: Account labels come from Graph; no account name is ever typed on a remote
 - [ ] **AUTH-22**: The add-on root is the account list, with an "Add an account…" row and a per-row context menu offering re-authorise and remove
-- [ ] **AUTH-23**: The `sign-in-server` setting and every code path referencing an external OAuth broker are gone
+- [x] **AUTH-23**: The `sign-in-server` setting and every code path referencing an external OAuth broker are gone
 
 ### Browsing
 
@@ -237,7 +237,7 @@ Cross-cutting notes. `CI-06` (per-phase manual acceptance on the TCL Android TV 
 | AUTH-20 | Phase 3 | Complete |
 | AUTH-21 | Phase 3 | Complete |
 | AUTH-22 | Phase 3 | Pending |
-| AUTH-23 | Phase 3 | Pending |
+| AUTH-23 | Phase 3 | Complete |
 | BROWSE-01 | Phase 4 | Pending |
 | BROWSE-02 | Phase 2 | Pending |
 | BROWSE-03 | Phase 2 | Pending |

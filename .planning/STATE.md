@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 03
 current_phase_name: authentication
 status: executing
-stopped_at: Completed 03-11-PLAN.md
-last_updated: "2026-08-23T05:55:54.971Z"
+stopped_at: Completed 03-12-PLAN.md
+last_updated: "2026-08-23T06:13:45.315Z"
 last_activity: 2026-08-23
 last_activity_desc: Phase 03 execution started
 progress:
   total_phases: 2
   completed_phases: 1
   total_plans: 21
-  completed_plans: 18
+  completed_plans: 19
 ---
 
 # Project State
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-08-22)
 ## Current Position
 
 Phase: 03 (authentication) — EXECUTING
-Plan: 12 of 14
+Plan: 13 of 14
 Status: Ready to execute
 stands, its Windows rows were descoped because Windows is not a target. Phase criterion 2 (the Kodi
 19/20/21/22 install matrix) is therefore **unmet by decision, not satisfied**, and KODI-02 stays unchecked.
@@ -38,7 +38,7 @@ against the tree, KODI-01 and SETUP-06 carry inline qualifications, and the ROAD
 broker" parenthetical was corrected to the measurement.
 Last activity: 2026-08-23 — Phase 03 execution started
 
-Progress: [█████████░] 86%
+Progress: [█████████░] 90%
 
 ## Performance Metrics
 
@@ -82,6 +82,7 @@ Progress: [█████████░] 86%
 | Phase 03 P09 | 3h22m | 3 tasks | 12 files |
 | Phase 03 P10 | 16m | 2 tasks | 4 files |
 | Phase 03 P11 | 26m | 2 tasks | 3 files |
+| Phase 03 P12 | 45m | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -169,6 +170,10 @@ Load-bearing choices for current work:
 - [Phase ?]: The stale-settings-row assertion was widened to read the <data> child as well as the action attribute. The versioned schema has no action attribute, so left alone the assertion would have kept running and stopped being able to fail
 - [Phase ?]: client_id declares allowempty, because empty is the value that means 'use the built-in registration' and without it the keyboard dialog will not accept the setting's own default
 - [Phase ?]: Only AUTH-19, KODI-05, KODI-06 and KODI-08 were marked Complete by 03-11. AUTH-02, AUTH-18 and AUTH-23 are declared by later plans and stay Pending
+- [Phase ?]: The manifest disclaimer states the shipped flow; the third party's source link and self-hosting invitation are dropped, not reworded, because they now describe nothing
+- [Phase ?]: Three vendored files converted CRLF to LF during this phase are recorded in VENDORED.md rather than converted back; a conversion is itself a whole-file rewrite and would bury the problem a commit deeper
+- [Phase ?]: resources/skins/ is named as vendored surface: ten of the 38 copied files live outside resources/lib/vendor/, which the record never said
+- [Phase ?]: Only AUTH-23 was marked Complete by 03-12. AUTH-02 is declared by 03-13 and DIST-01 by 03-14, so neither is 03-12's to close; VND-09 was already Complete and is now true again
 
 ### Pending Todos
 
@@ -212,6 +217,6 @@ Open concerns:
 
 ## Session Continuity
 
-Last session: 2026-08-23T05:53:23.959Z
-Stopped at: Completed 03-11-PLAN.md
+Last session: 2026-08-23T06:11:12.214Z
+Stopped at: Completed 03-12-PLAN.md
 Resume file: None
