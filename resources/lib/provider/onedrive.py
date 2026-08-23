@@ -17,9 +17,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 
+from resources.lib.auth import device_code
 from resources.lib.vendor.clouddrive_common.remote.provider import Provider
 from resources.lib.vendor.clouddrive_common.utils import Utils
-from resources.lib.vendor.clouddrive_common.exception import RequestException, ExceptionUtils
+from resources.lib.vendor.clouddrive_common.exception import ExceptionUtils
 
 import urllib
 from urllib.error import HTTPError
@@ -37,39 +38,99 @@ class OneDrive(Provider):
         return None
     
     def get_account(self, request_params=None, access_tokens=None):
-        me = self.get('/me/', request_params=request_params, access_tokens=access_tokens)
-        if not me:
+        """The account's key and its label, without asking Graph who the user is.
+
+        The profile endpoint documents User.Read as its least-privileged
+        delegated permission for BOTH account classes, and the granted scope
+        read back from three live runs carries no such permission -- so a call
+        to it answers 403, and it used to be the first thing sign-in did after
+        acquiring a token. Removing it is what lets sign-in get past its first
+        step at all (D-01).
+
+        The identity token arrives with the token response at no extra request
+        and no extra permission, and the provider documents it as a superset of
+        what its user-info endpoint returns. `sub` is a pairwise,
+        per-application subject identifier -- the spike measured two users in
+        one tenant returning different values -- which is why it, and not a
+        drive id or an address, is what an account's files on disk are keyed by
+        (AUTH-21).
+
+        Nothing here is an authorization decision. These claims label a row in a
+        list and name a file; the access token is what answers anything that is
+        actually a question about permission.
+        """
+        access_tokens = Utils.default(access_tokens, {})
+        claims = device_code.read_identity_claims(
+            Utils.get_safe_value(access_tokens, 'id_token', ''))
+
+        key = Utils.str(Utils.get_safe_value(claims, 'sub', ''))
+        if not key:
+            # Without a subject claim there is no key, and without a key there
+            # is nowhere to put this account's credentials. Failing here is
+            # correct; inventing a key would put two accounts in one file.
             raise Exception('NoAccountInfo')
-        return { 'id' : me['id'], 'name' : me['displayName']}
-    
-    def get_drives(self, request_params=None, access_tokens=None):
-        drives = []
-        drives_id_list  =[]
+
+        name = Utils.str(Utils.get_safe_value(claims, 'name', ''))
+        if not name:
+            # The fallback, and the reason it is this one: the default drive
+            # answers 200 under this exact scope set on both account classes,
+            # and the drive is being fetched a moment later anyway. Whether
+            # owner.user.displayName is non-null on a business drive was not
+            # transcribed from the spike output; plan 03-13 confirms it live.
+            name = self._drive_owner_name(request_params, access_tokens)
+
+        return {'id': key, 'name': name}
+
+    def _drive_owner_name(self, request_params, access_tokens):
+        """The drive owner's display name, or '' if the drive will not say.
+
+        Tolerant on purpose. A sign-in that has already succeeded must not be
+        undone because a label could not be read; an account with an empty name
+        is a cosmetic problem, and an account that failed to be created is not.
+        """
         try:
-            response = self.get('/drives', request_params=request_params, access_tokens=access_tokens)
-            for drive in response['value']:
-                drives_id_list.append(drive['id'])
-                drives.append({
-                    'id' : drive['id'],
-                    'name' : Utils.get_safe_value(drive, 'name', ''),
-                    'type' : drive['driveType']
-                })
-        except RequestException as ex:
-            httpex = ExceptionUtils.extract_exception(ex, HTTPError)
-            if not httpex or httpex.code != 403:
-                raise ex
-            
-        response = self.get('/me/drives', request_params=request_params, access_tokens=access_tokens)
-        for drive in response['value']:
-            if not drive['id'] in drives_id_list:
-                drives_id_list.append(drive['id'])
-                drives.append({
-                    'id' : drive['id'],
-                    'name' : Utils.get_safe_value(drive, 'name', ''),
-                    'type' : drive['driveType']
-                })
-        return drives
-    
+            # The literal is written out here, and again below, rather than
+            # held in a constant. A path behind a name is a path
+            # test_no_unanswerable_provider_endpoint cannot read, and that
+            # sweep is the only thing standing between this file and a 403 that
+            # breaks sign-in outright.
+            drive = self.get('/me/drive', request_params=request_params,
+                             access_tokens=access_tokens)
+        except Exception:
+            return ''
+        owner = Utils.get_safe_value(Utils.default(drive, {}), 'owner', {})
+        user = Utils.get_safe_value(Utils.default(owner, {}), 'user', {})
+        return Utils.str(Utils.get_safe_value(Utils.default(user, {}),
+                                              'displayName', ''))
+
+    def get_drives(self, request_params=None, access_tokens=None):
+        """The account's drive. One request, to the default-drive endpoint.
+
+        The two calls this replaces were one wasted round trip and one
+        guaranteed failure, and both are measurements rather than opinions
+        (SPIKE-DEVICE-CODE.md, against live accounts, with this scope set):
+
+          GET /drives     403 on a work/school account AND on a personal one
+          GET /me/drives  403 on a personal account
+          GET /me/drive   200 on both
+
+        The old code called /drives, swallowed its 403 and then called
+        /me/drives, which meant a personal account got two forbidden responses
+        and no drive. This codebase's last piece of apparently-dead code turned
+        out to be load-bearing and merely unexplained, so the evidence for this
+        deletion is written down rather than assumed (D-04, BROWSE-08).
+        """
+        drive = self.get('/me/drive', request_params=request_params,
+                         access_tokens=access_tokens)
+        if not drive or not Utils.get_safe_value(drive, 'id', ''):
+            raise Exception('NoDriveInfo')
+        return [{
+            'id': drive['id'],
+            'name': Utils.get_safe_value(drive, 'name', ''),
+            'type': Utils.get_safe_value(drive, 'driveType', '')
+        }]
+
+
     def get_drive_type_name(self, drive_type):
         if drive_type == 'personal':
             return 'OneDrive Personal'
