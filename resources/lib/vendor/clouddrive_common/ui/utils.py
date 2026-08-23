@@ -51,11 +51,33 @@ class KodiUtils:
         from resources.lib.vendor.clouddrive_common.utils import Utils
         return Utils.unicode(KodiUtils.get_addon_info("path", KodiUtils.common_addon_id))
     
+    # Kodi reserves 30000-33000 for an add-on's own strings and keeps everything
+    # below 30000 for itself. Anything at or above the boundary therefore
+    # belongs to an add-on's catalogue and anything below it to Kodi's.
+    ADDON_STRING_FLOOR = 30000
+
     @staticmethod
     def localize(string_id, addonid=None, addon=None):
-        if string_id < 32000:
+        """A string, from whichever catalogue owns its id.
+
+        The boundary was 32000 until this add-on was renumbered into the 30000
+        block, and it was right when the only add-on ids in the tree were the
+        vendored module's 32000-32088. It stopped being right the moment this
+        add-on's own strings moved down, and it failed silently: 30042 went to
+        Kodi's catalogue and came back as Kodi's 30042, so a caller got the
+        wrong sentence rather than an error.
+
+        No shipped caller passes an id in this add-on's block today -- the four
+        core ids that reach here, 1210, 12021 and 21479, are all below the
+        boundary either way -- so this is a latent fault being closed rather
+        than a visible one being fixed. test_localize_owns_this_addons_block in
+        tests/test_vendor_gates.py holds the boundary against the same
+        partition set the catalogue is asserted against, so the two cannot move
+        apart again.
+        """
+        if string_id < KodiUtils.ADDON_STRING_FLOOR:
             import xbmc
-            return xbmc.getLocalizedString(string_id) 
+            return xbmc.getLocalizedString(string_id)
         if not addon:
             addon = KodiUtils.get_addon(addonid)
         return addon.getLocalizedString(string_id)

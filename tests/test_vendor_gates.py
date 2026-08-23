@@ -468,6 +468,62 @@ def _po_ids(rel):
     return [int(i) for i in re.findall(r'msgctxt "#(\d+)"', _read(rel))]
 
 
+# The helper that picks a catalogue from an id, and the constant it picks with.
+LOCALIZE_MODULE = 'resources/lib/vendor/clouddrive_common/ui/utils.py'
+LOCALIZE_FLOOR_CONSTANT = 'ADDON_STRING_FLOOR'
+
+
+def test_localize_owns_this_addons_block():
+    """The boundary between Kodi's catalogue and this add-on's.
+
+    KodiUtils.localize routes an id below the boundary to Kodi's own catalogue
+    and everything else to an add-on's. The boundary was 32000, which was right
+    while the only add-on ids in the tree were the vendored module's
+    32000-32088, and wrong from the moment this add-on's own strings were
+    renumbered into the 30000 block -- wrong silently, because an id in that
+    block came back as Kodi's string of the same number rather than as an error.
+
+    Asserting the constant against ADDON_STRING_IDS rather than against a
+    literal is the point: the same set the catalogue is partitioned against
+    decides where the boundary has to be, so moving this add-on's block again
+    cannot leave the helper behind.
+    """
+    tree = ast.parse(_read(LOCALIZE_MODULE), filename=LOCALIZE_MODULE)
+    values = [node.value.value for node in ast.walk(tree)
+              if isinstance(node, ast.Assign)
+              and any(isinstance(t, ast.Name) and t.id == LOCALIZE_FLOOR_CONSTANT
+                      for t in node.targets)
+              and isinstance(node.value, ast.Constant)
+              and isinstance(node.value.value, int)]
+    assert len(values) == 1, (
+        '%s defines %s %d times; expected exactly one, so this assertion knows '
+        'which one it is checking' % (LOCALIZE_MODULE, LOCALIZE_FLOOR_CONSTANT,
+                                      len(values)))
+
+    floor = values[0]
+    assert floor <= min(ADDON_STRING_IDS), (
+        "the catalogue boundary is %d, which is above this add-on's lowest own "
+        'id, %d. Every id between the two resolves against Kodi\'s catalogue '
+        'and comes back as a different sentence, with nothing raised and '
+        'nothing logged.' % (floor, min(ADDON_STRING_IDS)))
+
+    localize = [node for node in ast.walk(tree)
+                if isinstance(node, ast.FunctionDef) and node.name == 'localize']
+    assert len(localize) == 1, (
+        '%s has %d localize definitions; the assertion above is anchored on '
+        'there being one' % (LOCALIZE_MODULE, len(localize)))
+    names = set()
+    for node in ast.walk(localize[0]):
+        if isinstance(node, ast.Attribute):
+            names.add(node.attr)
+        elif isinstance(node, ast.Name):
+            names.add(node.id)
+    assert LOCALIZE_FLOOR_CONSTANT in names, (
+        'localize does not read %s, so the constant above is decoration and '
+        'the comparison it is meant to control is a literal somewhere else'
+        % LOCALIZE_FLOOR_CONSTANT)
+
+
 def test_string_ids_partitioned():
     assert len(ADDON_STRING_IDS) == 49, (
         'the add-on owns 25 renumbered ids, the 23 the sign-in copy added, and '
