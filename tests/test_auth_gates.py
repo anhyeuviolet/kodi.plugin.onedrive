@@ -704,3 +704,95 @@ def test_transport_report_redacts_credential_fields():
         'a raw request or response body is concatenated into a report that goes '
         'to the log. A successful token response IS the credential, and the log '
         'it lands in gets pasted into issues:\n%s' % report(hits))
+
+
+# ---------------------------------------------------------------------------
+# The refresh transport profile (the three-way coupling nothing else can see)
+# ---------------------------------------------------------------------------
+#
+# resources/lib/auth/refresh.py pins a short retry profile -- two attempts, a
+# five-second delay, no backoff -- and states its arithmetic in a comment:
+# 2 * 30 + 5 = 65 seconds worst case, against a RefreshLock lifetime of 90. The
+# lock's lifetime was chosen against that number and against nothing else.
+#
+# But the profile is only values. It is the Kodi layer that hands them to the
+# transport's constructor, and the transport's own defaults (tries=4, delay=5,
+# backoff=2) put the worst case at 155 seconds -- sixty-five seconds PAST the
+# lifetime, at which point a second contender judges a live lock stale and
+# breaks it while the first is still mid-exchange. That is the precise race the
+# lock exists to prevent.
+#
+# Neither the refresh module's tests nor the lock's can see it: from their side
+# the profile is correct, and the call site that ignores it lives in a file
+# neither of them may import, because importing it imports Kodi. So the
+# coupling is asserted here, statically, on the one construction that carries
+# it -- otherwise it is a comment, and a comment is not a constraint.
+PROVIDER = 'resources/lib/vendor/clouddrive_common/remote/provider.py'
+
+# The names, not the numbers. Asserting tries=2 would stay green against a
+# literal 2 that nobody revisited when refresh.py changed its arithmetic; the
+# whole point is that the two move together, and only a reference moves
+# together.
+REFRESH_PROFILE_ARGUMENTS = {
+    'tries': 'REQUEST_TRIES',
+    'delay': 'REQUEST_DELAY_SECONDS',
+    'backoff': 'REQUEST_BACKOFF',
+}
+
+
+def _refresh_transport_constructions():
+    """Every Request(...) built inside the provider's refresh path.
+
+    "Inside the refresh path" is decided by the enclosing function's name,
+    because that is what a reader can check by eye. A construction moved out of
+    a function whose name says refresh is one this sweep stops seeing -- which
+    is what the non-vacuity guard below is for.
+    """
+    found = []
+    for node in ast.walk(_parse(PROVIDER)):
+        if not isinstance(node, ast.FunctionDef):
+            continue
+        if 'refresh' not in node.name.lower():
+            continue
+        for call in ast.walk(node):
+            if isinstance(call, ast.Call) and \
+                    _func_name(call.func).split('.')[-1] == 'Request':
+                found.append((node.name, call))
+    return found
+
+
+def test_refresh_transport_is_built_from_the_pinned_profile():
+    assert PROVIDER in tracked_files(), (
+        '%s is missing; it is where the refresh reaches the network' % PROVIDER)
+
+    constructions = _refresh_transport_constructions()
+    assert constructions, (
+        'no Request construction was found inside a refresh function in %s, so '
+        'this sweep certifies nothing. Either the refresh no longer builds its '
+        'own transport -- in which case it has silently inherited the '
+        '155-second default profile -- or the function was renamed out from '
+        'under this assertion.' % PROVIDER)
+
+    contents = read(PROVIDER)
+    missing = []
+    for function_name, call in constructions:
+        supplied = {keyword.arg: keyword for keyword in call.keywords
+                    if keyword.arg}
+        for argument, constant in REFRESH_PROFILE_ARGUMENTS.items():
+            keyword = supplied.get(argument)
+            if keyword is None:
+                missing.append((PROVIDER, call.lineno,
+                                '%s(): no %s=, so the transport default applies'
+                                % (function_name, argument)))
+                continue
+            source = (ast.get_source_segment(contents, keyword.value) or '').strip()
+            if constant not in source:
+                missing.append((PROVIDER, call.lineno,
+                                '%s(): %s=%s does not name %s'
+                                % (function_name, argument, source, constant)))
+
+    assert not missing, (
+        'the refresh transport is not built from the profile refresh.py pins. '
+        'On the transport defaults the worst case is 155 seconds against a lock '
+        'lifetime of 90, so a slow network lets a second contender break a LIVE '
+        'lock:\n%s' % report(missing))
