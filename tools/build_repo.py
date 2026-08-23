@@ -362,7 +362,7 @@ def _prepare_out_dir(out_dir, index_path):
                 'tool. Refusing to delete it; choose another --out-dir or empty '
                 'this one by hand' % (out_dir, index_path))
         shutil.rmtree(str(out_dir))
-    out_dir.mkdir(parents=True)
+    out_dir.mkdir(parents=True, exist_ok=True)
     return out_dir
 
 
