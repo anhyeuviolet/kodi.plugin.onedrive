@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 03
 current_phase_name: authentication
 status: executing
-stopped_at: Completed 03-05-PLAN.md
-last_updated: "2026-08-23T03:54:22.051Z"
+stopped_at: Completed 03-06-PLAN.md
+last_updated: "2026-08-23T04:05:52.471Z"
 last_activity: 2026-08-23
 last_activity_desc: Phase 03 execution started
 progress:
   total_phases: 2
   completed_phases: 1
   total_plans: 21
-  completed_plans: 12
+  completed_plans: 13
 ---
 
 # Project State
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-08-22)
 ## Current Position
 
 Phase: 03 (authentication) — EXECUTING
-Plan: 6 of 14
+Plan: 7 of 14
 Status: Ready to execute
 stands, its Windows rows were descoped because Windows is not a target. Phase criterion 2 (the Kodi
 19/20/21/22 install matrix) is therefore **unmet by decision, not satisfied**, and KODI-02 stays unchecked.
@@ -38,7 +38,7 @@ against the tree, KODI-01 and SETUP-06 carry inline qualifications, and the ROAD
 broker" parenthetical was corrected to the measurement.
 Last activity: 2026-08-23 — Phase 03 execution started
 
-Progress: [██████░░░░] 57%
+Progress: [██████░░░░] 62%
 
 ## Performance Metrics
 
@@ -76,6 +76,7 @@ Progress: [██████░░░░] 57%
 | Phase 03 P03 | 30 min | 3 tasks | 5 files |
 | Phase 03 P04 | 20min | 2 tasks | 4 files |
 | Phase 03 P05 | 35min | 2 tasks | 4 files |
+| Phase 03 P06 | 25min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -140,6 +141,9 @@ Load-bearing choices for current work:
 - [Phase 03]: AADSTS7000218 is not an administrator outcome and its message says adding a secret will not help; after shipping only somebody who set their own client id can reach it
 - [Phase 03]: The honest union of the roadmap and pitfall codes is twelve; AADSTS70019 (device code expired) is a deliberate thirteenth because it is the terminal refusal a fifteen-minute window produces most often
 - [Phase 03]: The whole phase's English copy landed in one commit (30036-30058) with the exact-equality partition gate widened beside it, so four later plans add screens without touching the gate
+- [Phase ?]: The sign-in dialog leads with the code at font60 across the full panel width; the QR is secondary at 150px, because the provider never returns verification_uri_complete
+- [Phase ?]: Focus in QRDialogProgress is set at transitions only (onInit, expiry, return from expiry) and never inside a method the countdown calls once a second
+- [Phase ?]: This add-on's 30000-block strings must be read through xbmcaddon.Addon().getLocalizedString; KodiUtils.localize routes every id below 32000 to Kodi's own catalogue and silently returns the wrong string
 
 ### Pending Todos
 
@@ -183,6 +187,6 @@ Open concerns:
 
 ## Session Continuity
 
-Last session: 2026-08-23T03:54:22.033Z
-Stopped at: Completed 03-05-PLAN.md
+Last session: 2026-08-23T04:05:44.026Z
+Stopped at: Completed 03-06-PLAN.md
 Resume file: None
