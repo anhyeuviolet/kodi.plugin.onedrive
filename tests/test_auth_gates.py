@@ -534,21 +534,38 @@ MINIMUM_CONSTRUCTED_ACTIONS = 10
 
 
 def _action_map_entries(rel):
-    """(key, attribute-name, lineno) for every entry of `rel`'s action map."""
+    """(key, attribute-name, lineno) for every entry of `rel`'s action map.
+
+    Both shapes an entry can take: a pair inside a dict literal, and an
+    assignment into the dict a subclass got back from its base. Reading only the
+    first would let a whole file's worth of entries hide behind the second, and
+    a sweep that can be stepped around by changing syntax is not a sweep.
+    """
     entries = []
     for node in ast.walk(_parse(rel)):
         if not (isinstance(node, ast.FunctionDef)
                 and node.name == ACTION_MAP_FUNCTION):
             continue
-        for dictionary in ast.walk(node):
-            if not isinstance(dictionary, ast.Dict):
-                continue
-            for key, value in zip(dictionary.keys, dictionary.values):
-                name = _constant_str(key) if key is not None else None
-                if name is None:
-                    continue
-                attribute = value.attr if isinstance(value, ast.Attribute) else None
-                entries.append((name, attribute, dictionary.lineno))
+        for child in ast.walk(node):
+            if isinstance(child, ast.Dict):
+                for key, value in zip(child.keys, child.values):
+                    name = _constant_str(key) if key is not None else None
+                    if name is None:
+                        continue
+                    attribute = (value.attr if isinstance(value, ast.Attribute)
+                                 else None)
+                    entries.append((name, attribute, child.lineno))
+            elif isinstance(child, ast.Assign):
+                for target in child.targets:
+                    if not isinstance(target, ast.Subscript):
+                        continue
+                    name = _constant_str(target.slice)
+                    if name is None:
+                        continue
+                    attribute = (child.value.attr
+                                 if isinstance(child.value, ast.Attribute)
+                                 else None)
+                    entries.append((name, attribute, child.lineno))
     return entries
 
 

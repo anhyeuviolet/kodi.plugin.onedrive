@@ -850,14 +850,73 @@ class CloudDriveAddon:
         
     def _rename_action(self):
         pass
-        
+
+    def _action_map(self):
+        """Every action a plugin address may name, written down.
+
+        A plugin:// address is not a trusted input. A favourite, a stored
+        playlist entry, a keymap or another installed add-on can construct one,
+        and nothing on this side can tell which did. What stood here looked the
+        method up by name on `self`, so the address chose which method ran out
+        of everything the class and its bases happened to define -- including
+        every private helper and every method a future edit adds (T-03-40).
+
+        A stop-list on names would not fix it, and it is worth saying why,
+        because a stop-list is the cheaper-looking answer. The namespace it
+        would filter grows every time somebody adds a method: each addition
+        silently gains an entry point, and nobody reviewing that addition is
+        looking at the router. This mapping gains nothing when a method is
+        added. That asymmetry is the whole argument.
+
+        The keys are derived, not recalled: `test_every_constructed_action_is_
+        routable` sweeps the tree for every literal this add-on writes into an
+        address of its own and asserts each one is here. Aliases are not -- the
+        three friendly names live in `_rename_action`, which runs first, so this
+        table stays a plain name-to-method list a reader can check by eye.
+
+        Deliberately absent: `_open_common_settings`. Nothing constructs an
+        address for it and `test_vendor_gates` asserts no settings row does,
+        because the separate module whose settings it opened no longer exists.
+        """
+        actions = {
+            '_add_account': self._add_account,
+            '_remove_account': self._remove_account,
+            '_remove_drive': self._remove_drive,
+            '_list_drive': self._list_drive,
+            '_list_folder': self._list_folder,
+            '_list_exports': self._list_exports,
+            '_open_export': self._open_export,
+            '_run_export': self._run_export,
+            '_remove_export': self._remove_export,
+            '_search': self._search,
+            '_slideshow': self._slideshow,
+            '_clear_cache': self._clear_cache,
+            'play': self.play,
+            'download': self.download,
+        }
+        return actions
+
     def route(self):
         try:
             Logger.debug(self._addon_params)
             self._action = Utils.get_safe_value(self._addon_params, 'action')
             if self._action:
+                # Rewriting first, lookup second -- the same order the dynamic
+                # lookup ran in, so the three friendly names keep working.
                 self._rename_action()
-                method = getattr(self, self._action)
+                actions = self._action_map()
+                method = actions.get(self._action)
+                if method is None:
+                    # The ordinary failure path, not a call. It reaches
+                    # _handle_exception below, which shows the add-on's usual
+                    # error dialog; an unmapped name is either a stale favourite
+                    # or somebody probing, and neither deserves a call.
+                    raise UIException(32027, Exception(
+                        'unroutable action: %s' % Utils.str(self._action)))
+                # Binding by introspection is fine now that the method was not
+                # chosen by an untrusted string: the name decides which entry of
+                # the table above runs, and only the arguments that entry
+                # declares are taken from the address.
                 arguments = {}
                 for name in inspect.getfullargspec(method)[0]:
                     if name in self._addon_params:

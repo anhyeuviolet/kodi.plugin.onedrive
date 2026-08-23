@@ -233,6 +233,23 @@ class OneDriveAddon(CloudDriveAddon):
             xbmcplugin.endOfDirectory(self._addon_handle, succeeded=True,
                                       cacheToDisc=False)
     # ---------------- end temporary debug affordance -------------------
+
+    def _action_map(self):
+        """The base class's table, plus this add-on's own entries.
+
+        `_dialog_smoke` is temporary and looks exactly like something to tidy
+        away. It is also the only route to all three dialogs -- QRDialogProgress
+        is built deep inside sign-in, and the two export dialogs need a store
+        with a record already in it -- and the television acceptance pass
+        repeats the phase-1 checklist through it. Removing this entry would fail
+        nothing and would make that pass produce a green that meant nothing, so
+        `test_the_dialog_affordance_stays_routable` holds it here until the
+        affordance itself goes, in the same commit as the assertion.
+        """
+        actions = super(OneDriveAddon, self)._action_map()
+        actions['_dialog_smoke'] = self._dialog_smoke
+        return actions
+
     def _rename_action(self):
         if self._action == 'open_drive_folder':
             self._addon_params['path'] = Utils.get_safe_value(self._addon_params, 'folder')
