@@ -31,30 +31,21 @@ import functools
 import hashlib
 import json
 import re
-import subprocess
 import sys
 import xml.etree.ElementTree as ET
-from pathlib import Path, PurePosixPath
+from pathlib import PurePosixPath
 
-# The repository root, resolved from this file's location and never from the
-# current working directory, so the gate gives the same verdict from anywhere.
-REPO = Path(__file__).resolve().parent.parent
-
-# The single exclusion set, defined once. Widening it is how a gate quietly stops
-# checking anything, so it lives here and nowhere else.
-#
-#   .planning / tests  - not shipped source; the planning record and this gate
-#                        file are both required to name the constructs they forbid.
-#   the four documents - VENDORED.md, CREDITS.md, COVERAGE.md and README.md are
-#                        *required* to name the upstream module and the original
-#                        add-on id. Forgetting them produces a gate that can never
-#                        go green. They are covered instead by the positive
-#                        assertions in test_vendored_sha_recorded,
-#                        test_vendored_md_sections and test_credits_content.
-EXCLUDED_TOP_LEVEL = frozenset({'.planning', 'tests'})
-EXCLUDED_DOCS = frozenset({'VENDORED.md', 'CREDITS.md', 'COVERAGE.md', 'README.md'})
-
-TEXT_SUFFIXES = frozenset({'.py', '.xml', '.po', '.md', '.ini', '.txt'})
+# The repository root, the index-backed file lists, the one exclusion set, the
+# pattern sweep and the failure report all live in gatelib, because this is no
+# longer the only gate file. Two copies of the exclusion set drift; one does not.
+from gatelib import (
+    REPO,
+    python_sources,
+    read as _read,
+    report as _report,
+    source_scan,
+    tracked_files,
+)
 
 # Not every shipped file is GPL. The vendored QR encoder is BSD-3-Clause with
 # an MIT PNG writer bundled inside it, and stamping a GPL banner on either
@@ -84,82 +75,9 @@ VENDORED_PREFIX = 'resources.lib.vendor.clouddrive_common'
 
 
 # ---------------------------------------------------------------------------
-# Harness
+# The one list that stays here: it exists for the compile check below and has
+# no second reader, so moving it to the shared harness would buy nothing.
 # ---------------------------------------------------------------------------
-
-@functools.lru_cache(maxsize=1)
-def tracked_files():
-    """Every path in the git index, relative to REPO, with '/' separators.
-
-    The index rather than a filesystem walk, so an untracked scratch file or a
-    __pycache__ directory can never influence a verdict.
-    """
-    out = subprocess.run(
-        ['git', 'ls-files', '-z'],
-        cwd=str(REPO), stdout=subprocess.PIPE, check=True,
-    )
-    return tuple(p for p in out.stdout.decode('utf-8').split('\0') if p)
-
-
-def _is_text(rel):
-    suffix = PurePosixPath(rel).suffix
-    # A dotfile such as .gitignore has no suffix and counts as extensionless.
-    return suffix == '' or suffix.lower() in TEXT_SUFFIXES
-
-
-def _read(rel):
-    return (REPO / rel).read_text(encoding='utf-8', errors='replace')
-
-
-@functools.lru_cache(maxsize=1)
-def text_files():
-    """(path, contents) for every tracked file that is text by suffix.
-
-    Binary assets are excluded by suffix, not by sniffing.
-    """
-    result = []
-    for rel in tracked_files():
-        if not _is_text(rel):
-            continue
-        if not (REPO / rel).is_file():
-            continue
-        result.append((rel, _read(rel)))
-    return tuple(result)
-
-
-def _excluded(rel, extra_excludes=()):
-    parts = PurePosixPath(rel).parts
-    if parts and parts[0] in EXCLUDED_TOP_LEVEL:
-        return True
-    if rel in EXCLUDED_DOCS:
-        return True
-    return rel in extra_excludes
-
-
-def source_scan(pattern, extra_excludes=(), transform=None):
-    """Every (path, lineno, line) in shipped text source matching `pattern`.
-
-    `transform` is applied to each line before matching, which is how a test
-    subtracts the one construction where a forbidden literal is legitimate. It
-    narrows what counts as a hit; it never narrows which files are read.
-    """
-    regex = re.compile(pattern) if isinstance(pattern, str) else pattern
-    hits = []
-    for rel, contents in text_files():
-        if _excluded(rel, extra_excludes):
-            continue
-        for lineno, line in enumerate(contents.splitlines(), start=1):
-            candidate = transform(line) if transform else line
-            if regex.search(candidate):
-                hits.append((rel, lineno, line.rstrip()))
-    return hits
-
-
-def python_sources():
-    """Tracked .py files in shipped source, under the same exclusions."""
-    return [rel for rel in tracked_files()
-            if rel.endswith('.py') and not _excluded(rel)]
-
 
 def addon_tree_python():
     """Every tracked .py under resources/, plus the two root entry scripts."""
@@ -168,10 +86,6 @@ def addon_tree_python():
     files.extend(rel for rel in ('entrypoint.py', 'service.py')
                  if rel in tracked_files())
     return files
-
-
-def _report(hits):
-    return '\n'.join('{}:{}: {}'.format(*h) for h in hits)
 
 
 # ---------------------------------------------------------------------------
