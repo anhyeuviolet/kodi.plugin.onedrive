@@ -732,3 +732,61 @@ def test_credits_content():
                 'GPL-3.0', 'BSD-3-Clause', 'MIT', 'Apache-2.0')
     absent = [value for value in required if value not in contents]
     assert not absent, 'CREDITS.md does not name: %r' % (absent,)
+
+
+# ---------------------------------------------------------------------------
+# The registration runbook (SETUP-04)
+#
+# This is what the fifth entry in EXCLUDED_DOCS buys. The runbook is excluded
+# from the literal sweeps because it must quote a response that names the two
+# credential parameters; in exchange the file is read here by name and its
+# load-bearing contents are asserted, so the exclusion is a stronger gate rather
+# than a hole. Same trade as the four documents above.
+# ---------------------------------------------------------------------------
+
+RUNBOOK = 'docs/AZURE-REGISTRATION.md'
+
+# The response verbatim, as PITFALLS.md Pitfall 2 records it. This is the whole
+# reason SETUP-04 exists: the text invites the reader to embed a credential, and
+# the runbook is where they are told not to.
+AADSTS7000218 = (
+    "AADSTS7000218: The request body must contain the following parameter: "
+    "'client_assertion' or 'client_secret'."
+)
+
+
+def test_runbook_contains_aadsts7000218():
+    path = REPO / RUNBOOK
+    assert path.is_file(), (
+        '%s is missing. The app registration is the one piece of this system '
+        'that lives outside the repository, and this is the only thing that '
+        'can recreate it.' % RUNBOOK)
+
+    assert RUNBOOK in tracked_files(), (
+        '%s exists but is not in the git index, so it does not ship and does '
+        'not survive a fresh clone' % RUNBOOK)
+
+    contents = _read(RUNBOOK)
+
+    assert AADSTS7000218 in contents, (
+        'the runbook does not carry the misconfiguration response verbatim.\n'
+        'Expected, exactly:\n  %s\n'
+        'Paraphrasing it defeats the point: the reader who hits this error '
+        'searches for the string they saw.' % AADSTS7000218)
+
+    # The instruction that the quote exists to carry. Without it the runbook
+    # reproduces the misleading advice instead of correcting it.
+    assert re.search(r'\*\*Do not fix this by adding a client secret\.\*\*',
+                     contents), (
+        'the runbook quotes the error but does not immediately forbid the '
+        '"fix" it invites; the quote alone is worse than not quoting it')
+
+    for label, value in (
+            ('supported-account setting', 'AzureADandPersonalMicrosoftAccount'),
+            ('public-client flag', 'isFallbackPublicClient'),
+            ('public-client flag, as the portal spells it',
+             'Allow public client flows'),
+            ('application identifier', 'efe197b3-5c14-4d67-810f-e10406742a06')):
+        assert value in contents, (
+            'the runbook does not name the %s (%s); the registration cannot be '
+            'recreated from it' % (label, value))

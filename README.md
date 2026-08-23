@@ -55,6 +55,13 @@ same licence, **PyQRCode** by **Michael Nooner** under BSD-3-Clause, and **pypng
 The full attribution list is in [CREDITS.md](CREDITS.md). Where the bundled code came from, what
 was left out of the copy and every local change to it are recorded in [VENDORED.md](VENDORED.md).
 
+## Maintainer notes
+
+The add-on signs in with an application identifier that is registered with Microsoft outside this
+repository. That registration is the only part of the system a fresh clone cannot rebuild, so how it
+is configured, how to recreate it and what to do if it lapses are written down in
+[docs/AZURE-REGISTRATION.md](docs/AZURE-REGISTRATION.md).
+
 ## Licence
 
 GPL-3.0-or-later. See [LICENSE.txt](LICENSE.txt).

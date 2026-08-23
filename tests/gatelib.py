@@ -53,8 +53,21 @@ REPO = Path(__file__).resolve().parent.parent
 #                        go green. They are covered instead by the positive
 #                        assertions in test_vendored_sha_recorded,
 #                        test_vendored_md_sections and test_credits_content.
+#   the runbook        - docs/AZURE-REGISTRATION.md is *required* to quote the
+#                        AADSTS7000218 response verbatim, and that response names
+#                        'client_assertion' and 'client_secret'. Quoting it is the
+#                        entire point of the document: it is what stops the next
+#                        maintainer from "fixing" the error by embedding a
+#                        credential. Softening the credential pattern to let the
+#                        quote through would weaken that sweep everywhere; naming
+#                        one document here weakens it in one auditable place. It
+#                        is covered instead by test_runbook_contains_aadsts7000218,
+#                        which reads the file by name and asserts the quote, the
+#                        supported-account value and the public-client flag are
+#                        all present.
 EXCLUDED_TOP_LEVEL = frozenset({'.planning', 'tests'})
-EXCLUDED_DOCS = frozenset({'VENDORED.md', 'CREDITS.md', 'COVERAGE.md', 'README.md'})
+EXCLUDED_DOCS = frozenset({'VENDORED.md', 'CREDITS.md', 'COVERAGE.md', 'README.md',
+                           'docs/AZURE-REGISTRATION.md'})
 
 TEXT_SUFFIXES = frozenset({'.py', '.xml', '.po', '.md', '.ini', '.txt'})
 
