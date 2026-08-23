@@ -80,20 +80,16 @@ msgctxt "#30020"
 msgid "Hide exporting progress dialog"
 msgstr ""
 
-msgctxt "#30030"
-msgid "Collaboration"
-msgstr ""
-
-msgctxt "#30031"
-msgid "Report errors automatically to help resolve them quickly"
-msgstr ""
+# 30030 and 30031 named the third category and its single row, which offered to
+# send an error report to a third party; 30033 labelled the row holding that
+# third party's address. All three settings rows are gone, and the code behind
+# the first two went with the error reporter in the previous plan, so the
+# strings are removed rather than left as orphans. The gap they leave is not
+# refilled: renumbering downwards would move labels the settings file and the
+# sign-in copy both reference by number.
 
 msgctxt "#30032"
 msgid "Advanced"
-msgstr ""
-
-msgctxt "#30033"
-msgid "Sign-in Server"
 msgstr ""
 
 msgctxt "#30034"

@@ -107,11 +107,15 @@
 		</category>
 		<category id="advanced" label="30032">
 			<group id="1">
-				<setting id="sign-in-server" type="string" label="30033">
-					<level>0</level>
-					<default>https://drive-login.herokuapp.com</default>
-					<control type="edit" format="string"/>
-				</setting>
+				<!--
+					A row stood here holding the address of a hosted third
+					party that sat in the middle of sign-in. It is removed
+					rather than hidden: a hidden row still ships a default
+					naming a hostname somebody else could register once the
+					original lapsed, and a stored value is still a stored value
+					when nothing reads it (AUTH-23). VENDORED.md carries the
+					name and the history.
+				-->
 				<setting id="cache-expiration-time" type="integer" label="30034">
 					<level>0</level>
 					<default>5</default>
@@ -166,14 +170,11 @@
 				</setting>
 			</group>
 		</category>
-		<category id="collaboration" label="30030">
-			<group id="1">
-				<setting id="report_error" type="boolean" label="30031">
-					<level>0</level>
-					<default>false</default>
-					<control type="toggle"/>
-				</setting>
-			</group>
-		</category>
+		<!--
+			A third category stood here with one row in it, offering to send an
+			error report to the same third party. The code behind it was deleted
+			in the previous plan, so the row was configuration for nothing:
+			every failure now reaches kodi.log and goes no further (KODI-08).
+		-->
 	</section>
 </settings>

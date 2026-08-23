@@ -448,8 +448,15 @@ def test_addon_xml_imports():
 # 30070-30071 are the label and the help of the custom application identifier,
 # added with the setting itself when the settings file moved to the versioned
 # schema. They are the last pair, for the same reason and under the same rule.
+#
+# 30030, 30031 and 30033 are absent from the middle of that third run, and the
+# gap is deliberate. They labelled the error-reporting category, its one row and
+# the row holding the replaced sign-in host; all three rows are gone, so the
+# strings went with them in the same commit as this narrowing. Renumbering the
+# survivors downwards to close the gap would move labels that the settings file
+# and the sign-in copy reference by number.
 ADDON_STRING_IDS = (set(range(30000, 30012)) | set(range(30017, 30021))
-                    | set(range(30030, 30036)) | set(range(30036, 30060))
+                    | {30032, 30034, 30035} | set(range(30036, 30060))
                     | set(range(30067, 30070)) | set(range(30070, 30072)))
 # The vendored module's contiguous block, left exactly where it was: the module
 # resolves some of these dynamically and one is persisted, so a mechanical
@@ -529,10 +536,11 @@ def test_localize_owns_this_addons_block():
 
 
 def test_string_ids_partitioned():
-    assert len(ADDON_STRING_IDS) == 51, (
-        'the add-on owns 25 renumbered ids, the 23 the sign-in copy added, '
-        "re-authorisation's wrong-account refusal, and the label and help of "
-        'the custom application identifier')
+    assert len(ADDON_STRING_IDS) == 48, (
+        'the add-on owns 22 of the renumbered ids -- three of the original 25 '
+        'went with the settings rows they labelled -- the 23 the sign-in copy '
+        "added, re-authorisation's wrong-account refusal, and the label and "
+        'help of the custom application identifier')
     assert len(MODULE_STRING_IDS) == 89, 'the module owns 89 ids'
 
     sets = {}
