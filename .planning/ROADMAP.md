@@ -197,6 +197,8 @@ Plans:
 **Depends on**: Phase 2 and Phase 3 (the two tracks converge here)
 **Requirements**: BROWSE-01, BROWSE-05, BROWSE-06, BROWSE-08, BROWSE-09, BROWSE-10, BROWSE-11, BROWSE-12, BROWSE-13, BROWSE-14, ERR-01, ERR-02, ERR-03
 
+**Inherited constraint from Phase 3 (recorded 2026-08-23).** `AUTH-20` requires tokens, delta tokens and cache keys to be isolated per account. Phase 3 delivered the token half and could not deliver the cache half, because at that point no cache exists to isolate — the only `Cache` consumers belong to `SourceService`, which is global and is scheduled for deletion. **This phase builds the listing cache, so this phase owns that clause: key the cache by account from the first commit.** Retrofitting an account key onto a populated global cache means either a migration or a silent cross-account data leak, where one account's listings are served to another. Delta tokens carry the same rule and belong to the deferred `REST-04`.
+
 **Success Criteria** (what must be TRUE):
 
   1. A user browses drives, folders and the pseudo-folders (Recent, Shared with me, Camera Roll) on a Business account, one page at a time without buffering the whole folder. A search containing a single quote succeeds, and names containing `#`, a space and a literal `%` resolve. **Narrowed 2026-08-23 to Business, the drive actually in use; the Personal pass is deferred, not deleted** — the reserved-character sets differ between the two classes, so a Business-only pass genuinely cannot find that class of bug and must not be written up as though it had.
