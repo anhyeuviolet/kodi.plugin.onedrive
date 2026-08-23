@@ -169,6 +169,44 @@ Run it a second time with a **personal** Microsoft account. That second run is t
 `signInAudience` in step 1, and it is the half that a maintainer testing with their own account
 never covers by accident.
 
+If either run fails, the whole failing response is now written to a timestamped
+`device-code-failure-*.json` beside that script and the path is printed. Those files hold an
+unredacted response and are ignored by git deliberately — read one where it lies, and never paste
+its contents anywhere tracked.
+
+### The second half: through the code that actually ships
+
+The script above proves the *registration*. It does not prove the add-on, because it is a
+standalone reimplementation of the protocol — it would keep passing after a change that broke
+`resources/lib/auth/` outright. The harness beside it closes that gap by importing the shipped
+package and driving it:
+
+```
+python .planning/research/live_sign_in.py
+```
+
+It takes the built-in identifier by default, so no argument is needed. Use a **work or school**
+account. It requests a code through `device_code.request_device_code`, polls through
+`poll_once`, writes the result through `store.merge_token_response` and `store.write`, and then
+refreshes twice through `refresh.refresh` holding a real `RefreshLock`. Nothing in it reimplements
+any of that.
+
+`--stop-after-code` asks for a code and stops without signing in, which is enough to confirm the
+registration is still answering. `--keep-tokens` leaves the acquired refresh token on disk; by
+default the scratch profile is deleted at the end. The scratch path is outside the repository and
+the harness refuses both an in-repository path and anything that looks like a real Kodi profile —
+it deletes the account file it writes, so pointing it at a live profile would sign that account out.
+
+**The one result that matters:** it prints three refresh-token prefixes in order. *All three must
+differ.* If any two match, the rotation is not reaching disk — stop, because every installation
+then keeps working until the original token reaches its ninety-day lifetime and they all fail on
+the same day with nothing in the history to blame.
+
+Alongside that it prints the values that have to be written down, because they are measured facts
+that no documentation supplies: the granted scope string verbatim including its ordering, whether
+the identity token carries a `name` claim, the drive owner's display name that the label path falls
+back to when it does not, and the `expires_in` of each of the three tokens.
+
 ### What the acceptance check cannot tell you
 
 **A tenant that blocks device code flow is not reproducible here, and the requirement covering it is
