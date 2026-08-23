@@ -1184,6 +1184,15 @@ def test_transport_report_redacts_credential_fields():
 # it -- otherwise it is a comment, and a comment is not a constraint.
 PROVIDER = 'resources/lib/vendor/clouddrive_common/remote/provider.py'
 
+# The startup keepalive builds a transport of its own, and it is the contender
+# that is MOST likely to meet the lock rather than least: it runs at Kodi start,
+# which is when the user opens the add-on. A profile pinned in the provider and
+# forgotten here would be a 155-second refresh under a 90-second lock reached
+# only from the background service, where nobody is watching it happen.
+STARTUP_REFRESH = 'resources/lib/startup_refresh.py'
+
+REFRESH_TRANSPORT_FILES = (PROVIDER, STARTUP_REFRESH)
+
 # The names, not the numbers. Asserting tries=2 would stay green against a
 # literal 2 that nobody revisited when refresh.py changed its arithmetic; the
 # whole point is that the two move together, and only a reference moves
@@ -1203,8 +1212,8 @@ REFRESH_PROFILE_ARGUMENTS = {
 TRANSPORT_BUILDERS = frozenset({'Request', '_post_port'})
 
 
-def _refresh_transport_constructions():
-    """Every transport built inside the provider's refresh path.
+def _refresh_transport_constructions(rel):
+    """Every transport built inside a refresh path in `rel`.
 
     "Inside the refresh path" is decided by the enclosing function's name,
     because that is what a reader can check by eye. A construction moved out of
@@ -1212,7 +1221,7 @@ def _refresh_transport_constructions():
     is what the non-vacuity guard below is for.
     """
     found = []
-    for node in ast.walk(_parse(PROVIDER)):
+    for node in ast.walk(_parse(rel)):
         if not isinstance(node, ast.FunctionDef):
             continue
         if 'refresh' not in node.name.lower():
@@ -1225,34 +1234,38 @@ def _refresh_transport_constructions():
 
 
 def test_refresh_transport_is_built_from_the_pinned_profile():
-    assert PROVIDER in tracked_files(), (
-        '%s is missing; it is where the refresh reaches the network' % PROVIDER)
-
-    constructions = _refresh_transport_constructions()
-    assert constructions, (
-        'no Request construction was found inside a refresh function in %s, so '
-        'this sweep certifies nothing. Either the refresh no longer builds its '
-        'own transport -- in which case it has silently inherited the '
-        '155-second default profile -- or the function was renamed out from '
-        'under this assertion.' % PROVIDER)
-
-    contents = read(PROVIDER)
     missing = []
-    for function_name, call in constructions:
-        supplied = {keyword.arg: keyword for keyword in call.keywords
-                    if keyword.arg}
-        for argument, constant in REFRESH_PROFILE_ARGUMENTS.items():
-            keyword = supplied.get(argument)
-            if keyword is None:
-                missing.append((PROVIDER, call.lineno,
-                                '%s(): no %s=, so the transport default applies'
-                                % (function_name, argument)))
-                continue
-            source = (ast.get_source_segment(contents, keyword.value) or '').strip()
-            if constant not in source:
-                missing.append((PROVIDER, call.lineno,
-                                '%s(): %s=%s does not name %s'
-                                % (function_name, argument, source, constant)))
+    for rel in REFRESH_TRANSPORT_FILES:
+        assert rel in tracked_files(), (
+            '%s is missing; it is one of the two places the refresh reaches '
+            'the network' % rel)
+
+        constructions = _refresh_transport_constructions(rel)
+        assert constructions, (
+            'no transport construction was found inside a refresh function in '
+            '%s, so this sweep certifies nothing about it. Either that refresh '
+            'no longer builds its own transport -- in which case it has '
+            'silently inherited the 155-second default profile -- or the '
+            'function was renamed out from under this assertion.' % rel)
+
+        contents = read(rel)
+        for function_name, call in constructions:
+            supplied = {keyword.arg: keyword for keyword in call.keywords
+                        if keyword.arg}
+            for argument, constant in REFRESH_PROFILE_ARGUMENTS.items():
+                keyword = supplied.get(argument)
+                if keyword is None:
+                    missing.append((rel, call.lineno,
+                                    '%s(): no %s=, so the transport default '
+                                    'applies' % (function_name, argument)))
+                    continue
+                source = (ast.get_source_segment(contents, keyword.value)
+                          or '').strip()
+                if constant not in source:
+                    missing.append((rel, call.lineno,
+                                    '%s(): %s=%s does not name %s'
+                                    % (function_name, argument, source,
+                                       constant)))
 
     assert not missing, (
         'the refresh transport is not built from the profile refresh.py pins. '
