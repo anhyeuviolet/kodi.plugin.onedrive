@@ -1,9 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Sign-in dialog. The layout is built around the CODE, not the QR image.
+
+    The provider does not return `verification_uri_complete`, measured in all
+    three spike runs, so the QR can only ever carry the address - never the
+    code. A layout that gives the QR the left third and leaves the code inside
+    a body block is therefore the wrong shape: the code is the thing a person
+    has to read across a room and type on a phone, and the QR is a convenience
+    that saves them typing the address. The code gets the full panel width and
+    the QR is shrunk to suit.
+
+    Fonts must be names the ACTIVE SKIN defines. Kodi falls back to font13
+    silently when it cannot resolve a font name - no error, no log line - which
+    is how this file shipped naming `font12_title`, a font Estuary does not
+    define, with its body text rendering at the fallback ever since.
+
+    font60 is the code font: 60px in these 1080-line coordinates, present in
+    both of Estuary's fontsets. A nine-character code at that size is roughly
+    320px wide, well inside the 1150px panel. If a real code proves too wide on
+    the television, the fallbacks in descending order are font52_title then
+    font45 - both also defined in both fontsets. Do NOT reach for WeatherTemp
+    (120px): it is Estuary-specific in a way font60 is not, and a name that
+    resolves nowhere else substitutes silently.
+-->
 <window>
     <coordinates>
         <left>385</left>
         <top>315</top>
     </coordinates>
+    <!-- The only input device is a directional pad, so the initial focus is a
+         decision rather than an accident. Cancel takes it: the second button
+         is hidden until the code expires. -->
+    <defaultcontrol always="true">1003</defaultcontrol>
     <controls>
         <animation type="WindowOpen" reversible="false">
             <effect type="zoom" start="80" end="100" center="960,540" delay="160" tween="back" time="240" />
@@ -50,37 +78,73 @@
             <aligny>center</aligny>
             <shadowcolor>FF000000</shadowcolor>
         </control>
-        <!-- QR image -->
+        <!-- The code. The largest element on the panel, and the reason the
+             panel exists. Filled from Python; see QRDialogProgress.set_code. -->
+        <control type="label" id="1005">
+            <left>0</left>
+            <top>76</top>
+            <width>1150</width>
+            <height>96</height>
+            <font>font60</font>
+            <textcolor>FFFFFFFF</textcolor>
+            <align>center</align>
+            <aligny>center</aligny>
+            <shadowcolor>FF000000</shadowcolor>
+        </control>
+        <!-- QR image, now secondary: it carries the address only. -->
         <control type="image" id="1001">
-            <left>20</left>
-            <top>90</top>
-            <width>340</width>
-            <height>340</height>
+            <left>24</left>
+            <top>182</top>
+            <width>150</width>
+            <height>150</height>
             <aspectratio aligny="center" align="center">keep</aspectratio>
         </control>
         <!-- Text panel -->
         <control type="textbox" id="1002">
-            <left>380</left>
-            <top>90</top>
-            <width>770</width>
-            <height>340</height>
-            <font>font12_title</font>
+            <left>200</left>
+            <top>178</top>
+            <width>926</width>
+            <height>156</height>
+            <font>font27</font>
             <align>left</align>
             <aligny>top</aligny>
             <shadowcolor>FF000000</shadowcolor>
         </control>
-        <!-- Cancel button -->
-        <control type="button" id="1003">
-            <left>850</left>
-            <top>350</top>
+        <!-- Get a new code. Hidden until the code expires, then shown and
+             focused exactly once by QRDialogProgress.set_expired. Its label is
+             set from Python so the words live in the catalogue, not here. -->
+        <control type="button" id="1004">
+            <left>520</left>
+            <top>340</top>
             <width>300</width>
-            <height>100</height>
-            <font>font12_title</font>
+            <height>96</height>
+            <font>font25_title</font>
+            <textcolor>FFFFFFFF</textcolor>
+            <align>center</align>
+            <aligny>center</aligny>
+
+            <onup>1004</onup>
+            <ondown>1004</ondown>
+            <onleft>1003</onleft>
+            <onright>1003</onright>
+        </control>
+        <!-- Cancel button. Stays present through the expiry transition, so
+             there are always two ways out of this dialog. -->
+        <control type="button" id="1003">
+            <left>840</left>
+            <top>340</top>
+            <width>290</width>
+            <height>96</height>
+            <font>font25_title</font>
             <textcolor>FFFFFFFF</textcolor>
             <label>222</label>
             <align>center</align>
             <aligny>center</aligny>
+
+            <onup>1003</onup>
+            <ondown>1003</ondown>
+            <onleft>1004</onleft>
+            <onright>1004</onright>
         </control>
     </controls>
 </window>
-
