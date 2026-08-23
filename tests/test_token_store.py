@@ -27,6 +27,7 @@ import json
 import os
 import re
 import stat
+import threading
 import time
 
 import pytest
@@ -546,6 +547,68 @@ def test_every_path_producer_validates_before_it_joins(profile, key):
         store.lock_path(profile, key)
     with pytest.raises(ValueError):
         store.remove_account(profile, key)
+
+
+def test_the_second_contender_sees_the_first_contenders_write(profile):
+    """AUTH-14 end to end, with the two parts this plan built.
+
+    The lock is not the point on its own; this is. Two contenders race, one
+    wins, and the loser -- once it gets in -- reads a store that already holds
+    the winner's token and does not perform a second exchange. Without the lock
+    both exchange, and the loser's write invalidates the refresh token the
+    winner just stored.
+
+    The caller loop is written out here rather than imported because it does not
+    exist yet: plan 03-08 builds it. What this asserts is that the two pieces
+    delivered here support it, which is the thing that would be expensive to
+    discover later.
+    """
+    store.accounts_dir(profile, create=True)
+    token = store.token_path(profile, ACCOUNT_A)
+    lock_file = store.lock_path(profile, ACCOUNT_A)
+
+    exchanges = []
+    errors = []
+    both_ready = threading.Barrier(2)
+
+    def wait(seconds):
+        time.sleep(min(seconds, 0.01))
+        return False
+
+    def refresh(name):
+        try:
+            both_ready.wait(5)
+            lock = RefreshLock(lock_file, SESSION, wait)
+            if not lock.acquire(5):
+                errors.append('%s never got in at all' % name)
+                return
+            try:
+                if store.read(token).get('access_token'):
+                    # Somebody else did the exchange while this one waited. Use
+                    # what they wrote; do not spend the refresh token again.
+                    return
+                exchanges.append(name)
+                store.write(token, {'access_token': 'exchanged-by-' + name,
+                                    'refresh_token': 'rotated-by-' + name})
+            finally:
+                lock.release()
+        except BaseException as failure:          # pragma: no cover - reported
+            errors.append('%s: %r' % (name, failure))
+
+    threads = [threading.Thread(target=refresh, args=(name,))
+               for name in ('A', 'B')]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join(15)
+
+    assert not errors, errors
+    assert len(exchanges) == 1, \
+        'both contenders performed a token exchange: %s' % exchanges
+    assert store.read(token) == {
+        'access_token': 'exchanged-by-' + exchanges[0],
+        'refresh_token': 'rotated-by-' + exchanges[0],
+    }
 
 
 def test_a_rejected_key_touches_nothing_on_disk(profile):

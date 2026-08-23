@@ -29,8 +29,110 @@ four and is documented to raise rather than return a bool.
 
 import json
 import os
+import re
 import time
 import uuid
+
+# One directory under the resolved profile path, holding one JSON file and one
+# lock file per account. Two accounts therefore cannot touch each other's
+# credentials, and two accounts refreshing at the same moment do not contend,
+# because the lock is a name and their names differ (AUTH-20).
+ACCOUNTS_DIRNAME = 'accounts'
+TOKEN_SUFFIX = '.json'
+LOCK_SUFFIX = '.lock'
+
+# The account key is the pairwise subject identifier from the identity token. It
+# is per-application and per-user -- the spike measured two users in one tenant
+# returning different values, which is the evidence for keying on it -- and it
+# is URL-safe base64, so it is filename-safe as written.
+#
+# Which is exactly why it is asserted rather than trusted. A key that reaches
+# the filesystem unvalidated is a path traversal with extra steps, even when
+# today's issuer would never emit one, and the cost of being wrong is a write
+# outside the profile directory (T-03-16).
+#
+# Rejected, never sanitised. A sanitiser maps two different keys onto one
+# filename, which is the cross-account leak this requirement exists to prevent
+# arriving by a different road.
+SAFE_ACCOUNT_KEY = re.compile(r'[A-Za-z0-9_-]+')
+
+# Well inside the 255-byte limit a filename component has on every filesystem
+# this add-on can land on, with room for what gets appended to it: the lock's
+# suffix, and the write's temporary sibling, which adds '.tmp-' and thirty-two
+# hexadecimal characters.
+MAX_ACCOUNT_KEY_LENGTH = 128
+
+
+def validate_account_key(key):
+    """`key` unchanged, or ValueError if it is not safe to put in a filename.
+
+    Raising rather than returning a cleaned-up value is the point: see the
+    comment on SAFE_ACCOUNT_KEY.
+    """
+    if not isinstance(key, str):
+        raise ValueError('account key must be a string, not %s'
+                         % type(key).__name__)
+    if not key:
+        raise ValueError('account key is empty; there is no such account')
+    if len(key) > MAX_ACCOUNT_KEY_LENGTH:
+        raise ValueError('account key is %d characters, over the %d this store '
+                         'will put in a filename'
+                         % (len(key), MAX_ACCOUNT_KEY_LENGTH))
+    if not SAFE_ACCOUNT_KEY.fullmatch(key):
+        # The offending characters, not the key itself: the key identifies a
+        # person, and this message may end up in a log.
+        offending = sorted(set(character for character in key
+                               if not SAFE_ACCOUNT_KEY.fullmatch(character)))
+        raise ValueError('account key contains %r, which is outside the '
+                         'URL-safe base64 alphabet a subject identifier uses'
+                         % (''.join(offending),))
+    return key
+
+
+def accounts_dir(profile_path, create=False):
+    """The directory holding every account's pair of files.
+
+    `profile_path` arrives already resolved. The Kodi layer translates
+    `special://profile/addon_data/...` once and passes the result in; nothing in
+    this package translates a Kodi path or learns that such a thing exists.
+    """
+    path = os.path.join(os.fspath(profile_path), ACCOUNTS_DIRNAME)
+    if create:
+        os.makedirs(path, exist_ok=True)
+    return path
+
+
+def token_path(profile_path, account_key):
+    """Where one account's token blob lives."""
+    key = validate_account_key(account_key)
+    return os.path.join(accounts_dir(profile_path), key + TOKEN_SUFFIX)
+
+
+def lock_path(profile_path, account_key):
+    """Where one account's refresh lock lives -- beside the file it protects.
+
+    `lock.RefreshLock` takes this path and nothing else about the layout. One
+    pair per account is what keeps two accounts from serialising against each
+    other for no reason.
+    """
+    key = validate_account_key(account_key)
+    return os.path.join(accounts_dir(profile_path), key + LOCK_SUFFIX)
+
+
+def remove_account(profile_path, account_key):
+    """Delete both of an account's files, tolerating either being absent.
+
+    Small, and easy to leave out. Leaving it out means a removed-and-re-added
+    account inherits the stale blob, and the resulting failure -- a refresh
+    rejected against a credential the user believes they just replaced -- has no
+    obvious cause from the outside.
+    """
+    for path in (token_path(profile_path, account_key),
+                 lock_path(profile_path, account_key)):
+        try:
+            os.unlink(path)
+        except OSError:
+            pass
 
 
 def read(path):
