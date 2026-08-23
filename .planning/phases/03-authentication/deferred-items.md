@@ -27,7 +27,16 @@ deliberate. **Belongs to a sweep of its own**, and the check that pays for it is
 a gate asserting no shipped module calls `urllib.<submodule>.` without importing
 that submodule by name.
 
-**2. `tests/test_token_store.py::test_the_second_contender_sees_the_first_contenders_write` is timing-sensitive.**
+**2. `RefreshLock.release()` intermittently leaves the lock file on disk, and says nothing.**
+
+> **This item was headed "…is timing-sensitive" through nine observations and
+> that heading was wrong.** The measured cause is a defect in shipped code, not
+> in the test and not in the machine. The original text and every observation are
+> kept below exactly as written, because how a wrong diagnosis accumulated nine
+> confirmations is the more useful half of this record. **Read the correction at
+> the end of the item before acting on anything above it.**
+
+**2 (as originally recorded). `tests/test_token_store.py::test_the_second_contender_sees_the_first_contenders_write` is timing-sensitive.**
 
 It failed once during 03-09 — `'A never got in at all'` — on a run that took
 7.98s against a usual 3.2s, i.e. with the machine loaded by a parallel
@@ -57,18 +66,6 @@ eight seconds; the predicate has held on each occasion it has been available to
 check, which is what turns it from a description into something worth acting on.
 Suite otherwise green at 256 passed, 1 skipped.
 
-*Two more, during the early Phase 5 repository work on 2026-08-23, and the
-predicate held again.* Failures on runs of 9.26s and 13.51s; passes on five runs
-of 3.5-4.5s around them, with no file touched between a failure and the passes
-that followed. **Nine failures now, and nine runs over eight seconds, with no
-failure ever seen on a run under it.** Both of these were on runs that had just
-built one or more archives, which is the same shape of cause as the `compileall`
-below — and the second was a 13.5s run, the slowest yet, on the run that also
-built the whole repository tree. Nothing about this changes the item: the knob is
-still the five-second `acquire` timeout in the test. It is recorded because a
-predicate that has held on nine occasions and failed on none is worth the two
-lines it costs to keep confirming.
-
 *Three more, during the post-verification gap closure, and the predicate held on
 every one.* Failures on runs of 8.38s, 8.66s and 8.47s; passes on six runs of
 3.30-3.68s interleaved with them, with no file touched between a failure and the
@@ -78,6 +75,89 @@ once been wrong when it could be checked, which is as much evidence as this is
 going to accumulate by accident: **the knob is the five-second `acquire` timeout
 in the test, not `ACQUIRE_TIMEOUT_SECONDS` in the lock**, and nothing about the
 shipped code is implicated. Suite otherwise green at 260 passed, 1 skipped.
+
+---
+
+### Correction, measured 2026-08-23 during the early Phase 5 repository work
+
+**Everything above this line diagnoses the wrong thing.** The observations are
+real; the conclusion drawn from them is not, and "nothing about the shipped code
+is implicated" is false.
+
+**What was measured.** The scenario was replayed in-process, outside pytest, 300
+times, with the state of the lock file recorded at the moment of failure. It
+fails on **roughly one run in ten**, and the failing runs look like this:
+
+```
+errors   : ['A never got in at all']
+exchanges: ['B']
+events   : [('B','acquire',True,0.0), ('B','released',True), ('A','acquire',False,5.01)]
+state    : lock_exists=True  body=b'{"session": "..."}'  mtime_age=5.01
+```
+
+The third element of the `released` event is `os.path.exists(lock_file)` taken
+immediately after `lock.release()` returned. **It is `True`.** The winner
+released, the file stayed, and it was never touched again — so the loser polled a
+lock that could not go away until it aged past `LIFETIME_SECONDS`, which is 90.
+
+**Why.** `release()` ends with `os.unlink(self._path)` wrapped in
+`except OSError: pass`. A second probe wrapped `os.unlink` to record what that
+clause discards. Every single failure had exactly one swallowed exception and it
+was always the same one:
+
+```
+PermissionError(13, 'The process cannot access the file because it is being
+used by another process')   winerror=32
+```
+
+The other process is the loser, in the same interpreter: `_staleness()` calls
+`_recorded_session()`, which does `open(self._path, 'r')` on every poll. CPython
+on Windows opens without `FILE_SHARE_DELETE`, so while that read handle is open
+the holder's `unlink` is refused. The loser polls constantly, so the window is
+wide.
+
+**This does not happen on the target device.** On Linux — and therefore on
+Android, and therefore on the TCL — `unlink` succeeds regardless of open
+handles. The defect is real everywhere; the *symptom* is Windows-only, which is
+why nine observations on the development host never pointed at the code.
+
+**How the wrong predicate got nine confirmations, because this is the part worth
+keeping.** The predicate was "the run took longer than about eight seconds". The
+recorded failing runs are 7.98, 8.45, 8.73, 8.51, 8.38, 8.66 and 8.47 seconds
+against a usual 3.2–4.3. The gap is 5.0 seconds every time, and 5.0 is the
+`acquire` timeout the failing contender burns before giving up. **The slow run
+was the failure, not its cause — the causality was recorded backwards**, and a
+correlation that is really an identity confirms beautifully every time it is
+checked. Item 11 in this same file makes the same point about a different
+instrument: a measurement that cannot fail is not evidence.
+
+**Confirmed by disproof, not by argument.** The deadlines were raised from 5/5/15
+to 30/30/60 on the strength of the old diagnosis. If a scheduler stall were the
+cause, that would have fixed it. It did not: the test then failed at exactly
+30.1 seconds, at the same rate, on a test that takes 0.03 seconds when it
+passes. The change was reverted — `git diff` on
+`tests/test_token_store.py` is empty — because a fix built on a wrong diagnosis
+that makes failures six times slower is worse than the flake.
+
+**Not fixed here, and the reason is ownership, not effort.** `resources/lib/auth/lock.py`
+is shipped authentication code delivered by Phase 3 and it is not this work's to
+change; the repository slice touched no file under `resources/`. More to the
+point, the fix is a design decision rather than a line: should `release()` retry,
+should it stop swallowing and report, should the poll read stop holding a handle,
+or should the loser not open the file at all? Those interact with the
+stale-breaker and with `AUTH-14`'s stated guarantee. Item 17 states the rule this
+follows: a phase running ahead does not get to settle the design of the phase it
+overtook.
+
+**Belongs to whoever next works on `resources/lib/auth/lock.py`** — the same
+owner the item always had, now with the right target. Two things to carry:
+
+- **The bug is the swallow, on every platform.** `except OSError: pass` on the
+  unlink means a release that did not release reports success. Whatever else
+  changes, that clause should not silently discard a failure to give up a lock.
+- **The check that pays for it** is a test asserting the lock file is gone after
+  `release()` returns. There is currently no such assertion anywhere, which is
+  how a 10 %-per-run defect survived fourteen plans and a phase verification.
 
 **3. `AccountManager.remove_drive` has no caller.**
 

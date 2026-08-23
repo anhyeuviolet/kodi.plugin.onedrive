@@ -536,9 +536,15 @@ def _miniature_site(root, site_root, path='downloads', hashes='sha256',
         '</addon>\n' % (plugin_id, version), encoding='utf-8')
     (root / 'entrypoint.py').write_text('# entry\n', encoding='utf-8')
     (root / 'icon.png').write_bytes(b'\x89PNG\r\n\x1a\nplugin')
+    # Twenty-two, which puts the member list at twenty-five: comfortably over
+    # build_addon_zip's floor of twenty and no higher. This fixture is built
+    # fresh by fourteen tests, so every file in it is paid for fourteen times,
+    # and nothing in this file asserts a member count. The forty it started at
+    # was copied from `_miniature_repo` in test_build_zip.py, where forty is
+    # load-bearing for an assertion this fixture does not make.
     shipped = root / 'resources'
     shipped.mkdir(exist_ok=True)
-    for index in range(40):
+    for index in range(22):
         (shipped / ('module_%02d.py' % index)).write_text(
             '# %d\n' % index, encoding='utf-8')
 
