@@ -69,16 +69,16 @@ The identity change (`plugin.onedrive` becomes `plugin.onedrive.kn`) belongs her
 
 **Prerequisites** (maintainer, not code — do these before the first file is copied):
 
-  1. SETUP-06: provision a clean Kodi profile with `plugin.googledrive`, `plugin.dropbox` and `script.module.clouddrive.common` uninstalled, plus an Android phone running Kodi and reachable over `adb`. The Android TV box is the deployment target, not a test device — see CI-06.
+  1. SETUP-06: provision a clean Kodi profile with `plugin.googledrive`, `plugin.dropbox` and `script.module.clouddrive.common` uninstalled, plus an Android phone running Kodi and reachable over `adb`. The TCL Android TV 12 box is the primary acceptance device — it is what this add-on is written for, and the emulator and phone stand in for it only where the question is an API-level one.
   2. Decide the vendored package name. Reversing it later means redoing every import. *(Decided: `resources/lib/vendor/clouddrive_common/`.)*
 
 **Success Criteria** (what must be TRUE):
 
   1. A repo-wide grep returns zero hits for `script.module.clouddrive.common` and zero for `eval(`, and `addon.xml` declares no `<import>` other than `xbmc.python`.
-  2. Kodi 19 mechanically refuses to install the add-on; Kodi 20, 21 and 22 install it and load both the plugin and service entry points.
+  2. Kodi 19 mechanically refuses to install the add-on; Kodi 20, 21 and 22 install it and load both the plugin and service entry points. *(Not met, and not pursued: the multi-version matrix was dropped along with Windows. KODI-02 stays unchecked.)*
   3. On the clean profile from SETUP-06, with every sibling cloud-drive add-on and the external common module uninstalled, the add-on behaves as it did before the vendor commit (modulo the already-dead broker) and every dialog opens — including the one that writes `qr.png`, which is the one that lands on the sign-in screen.
   4. `VENDORED.md` records upstream URL, the `matrix` branch, version 1.4.0, the commit SHA, per-subtree licence and local modifications; both the GPL-3.0 and the Apache-2.0 licence files survive, and every outbound HTTP call in the vendored tree passes an explicit `timeout=`.
-  5. Manual acceptance pass on Windows and on the Android phone over `adb`, on a clean profile — establishing the per-phase standard (CI-06) that every later phase inherits. The Android TV box is the deployment target, not a test device; it is checked before release.
+  5. Manual acceptance pass on Android over `adb`, on a clean profile — establishing the per-phase standard (CI-06) that every later phase inherits. The TCL Android TV 12 box is the primary acceptance device; it is exercised from Phase 3 onward, once the add-on does something a run on it would prove. *(Closed 2026-08-23: the Android acceptance pass ran on an Android 11 emulator. The Windows half was dropped — Windows is not a target for this add-on — which leaves criterion 2 unmet; see `01-07-SUMMARY.md`.)*
 
 **Plans**: 7/7 plans executed
 
@@ -142,7 +142,8 @@ Plans:
   2. The authorization request carries exactly `https://graph.microsoft.com/Files.Read offline_access openid profile`; a grep finds no `Files.Read.All`, no write scope, no `.default`, no `client_secret`, no `client_assertion`, and no reference to `sign-in-server` or any external broker anywhere in the tree.
   3. An automated test proves the persisted refresh token changed across two consecutive refreshes, and that a token response omitting `refresh_token` retains the previous one. A two-interpreter test shows the `O_EXCL` lock serialises refreshes and that a loser receiving `invalid_grant` re-reads the store and adopts the winner's token instead of signing the user out; no `threading.Lock` or `fcntl.lockf` appears in the auth package.
   4. The add-on root is the account list, with an "Add an account…" row and per-row re-authorise and remove. Labels come from Graph, Back or Esc during sign-in leaves no partially-created account, tokens and delta tokens and cache keys are isolated per account, and the background service never opens a sign-in dialog.
-  5. Manual acceptance on Windows and Android TV: the code renders at the skin's largest font and is legible from a sofa, the expiry countdown ticks, "Get a new code" arrives focused on expiry, and any QR shown encodes only the server-supplied `verification_uri`.
+  5. Manual acceptance on Android TV: the code renders at the skin's largest font and is legible from a sofa, the expiry countdown ticks, "Get a new code" arrives focused on expiry, and any QR shown encodes only the server-supplied `verification_uri`.
+  6. **First run on the real target device.** The add-on is installed on the TCL television running Android TV 12, over network `adb`, and the same checklist the Android emulator ran in Phase 1 is repeated on it: both entry points load under the add-on's own id, the background service starts at login, all three dialogs open and render from the add-on's own skin directory, two openings of the QR dialog write two different image paths, and `grep -c Traceback` over the session log returns 0. This is the first time the add-on runs on the hardware it is written for — Phase 1's pass used an Android 11 emulator, one API level below it — so anything the emulator could not answer is answered here: real GPU rendering, D-pad focus order, readability from a sofa, performance on a low-end chip, and whether the television's own Android build restricts shell access to `Android/data`.
 
 **Plans**: TBD (5 expected)
 **UI hint**: yes

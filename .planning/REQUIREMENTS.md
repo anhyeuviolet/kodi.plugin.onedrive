@@ -98,7 +98,7 @@ Scope note: this is a brownfield refactor. Requirements below describe the targe
 ### Kodi modernization
 
 - [x] **KODI-01**: `addon.xml` declares `<import addon="xbmc.python" version="3.0.1"/>`, installing on Kodi 20, 21, and 22 and being rejected by Kodi 19
-- [ ] **KODI-02**: The add-on installs and runs on Kodi 20 Nexus, 21 Omega, and 22 Piers
+- [ ] **KODI-02**: The add-on installs and runs on Kodi 20 Nexus, 21 Omega, and 22 Piers. **Narrowed by decision on 2026-08-23 and deliberately left unchecked**: the multi-version install matrix was dropped along with the Windows leg, because this add-on targets one device — a TCL television running Android TV 12 — and backwards compatibility across Kodi versions is not being pursued. Uncontrolled logs from an interrupted run show Kodi 20.5 and 22.0-BETA1 installing the zip and starting both entry points, but that is not an acceptance pass and is not treated as one. If the requirement is still wanted, it is verified at the release stage; see `.planning/phases/01-vendor-lift/01-07-SUMMARY.md`
 - [ ] **KODI-03**: List items use typed InfoTag setters, and this lands in the same commit as the integer-duration fix
 - [ ] **KODI-04**: A full browse-and-play `kodi.log` contains zero `is deprecated` warnings from this add-on
 - [ ] **KODI-05**: `resources/settings.xml` uses the `<settings version="1">` schema with section, category, and group structure
@@ -253,7 +253,7 @@ Cross-cutting notes. `CI-06` (per-phase manual acceptance on Windows and on an A
 | PLAY-09 | Phase 6 | Pending |
 | PLAY-10 | Phase 7 | Pending |
 | KODI-01 | Phase 1 | Complete |
-| KODI-02 | Phase 1 | Pending |
+| KODI-02 | Phase 1 | Narrowed — not met, moved out of Phase 1 |
 | KODI-03 | Phase 7 | Pending |
 | KODI-04 | Phase 7 | Pending |
 | KODI-05 | Phase 7 | Pending |

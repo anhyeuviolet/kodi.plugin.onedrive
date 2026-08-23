@@ -16,6 +16,7 @@ provides:
   - "README.md — an accurate description with the attribution ID-04 requires"
   - "OneDriveAddon._dialog_smoke — the affordance that makes all three WindowXMLDialog subclasses reachable without a network round trip or a human at a browser"
   - "A full clean acceptance pass on Kodi 21.3 on Android 11 with zero tracebacks, both logs archived"
+  - "A recorded scope decision: Windows is not a target for this add-on, the TCL Android TV 12 is the primary acceptance device, and the four-version Kodi install matrix is not pursued"
   - "The measured fact that the sign-in broker is alive, which corrects a record every later phase would have inherited"
 affects: [phase-03-auth, phase-07-cleanup, phase-02-ci]
 
@@ -40,27 +41,33 @@ key-decisions:
   - "The install matrix and the Windows acceptance row cannot be run from this shell: the interactive session is disconnected and Kodi logs FATAL CApplication::Create: Unable to create window. Extracting the add-on into the addons directory is not a substitute, because it bypasses the very dependency gate row 1 exists to test"
   - "kodi-addon-checker is run against a staged directory named after the add-on id, because the development checkout is named OneDrive.Addon and the folder-name check is about the shipped artefact"
   - "The supplementary log is redacted before archiving: the broker's reply carries the requester's public IP and an encrypted credential blob"
+  - "The Windows leg and the four-version install matrix are dropped by the owner's decision, because Windows is not a target for this personal-use add-on — not because they were blocked. KODI-02 is narrowed rather than satisfied, and stays unchecked"
+  - "The TCL Android TV 12 is the primary acceptance device from here on, not a pre-release checkbox. Its first acceptance run is deferred to Phase 3, because Phase 1 leaves the add-on able to install and open dialogs and nothing else"
 
 requirements-completed: []
 requirements-partial: [VND-07, VND-09, VND-10, ID-04, CI-06]
-requirements-blocked: [KODI-02]
+requirements-blocked: []
+requirements-descoped: [KODI-02]
 
 metrics:
   duration: "~2h"
   completed: 2026-08-23
-  tasks: "2 of 3 complete, 1 partial"
+  tasks: "3 of 3 closed — Tasks 1 and 2 complete; Task 3 closed with its Android row filled and its Windows rows descoped"
 
-status: blocked
+status: complete
 ---
 
 # Phase 1 Plan 07: The Record and the Acceptance Pass Summary
 
-**The record is written and the whole gate suite is green for the first time — 22 of 22 — and the add-on has been driven end to end on Kodi 21.3 on Android 11 with no traceback in the log. Along the way the acceptance pass overturned one of the deviations the record was about to enshrine: the sign-in broker everyone believed dead since 2022 answered on the first request.**
+**The record is written and the whole gate suite is green for the first time — 22 of 22 — and the add-on has been driven end to end on Kodi 21.3 on Android 11 with no traceback in the log. Along the way the acceptance pass overturned one of the deviations the record was about to enshrine: the sign-in broker everyone believed dead since 2022 answered on the first request. The Windows half of the
+acceptance pass was then dropped by the owner's decision — Windows is not a target for this add-on — and the plan
+closes on the Android row, with everything Windows never established written down as unestablished.**
 
 ## Performance
 
 - **Duration:** ~2 h
-- **Tasks:** 2 of 3 complete; Task 3 half done — the Android row is filled, the Windows rows are blocked
+- **Tasks:** 3 of 3 closed. Tasks 1 and 2 complete; Task 3 closed with its Android row filled and its Windows rows
+  descoped by decision rather than filled
 - **Files:** 2 created, 3 modified
 
 ## Task commits
@@ -306,7 +313,12 @@ with *Cloud Drive*, *Cloud Folder*, *Destination*, four toggles, the schedules l
 behaviour. The instrument ran on SwiftShader and none of the four was checked. They belong to the
 deployment box under CI-07.
 
-### Windows rows and the install matrix — BLOCKED
+### Windows rows and the install matrix — BLOCKED *(superseded)*
+
+> **Superseded on 2026-08-23.** Read this subsection as a record of what was true at 23:23 on 2026-08-22, not as a
+> standing fact. The session blocker it describes later cleared, and the leg was then dropped by decision rather than
+> by inability. See **The Windows leg — closed by decision, not by evidence** below, which corrects two specific
+> statements made here.
 
 Not run, and not runnable from this shell. The interactive Windows session is **disconnected**
 (`query session` shows session 1 in state `Disc`), so Kodi cannot create a rendering surface:
@@ -360,6 +372,186 @@ are the emulator's own `10.0.2.15` and `10.0.2.16`.
 held for the acceptance log and **stopped holding for the supplementary one the moment a sign-in was
 started**, which is why it was redacted. The register's note that this rationale expires at Phase 3
 is correct and arrives sooner than expected.
+
+## The Windows leg — closed by decision, not by evidence
+
+*Recorded 2026-08-23, closing Task 3.*
+
+### The decision, and the reason
+
+This add-on is written for one person's own use. Their device is a **TCL television running Android TV 12**. Windows
+Kodi was never a target; it was an instrument of convenience, and the four-version install matrix came from a
+general-purpose acceptance standard inherited by the phase rather than from anything this project needs. The owner
+stopped the Windows run while it was in progress and directed the effort at the target device instead. Working on
+backwards compatibility across Kodi versions and desktop platforms is explicitly not being pursued.
+
+**The Windows leg is dropped because Windows is not a target — not because it was hard.** That distinction matters
+for anyone reading this later: the run was progressing when it was stopped, and the earlier "blocked" record above
+had already ceased to be true. Nothing here is a retreat from a difficulty.
+
+Other devices, other users and public sharing remain "best to have". They are not what this milestone is being
+steered by.
+
+### What was harvested from disk, and what it establishes
+
+The interrupted run left four Kodi logs behind. Kodi writes them at launch, so they cost nothing to read; **no Kodi
+was started to produce them, nothing was installed, and nothing under `%APPDATA%\Kodi` or `D:\KodiPortable` was
+modified.** They were read and nothing else.
+
+| Kodi | Log | Size | Session window |
+|---|---|---|---|
+| 19.5 (19.5.0) Git:20221224-f8fdeb6b1b | `D:\KodiPortable\kodi-19.5\portable_data\kodi.log` | 300,730 B | 06:34:27 → 06:36:50 |
+| 20.5 (20.5.0) Git:20240303-4b95737efa | `D:\KodiPortable\kodi-20.5\portable_data\kodi.log` | 395,659 B | 06:37:57 → 06:39:34 |
+| 22.0-BETA1 (21.90.801) Git:20260621-77395cf42e | `D:\KodiPortable\kodi-22.0-beta1\portable_data\kodi.log` | 208,121 B | 06:40:35 → 06:43:06 |
+| 21.3 (21.3.0) Git:20251031-a3a448d26b, main profile | `C:\Users\nguyentiendat07\AppData\Roaming\Kodi\kodi.log` | 91,685 B | 06:56:43 → 06:57:02, **cut off mid-run** |
+
+No `.old.log` exists beside any of them. `grep -c Traceback` returns **0** on all four.
+
+**Kodi 19.5 — the zip was offered and mechanically refused:**
+
+```
+06:34:27.053 CAddonMgr::FindAddons: xbmc.python v3.0.0 installed
+06:34:55.600 CAddonInstaller: installing from zip '…\stage\plugin.onedrive.kn-1.0.0.zip'
+06:34:55.603 DEBUG CAddonInstallJob[plugin.onedrive.kn]: requires xbmc.python version 3.0.1 which is not available
+06:34:55.603 ERROR CAddonInstallJob[plugin.onedrive.kn]: The dependency on xbmc.python version 3.0.1 could not be satisfied.
+```
+
+`plugin.onedrive.kn` appears three times in that log and never as an installed add-on; `entrypoint.py` and
+`service.py` appear zero times; and `kodi-19.5\portable_data\addons\` holds no `plugin.onedrive.kn` today.
+
+**Kodi 20.5 — installed from the zip, both entry points ran, all three sub-services started:**
+
+```
+06:38:27.726 CAddonInstaller: installing from zip '…\stage\plugin.onedrive.kn-1.0.0.zip'
+06:38:27.860 CAddonMgr::FindAddon: plugin.onedrive.kn v1.0.0 installed
+06:38:27.863 CPythonInvoker(1, …\plugin.onedrive.kn\service.py): start processing
+06:38:27.873 …: instantiating addon using automatically obtained id of "plugin.onedrive.kn" dependent on version 3.0.1 of the xbmc.python api
+06:38:29.155 [plugin.onedrive.kn][service-export-14836]: Service 'export' started.
+06:38:29.155 [plugin.onedrive.kn][service-player-46476]: Service 'player' started.
+06:38:29.165 [plugin.onedrive.kn][service-download-3700]: Service 'download' started in port 56216
+06:39:20.100 CPythonInvoker(3, …\plugin.onedrive.kn\entrypoint.py): start processing
+06:39:20.462 …entrypoint.py: script successfully run
+```
+
+The real sign-in route was also driven there, not the smoke action, and the dialog opened and closed cleanly:
+
+```
+06:39:24.153 CScriptRunner: running add-on script OneDrive KN('plugin://plugin.onedrive.kn/', '-1', '?action=_add_account&content_type=video')
+06:39:26.508 Loading skin file: D:\…\plugin.onedrive.kn\resources\skins\default\1080i\pin-dialog.xml
+06:39:31.728 ------ Window Deinit (…\pin-dialog.xml) ------
+```
+
+**Kodi 22.0-BETA1 — installed from the zip, service ran, all three sub-services started:**
+
+```
+06:41:10.133 CAddonInstaller: installing from zip '…\stage\plugin.onedrive.kn-1.0.0.zip'
+06:41:10.234 Addon Manager: Found addon: 'plugin.onedrive.kn v1.0.0'
+06:41:10.245 …\service.py: instantiating addon … dependent on version 3.0.1 of the xbmc.python api
+06:41:11.668 Service 'export' started.  /  Service 'player' started.
+06:41:11.678 Service 'download' started in port 57005
+06:42:51.297 …\entrypoint.py: script successfully run
+```
+
+**Kodi 21.3, main profile — the run that was stopped.** It reached the smoke action and the first dialog, and the
+log simply ends there:
+
+```
+06:57:02.431 CPythonInvoker(1):  ?action=_dialog_smoke
+06:57:02.728 dialog-smoke: addon id: plugin.onedrive.kn
+06:57:02.728 dialog-smoke: dialog scriptPath: C:\…\addons\plugin.onedrive.kn\
+06:57:02.728 dialog-smoke: profile path: C:\…\userdata\addon_data\plugin.onedrive.kn\
+06:57:02.734 Loading skin file: C:\…\plugin.onedrive.kn\resources\skins\default\1080i\pin-dialog.xml
+```
+
+### What this evidence is **not**
+
+It is uncontrolled. It is kept because the bytes were already written, and it is **not** an acceptance row. Stated
+plainly, so nobody later mistakes it for one:
+
+- **No profile was verified clean before any of the four runs.** Sibling cloud-drive add-ons happen not to appear in
+  any of the logs, which is weaker than having checked for them, and `addon_data` was never inspected beforehand.
+- **No run reached the settings walk.** The 22-row label check exists only for Android.
+- **No run reached the export dialogs.** `export-main-dialog.xml` and `export-schedule-dialog.xml` appear **zero**
+  times across all four logs. Only `pin-dialog.xml` was ever loaded on Windows.
+- **No run produced a QR image path.** The two-differing-paths check has no Windows evidence at all — the 21.3 run
+  was stopped with the first dialog on screen, before any path was logged.
+- **Nothing was seen.** No screenshot was taken on Windows, and none of the four runs was observed by anyone signing
+  this record. Only the log bytes survive.
+
+**Therefore no Windows acceptance row is filled, and none is claimed.**
+
+### Two corrections this harvest forces on the record above
+
+**1. The "not runnable from this shell" blocker is not a standing fact.** The superseded subsection above records
+Kodi dying at `CApplication::Create: Unable to create window` because the interactive session was disconnected. That
+was accurate at 23:23 on 2026-08-22. By 06:34 on 2026-08-23 all four Kodi versions started, created windows and ran
+to a clean exit. The blocker was a property of a session that has since changed.
+
+**2. The Kodi 19 refusal was exercised — but not under a controlled run.** The subsection above records only a manual
+*extraction* onto Kodi 19, and it is right to refuse to read that as a pass. The harvested 19.5 log shows something
+different and stronger: the actual zip was handed to Kodi 19.5's installer and was refused, for the exact declared
+reason, with `xbmc.python v3.0.0` on that Kodi against the manifest's `3.0.1`. That is precisely the mechanism
+**KODI-01** asserts.
+
+This does not promote the row to an acceptance pass — the run was unobserved and the profile unverified — but it is
+no longer accurate to describe the refusal as untested. The honest state of KODI-01 is recorded under
+**Requirements** below.
+
+### Two defects in the test method — not in the product
+
+The interrupted executor wanted to redo its smoke pass over two concerns. Both are defects in its own rig. Neither
+was ever a finding against `resources/lib/addon.py` or the vendored tree, and neither should be re-opened as a
+product bug.
+
+**1. F10 was not in the keymap on disk when Kodi started.** The rig intended to trigger the smoke action from a key
+binding, and wrote the binding to the profile's keymap directory after Kodi had already read that directory at
+startup. Kodi therefore never had the binding. This is an ordering mistake in the harness — a file written after the
+program that reads it had started — and says nothing about the add-on. The action was reached over JSON-RPC instead,
+which is the route the Android row used throughout.
+
+**2. The QR write met a directory the plugin root had already created.** The rig treated "the QR directory already
+exists" as suspicious. It is not: opening the plugin root constructs the add-on's own profile directory as a matter
+of course, so by the time the smoke action runs the directory is legitimately present. The guard actually under test
+is the **per-invocation filename**, not the absence of the directory. The check was aimed at the wrong object.
+
+### The Android row's instrument gap
+
+The one filled acceptance row ran on an emulator: AVD `kodi_api30`, **Android 11 / API 30**, software rendering
+through SwiftShader. The device this add-on is for is a **TCL television running Android TV 12 / API 31** — one API
+level higher, a different form factor, a real GPU, a real remote and a low-end SoC. **The acceptance row did not run
+on the target hardware, and it is one API level below it.**
+
+The row remains this phase's evidence, and it is sound evidence for what it covers: the add-on loads under its own
+id, both entry points run, the service starts at login, all three dialogs construct and render from this add-on's
+own skin directory, two QR constructions produce two different paths, and the log carries zero tracebacks. Those are
+API-level facts and an emulator is a fair instrument for them.
+
+It is **not** evidence for API 31 behaviour, D-pad focus order, ten-foot readability, real GPU or codec behaviour,
+low-end performance, or a vendor ROM's storage rules. None of those was checked and none is claimed.
+
+### Standing deferred claims — still not passed
+
+| Claim | Status |
+|---|---|
+| `Request.HTTP_TIMEOUT_SECONDS = 30` is the right value | **Unmeasured.** No network throttling was applied in any run, on any platform, in 01-06 or here. The value's entire justification is marginal Android TV Wi-Fi, and no run has been anywhere near that condition. It must not be reported as validated. |
+| Whether a vendor ROM blocks shell access to `Android/data` | **Unanswerable on the instruments used.** The emulator is an AOSP image with no vendor storage policy, unchanged since 01-01. The question resolves the first time the add-on runs on the TCL. |
+
+### Requirements
+
+| Requirement | State | Note |
+|---|---|---|
+| **KODI-02** — installs and runs on Kodi 20 Nexus, 21 Omega and 22 Piers | **Unchecked. Not satisfied.** | Narrowed by the owner's decision: Windows is not a target and the multi-version matrix is not pursued. Uncontrolled logs show 20.5 and 22.0-BETA1 installing from the zip and starting both entry points, and 21.3 loading and running the plugin — but none of that is a controlled acceptance row, and 21 Omega was only ever exercised on Android. Verification of this requirement, in whatever form the project still wants it, moves out of Phase 1. |
+| **KODI-01** — manifest declares `xbmc.python 3.0.1`; installs on 20/21/22, rejected by 19 | **Left checked, with a gap stated here.** | The install half is evidenced on Android (21.3, controlled) and on Windows 20.5 / 22.0-BETA1 (uncontrolled). The **Kodi 19 refusal half was never exercised under a controlled, observed run** — it is evidenced only by the harvested 19.5 log quoted above, from an unobserved run on an unverified profile. That log is specific and matches the declared mechanism exactly, which is why the checkbox is not being silently removed. **It is flagged here for the owner to decide**: accept the harvested log as sufficient, or re-run the refusal once under controlled conditions. |
+
+No other requirement's checkbox was touched by this closure.
+
+### What moves to a later phase
+
+The first acceptance run on the **TCL Android TV 12** is deferred to **Phase 3 (Authentication)**, and is recorded
+there. The reason is timing, not priority: Phase 1 leaves the add-on able to install, load and open its dialogs and
+nothing else, so a TCL run today would prove very little beyond what the emulator already showed. Phase 3 is the
+first point at which the add-on does something a person can actually use, which is the first run worth spending the
+target device's time on. The TCL is the primary acceptance device from Phase 3 onward, not a pre-release checkbox.
 
 ## Deviations from plan
 
@@ -422,6 +614,19 @@ The ordering could not be honoured because the Windows leg is blocked. The reaso
 ordering is unharmed: **no Android result here is offered as evidence for Windows**, and the
 Windows rows are recorded as unfilled rather than inferred.
 
+### 5. [Scope — owner's decision] The Windows leg and the install matrix are dropped
+
+- **Found during:** Task 3, while the Windows run was in progress
+- **Change:** the owner stopped the Windows matrix and directed that the plan close on the Android
+  row. Windows is not a target for this add-on; the target is a TCL television running Android TV
+  12, and backwards compatibility across Kodi versions and desktop platforms is not being pursued.
+- **Why this is not a quiet pass:** KODI-02 stays **unchecked**, the Windows rows stay **unfilled**,
+  and the surviving logs are labelled uncontrolled rather than promoted to acceptance rows. Nothing
+  became true by being descoped.
+- **Consequence recorded elsewhere:** the TCL acceptance run moves to Phase 3, and ROADMAP.md is
+  corrected to name the TCL as the primary acceptance device rather than a release-time checkbox.
+- **Files:** `.planning/phases/01-vendor-lift/01-07-SUMMARY.md`, `.planning/ROADMAP.md`
+
 ## Findings for later phases
 
 - **Kodi's `addoninformation` dialog crashes this emulator for every add-on**, including
@@ -440,12 +645,31 @@ Windows rows are recorded as unfilled rather than inferred.
   `media_rw_data_file` with the app's categories. The same trap silently corrupted `guisettings.xml`
   and made Kodi fail with `unable to load settings`. Anyone repeating the Android leg needs this.
 - **The `download` service binds an ephemeral port** (`44485` in this run) and writes it back as an
-  undeclared `download.service.port` setting, exactly as VENDORED.md predicts.
+  undeclared `download.service.port` setting, exactly as VENDORED.md predicts. The harvested Windows
+  logs show the same behaviour with different ports — `56216` on Kodi 20.5, `57005` on 22.0-BETA1,
+  `51489` on 21.3 — so it is the design, not an Android artefact.
+- **Kodi 22 logs a `SyntaxWarning` out of the vendored tree, at `error` level.** New, and visible
+  only because Kodi 22 ships a newer Python:
+
+  ```
+  …\vendor\clouddrive_common\remote\oauth2.py:70: SyntaxWarning: "\/" is an invalid escape sequence.
+  Such sequences will not work in the future. Did you mean "\\/"? A raw string is also an option.
+  ```
+
+  It is a warning, not a failure — the service started normally straight after it — but the wording
+  says the sequence stops working in a future Python. It is an inherited upstream defect and a
+  one-character fix; worth doing whenever the vendored tree is next touched.
 
 ## Deferred issues
 
-- **The install matrix (four Kodi versions) and the Windows acceptance row** — blocked on an
-  interactive Windows session. This is the checkpoint below.
+- **The install matrix (four Kodi versions) and the Windows acceptance row** — **descoped by the
+  owner's decision**, not deferred for later attention. Windows is not a target. KODI-02 stays
+  unchecked. See *The Windows leg — closed by decision, not by evidence* above.
+- **The first acceptance run on the TCL Android TV 12** — deferred to **Phase 3**, where it is
+  recorded. Deferred on timing, not on priority: the TCL is the primary acceptance device, and
+  Phase 3 is the first phase after which a run on it proves something the emulator could not.
+- **The Kodi 19 refusal under a controlled run** — evidenced only by a harvested, unobserved log.
+  The owner decides whether to accept it or re-run it once cleanly; see *Requirements* above.
 - **`Request.HTTP_TIMEOUT_SECONDS = 30` is still unmeasured.** No network throttling was applied
   here either. 01-06 deferred it to this pass and this pass could not measure it: the instrument
   runs on a desktop's wired connection, and the value's entire justification is marginal Android TV
@@ -476,12 +700,27 @@ condition VND-10 attaches to it.
   0 tracebacks
 - Working tree clean after every commit
 
+**Closure pass, 2026-08-23:**
+
+- All four harvested Kodi logs exist at the paths quoted, at the sizes quoted; each was read only
+- No Kodi process was started, no add-on installed or removed, nothing under `%APPDATA%\Kodi` or
+  `D:\KodiPortable` written — the closure touched `.planning/` only
+- `python -m pytest tests/test_vendor_gates.py -q` → **22 passed**, no assertion edited
+- KODI-02 confirmed still unchecked in REQUIREMENTS.md; no other checkbox altered
+
 **Self-Check: PASSED**
 
-## Status: BLOCKED — awaiting the Windows leg
+## Status: COMPLETE — closed under a scope reduction
 
-Tasks 1 and 2 are complete and committed. Task 3's Android row is filled; its Windows rows are not,
-and cannot be filled from a disconnected session. The phase gate is not closed until they are.
+Tasks 1 and 2 are complete and committed. Task 3 is closed: its Android row is filled and stands as
+this phase's acceptance evidence, and its Windows rows are **descoped by the owner's decision**
+rather than filled. Windows is not a target for this add-on.
+
+What that leaves open is written down rather than absorbed: **KODI-02 is not satisfied and stays
+unchecked**, the Kodi 19 refusal has only uncontrolled evidence, the 30-second HTTP timeout is
+still unmeasured, the vendor-ROM storage question is still unanswerable, and the acceptance row ran
+on an Android 11 emulator rather than on the Android 12 TCL the add-on is actually for. The first
+run on that hardware is recorded against Phase 3.
 
 ---
 *Phase: 01-vendor-lift*

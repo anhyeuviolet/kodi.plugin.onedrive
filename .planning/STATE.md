@@ -4,9 +4,9 @@ milestone: v1.4.0
 milestone_name: milestone
 current_phase: 01
 current_phase_name: vendor-lift
-status: executing
-stopped_at: 01-07 Tasks 1-2 complete; Task 3 blocked on the Windows install matrix and acceptance row
-last_updated: "2026-08-22T17:20:17.239Z"
+status: verifying
+stopped_at: "01-07 closed: Android acceptance stands, Windows leg descoped by decision"
+last_updated: "2026-08-23T00:06:40.244Z"
 last_activity: 2026-08-22
 last_activity_desc: Phase 01 execution started
 progress:
@@ -27,12 +27,14 @@ See: .planning/PROJECT.md (updated 2026-08-22)
 
 ## Current Position
 
-Phase: 01 (vendor-lift) — EXECUTING
-Plan: 7 of 7
-Status: Ready to execute
-Last activity: 2026-08-22 — Phase 01 execution started
+Phase: 01 (vendor-lift) — READY FOR VERIFICATION
+Plan: 7 of 7 — all closed
+Status: All plans closed. 01-07 closed 2026-08-23 under a scope reduction: its Android acceptance row
+stands, its Windows rows were descoped because Windows is not a target. Phase criterion 2 (the Kodi
+19/20/21/22 install matrix) is therefore **unmet by decision, not satisfied**, and KODI-02 stays unchecked.
+Last activity: 2026-08-23 — 01-07 closed, Windows leg descoped
 
-Progress: [█████████░] 86%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -64,6 +66,7 @@ Progress: [█████████░] 86%
 | Phase 01 P05 | 20min | 2 tasks | 14 files |
 | Phase 01 P06 | 12min | 2 tasks | 4 files |
 | Phase 01 P01 | 2h | 3 tasks | 1 files |
+| Phase 01 P07 | ~2h | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -97,11 +100,13 @@ Load-bearing choices for current work:
 - [Phase ?]: test_gpl_headers_intact is made licence-aware via a per-file FOREIGN_NOTICES map rather than GPL-stamping BSD/MIT source, which the test's own closing assertion forbids
 - [Phase ?]: All four repr( write sites converted to JSON, not the two the plan names; db.setmany and cache.setmany are write sites too
 - [Phase ?]: The page cache stores a response body as bytes, a third shape JSON cannot carry; decoded at the write site in source.py, the exact inverse of the read path's Utils.encode
-- [Phase ?]: Request.HTTP_TIMEOUT_SECONDS = 30, recorded as unmeasured and confirmed on the Android test phone in 01-07; retry loop worst case 155s recorded, not bounded
+- [Phase ?]: Request.HTTP_TIMEOUT_SECONDS = 30 is **still unmeasured** after 01-07 — no throttling was applied on any platform, and the value's justification is marginal Android TV Wi-Fi, a condition no run has been near. It must not be reported as validated; retry loop worst case 155s recorded, not bounded
 - [Phase ?]: Android acceptance instrument is an API 30 emulator (Android 11), not a physical phone; storage-regime claims hold, ten-foot/GPU claims do not
 - [Phase ?]: Pulling an app-private Kodi log over adb needs root on Android 11+; a retail device must copy the log to a public directory first
 - [Phase ?]: Kodi 22 pinned to 22.0 Piers beta1 rather than a nightly, for a fixed version string and a published checksum
 - [Phase ?]: Kodi 22 ships Python 3.14 while 19/20/21 ship 3.8 — a compatibility gate is needed before Phase 2 leans on the matrix
+- [Phase 1]: Windows is not a target for this add-on; the Windows acceptance leg and the four-version Kodi install matrix are dropped by the owner's decision. KODI-02 stays unchecked rather than narrowed into a pass
+- [Phase 1]: The TCL Android TV 12 is the primary acceptance device, not a pre-release checkbox; its first acceptance run is recorded against Phase 3, the first phase after which a run on it proves something the emulator could not
 
 ### Pending Todos
 
@@ -113,6 +118,8 @@ None yet.
 
 **Settled 2026-08-22 — the Android device question, both halves.** The maintainer has an Android TV box running Android 11/12, and it is the primary design target. It is **not** a test device: driving it for a per-phase acceptance pass is too inconvenient to be honest about doing. So CI-06 now reads: per-phase acceptance on Windows and on an **Android phone** running Kodi over `adb`; the TV is exercised by use and checked before release.
 
+> **Superseded 2026-08-23.** The maintainer has since directed that the TCL Android TV 12 is the **primary acceptance device**, and that Windows is not a target at all. The Windows half of CI-06 is dropped; the emulator and phone stand in for the TCL only on API-level questions. The first run on the TCL itself is recorded against **Phase 3**, deferred on timing rather than on priority: Phase 1 leaves the add-on able to install and open dialogs and nothing more. The paragraph below still holds on the technical point — an API-matched Android instrument is a sound proxy for storage and locking questions and not for D-pad, readability or performance — but read "checked before release" as no longer the plan.
+
 The phone is a sound proxy for every OS-level question — storage paths, file mode bits, `O_EXCL`, loopback binding — because those follow the API level, not the form factor, and the phone matches the box's Android 11/12 storage regime. It is not a proxy for D-pad focus, 10-foot readability, or low-end performance, and no criterion pretends otherwise: three phase criteria that made TV-only claims (Phase 3 sign-in flow, Phase 5 listing timings, Phase 6 playback) are marked in ROADMAP.md with a **CI-06 exception** to resolve when those phases are planned.
 
 Two consequences worth carrying forward. **Android 11/12 kills Pitfall 18 on this device** — from Android 11 the app's own `Android/data` bypasses FUSE, so `chmod 0600` genuinely applies and no other app can read the profile. That removes the Android amplifier from the `eval()` threat model here, though not for users on Android 9/10 boxes (Fire OS 7 is Android 9), so the design still assumes the worst case. And **the two decisive playback tests need no Android at all**: the URL-latch question is Kodi C++ core, reproducible on the Windows Kodi 21.3 already installed, and the `downloadUrl` lifetime question is pure HTTP against a token `verify_device_code.py` already obtains. Both are runnable before Phase 1 starts, and PLAY-07's result decides Phase 6's ordering.
@@ -123,7 +130,9 @@ Open concerns:
 - **AUTH-18 cannot be fully verified yet.** No tenant that actually blocks third-party apps has been tested, so the exact `AADSTS` code that should trigger the custom `client_id` escape hatch is still unknown. The escape hatch is worthless if the user is never told it exists.
 - **No migration path exists, by design.** The add-on ships under a new id (`plugin.onedrive.kn`) so there is no prior profile to read, and tokens could not have been carried over anyway. Anyone coming from v2.3.0 simply signs in.
 - **Graph fixtures must be recorded from both drive classes.** The spike found real material worth capturing: Vietnamese names with diacritics and spaces on both drives, and the OneDrive Personal Vault, which Graph returns without a `folder` facet so naive detection renders it as a file (BROWSE-16).
-- 01-07 acceptance pass: the install matrix on Kodi 19/20/21.3/22 and the Windows acceptance row cannot run from this shell. The interactive Windows session is disconnected, so Kodi dies at 'FATAL CApplication::Create: Unable to create window'. The Android row is filled and clean. Zip is staged and ready.
+- ~~01-07 acceptance pass: the install matrix on Kodi 19/20/21.3/22 and the Windows acceptance row cannot run from this shell.~~ **Closed 2026-08-23, and not by being solved.** The session blocker later cleared, and the leg was then dropped by decision — Windows is not a target. The Android row remains filled and clean; the Windows rows remain unfilled and are recorded as such. **KODI-02 is not met and stays unchecked.**
+- **The Kodi 19 refusal has only uncontrolled evidence.** A harvested log from an unobserved run shows Kodi 19.5 refusing the zip for the declared reason (`The dependency on xbmc.python version 3.0.1 could not be satisfied`), on an unverified profile. KODI-01 is left checked on that basis and flagged, not silently accepted — the maintainer decides whether to re-run it once cleanly.
+- **The Phase 1 acceptance row ran on an Android 11 emulator, one API level below the TCL Android TV 12 it stands in for.** Nothing about API 31, real GPU, D-pad focus, readability or low-end performance is established. The first run on the TCL is recorded against Phase 3.
 
 ## Deferred Items
 
@@ -135,6 +144,6 @@ Open concerns:
 
 ## Session Continuity
 
-Last session: 2026-08-22T17:20:17.224Z
-Stopped at: 01-07 Tasks 1-2 complete; Task 3 blocked on the Windows install matrix and acceptance row
-Resume file: .planning/phases/01-vendor-lift/01-07-SUMMARY.md
+Last session: 2026-08-23T00:06:22.422Z
+Stopped at: 01-07 closed: Android acceptance stands, Windows leg descoped by decision
+Resume file: None
