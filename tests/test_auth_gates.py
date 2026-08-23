@@ -712,6 +712,120 @@ def test_every_mapped_action_names_a_method_that_exists():
 
 
 # ---------------------------------------------------------------------------
+# The account list: re-authorisation, and removal that takes the credential
+# ---------------------------------------------------------------------------
+#
+# The root of this add-on is the account list (AUTH-22). Three things about it
+# are asserted here rather than left to a reading, because all three are the
+# kind of omission that looks like nothing in a diff:
+#
+#   * removal that deletes the record and leaves the token file. The account
+#     disappears from the screen, so the removal looks complete, and the stale
+#     credential is only found when a re-added account fails a refresh against
+#     a token the user believes they just replaced (AUTH-20, T-03-43).
+#   * re-authorisation that writes a second record instead of replacing a blob,
+#     which leaves the list showing one account twice.
+#   * the per-drive removal option outliving the branch that made it reachable.
+
+def _function(rel, name):
+    for node in ast.walk(_parse(rel)):
+        if isinstance(node, ast.FunctionDef) and node.name == name:
+            return node
+    return None
+
+
+def _calls_in(node):
+    """(dotted name, lineno) for every call made inside `node`."""
+    return [(_func_name(child.func), child.lineno)
+            for child in ast.walk(node) if isinstance(child, ast.Call)]
+
+
+def test_removing_an_account_deletes_its_stored_credential():
+    removal = _function(ROUTER, '_remove_account')
+    assert removal is not None, (
+        '%s has no _remove_account; this sweep certifies nothing' % ROUTER)
+
+    calls = _calls_in(removal)
+    assert calls, '_remove_account calls nothing, so it removes nothing'
+
+    through_store = [name for name, _ in calls
+                     if name.split('.')[-1] == 'remove_account'
+                     and name != 'remove_account'
+                     and 'account_manager' not in name]
+    assert through_store, (
+        'removing an account does not go through the token store. The record '
+        'is what the list reads, so deleting it alone makes the removal look '
+        'complete; the credential stays on disk and the failure it causes -- a '
+        're-added account refusing a refresh against a token the user believes '
+        'they just replaced -- has no visible cause. Calls seen: %r'
+        % ([name for name, _ in calls],))
+
+
+def test_the_per_drive_removal_path_is_gone():
+    """Unreachable by measurement, not by opinion.
+
+    Drive resolution is one call to GET /me/drive, which returns the default
+    drive and only that: GET /drives is 403 on both account classes and is not
+    a v1.0 endpoint at all, and GET /me/drives is 403 accessDenied for personal
+    accounts. So an account carries exactly one drive, the `len(drives) > 1`
+    branch that offered per-drive removal can never be taken, and the option and
+    its handler are unreachable rather than merely unused.
+
+    This repository's previous piece of apparently-dead code was load-bearing
+    and merely unexplained (D-04), which is why the reason is written down here
+    and in the commit body rather than the code being called waste.
+    """
+    survivors = [(rel, lineno, line) for rel, lineno, line
+                 in source_scan(re.compile(r'_remove_drive'))]
+    assert not survivors, (
+        'the per-drive removal option or its handler survives:\n%s'
+        % report(survivors))
+
+
+def test_reauthorisation_replaces_a_blob_without_a_second_record():
+    handler = _function(ROUTER, '_reauthorise_account')
+    assert handler is not None, (
+        '%s has no _reauthorise_account. It is the whole delivery path for the '
+        "background service's silent failure: the service records a marker and "
+        'never prompts, the list shows it, and the user chooses to sign in '
+        '(AUTH-17, AUTH-22).' % ROUTER)
+
+    calls = _calls_in(handler)
+    saves = [(name, lineno) for name, lineno in calls
+             if name.split('.')[-1] == 'save_account']
+    tokens = [(name, lineno) for name, lineno in calls
+              if name.split('.')[-1] == 'save_tokens']
+
+    assert len(tokens) == 1, (
+        're-authorisation writes the token blob %d times; it must write it '
+        'once, through the store seam that merges rather than overwrites'
+        % len(tokens))
+    assert len(saves) == 1, (
+        're-authorisation saves the account record %d times. Once, keyed to the '
+        'account that already exists -- a second write is how one account comes '
+        'to occupy two rows.' % len(saves))
+
+    last_write = max(lineno for _, lineno in saves + tokens)
+    assert saves[0][1] == last_write, (
+        'the account record is not the last thing re-authorisation writes. '
+        'Assembling in memory and writing last is what makes a cancel leave '
+        'nothing behind, structurally rather than by a chain of guards.')
+
+
+def test_the_account_list_offers_re_authorisation():
+    listing = _function(ROUTER, 'list_accounts')
+    assert listing is not None, (
+        '%s has no list_accounts; this sweep certifies nothing' % ROUTER)
+
+    contents = read(ROUTER)
+    source = ast.get_source_segment(contents, listing) or ''
+    assert '_reauthorise_account' in source, (
+        'the per-row menu does not offer re-authorisation, so an account whose '
+        'credentials went stale has no way back except removal and a fresh '
+        'sign-in (AUTH-22)')
+
+
+# ---------------------------------------------------------------------------
 # Endpoints that cannot be answered under the locked scope set
 # ---------------------------------------------------------------------------
 #
