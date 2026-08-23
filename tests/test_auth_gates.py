@@ -845,6 +845,124 @@ def test_the_account_list_offers_re_authorisation():
 
 
 # ---------------------------------------------------------------------------
+# The failure table's outcomes and the sentences they render as (AUTH-18)
+# ---------------------------------------------------------------------------
+#
+# resources/lib/auth/errors.py holds identifiers and a flag and no words at all,
+# and resources/language/.../strings.po holds the words and no logic. That split
+# is what makes the table testable without Kodi and renderable without a second
+# copy of the copy -- and it is also a join with nothing holding the two ends
+# together. The pairing is written down twice, once as a comment above the .po
+# block and once as the renderer's map, and neither file names the other's
+# contents. So an outcome added to the table renders as nothing at all, and the
+# way that shows up is a person in front of a television being told the sign-in
+# failed and nothing else.
+#
+# This is the assertion that holds the join.
+
+ERRORS_MODULE = 'resources/lib/auth/errors.py'
+EN_GB_STRINGS = 'resources/language/resource.language.en_gb/strings.po'
+
+# The name the Kodi layer's outcome-to-string-id map is bound to.
+FAILURE_STRINGS_MAP = '_FAILURE_STRINGS'
+
+# The outcome that deliberately has no sentence of its own: it renders through
+# the fallback that keeps the bare provider code on screen, because a code a
+# person can read off a television and quote is worth more than a friendly
+# sentence that hides it.
+UNMAPPED_OUTCOME = 'unmapped'
+
+# The table had thirteen codes and fourteen outcomes on the day it was written.
+# Non-vacuity only -- the assertion below is over whatever is there now.
+MINIMUM_OUTCOMES = 13
+
+
+def _outcome_constants():
+    """Every symbolic outcome errors.py defines, by constant name and value."""
+    outcomes = {}
+    for node in ast.walk(_parse(ERRORS_MODULE)):
+        if not isinstance(node, ast.Assign):
+            continue
+        value = _constant_str(node.value)
+        if value is None or not re.match(r'^[a-z][a-z0-9_]*$', value):
+            continue
+        for target in node.targets:
+            if isinstance(target, ast.Name) and target.id.isupper():
+                outcomes[target.id] = value
+    return outcomes
+
+
+def _failure_string_map():
+    """(constant name -> string id) for the renderer's outcome map."""
+    entries = {}
+    for node in ast.walk(_parse(ROUTER)):
+        if not isinstance(node, ast.Assign):
+            continue
+        names = [t.id for t in node.targets if isinstance(t, ast.Name)]
+        if FAILURE_STRINGS_MAP not in names:
+            continue
+        if not isinstance(node.value, ast.Dict):
+            continue
+        for key, value in zip(node.value.keys, node.value.values):
+            if not isinstance(key, ast.Attribute):
+                continue
+            if not (isinstance(value, ast.Constant)
+                    and isinstance(value.value, int)):
+                continue
+            entries[key.attr] = value.value
+    return entries
+
+
+def test_every_failure_outcome_renders_its_own_sentence():
+    outcomes = _outcome_constants()
+    assert len(outcomes) >= MINIMUM_OUTCOMES, (
+        'only %d outcomes were found in %s, so this sweep certifies nothing: '
+        '%r' % (len(outcomes), ERRORS_MODULE, sorted(outcomes)))
+
+    rendered = _failure_string_map()
+    assert rendered, (
+        '%s defines no %s, so no provider refusal renders as anything but the '
+        'generic sentence. The catalogue already holds one sentence per '
+        'outcome; without this map they are words nobody shows (AUTH-18).'
+        % (ROUTER, FAILURE_STRINGS_MAP))
+
+    expected = set(name for name, value in outcomes.items()
+                   if value != UNMAPPED_OUTCOME)
+    unrendered = sorted(expected - set(rendered))
+    assert not unrendered, (
+        'these outcomes route to no sentence, so a person meeting one is told '
+        'the sign-in failed and nothing else: %r' % (unrendered,))
+
+    unknown = sorted(set(rendered) - set(outcomes))
+    assert not unknown, (
+        '%s renders outcomes %s does not define. Either the table was renamed '
+        'or the map was written from memory: %r'
+        % (FAILURE_STRINGS_MAP, ERRORS_MODULE, unknown))
+
+    for name, value in outcomes.items():
+        if value == UNMAPPED_OUTCOME:
+            assert name not in rendered, (
+                'the unmapped outcome has a sentence of its own in %s. It must '
+                'render through the fallback that keeps the bare provider code '
+                'on screen -- that code is the one thing a person can read off '
+                'a television and quote.' % FAILURE_STRINGS_MAP)
+
+    declared = set(int(i) for i in re.findall(r'msgctxt "#(\d+)"',
+                                              read(EN_GB_STRINGS)))
+    absent = sorted(i for i in rendered.values() if i not in declared)
+    assert not absent, (
+        'the renderer names string ids the English catalogue does not declare, '
+        'so they resolve to nothing on screen: %r' % (absent,))
+
+    duplicated = sorted(i for i in set(rendered.values())
+                        if list(rendered.values()).count(i) > 1)
+    assert not duplicated, (
+        'two outcomes render as the same sentence: %r. The table proves its '
+        'entries distinct; rendering them identically throws that away at the '
+        'last step' % (duplicated,))
+
+
+# ---------------------------------------------------------------------------
 # Endpoints that cannot be answered under the locked scope set
 # ---------------------------------------------------------------------------
 #
