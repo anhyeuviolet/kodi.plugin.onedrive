@@ -50,6 +50,13 @@ eight seconds is what predicts it**, not anything about the code under test. The
 suite is otherwise green at 252 passed, 1 skipped. Still not worth chasing from
 inside a fix commit, and still the same knob.
 
+*A fourth, during the AUTH-05 font fix.* Failed again on an 8.51s run, then
+passed on three consecutive runs of 3.30–3.39s immediately after, with no file
+touched between them. Four failures now, and every one of them on a run over
+eight seconds; the predicate has held on each occasion it has been available to
+check, which is what turns it from a description into something worth acting on.
+Suite otherwise green at 256 passed, 1 skipped.
+
 **3. `AccountManager.remove_drive` has no caller.**
 
 03-09 deleted the per-drive removal option and its handler as unreachable — one
@@ -184,3 +191,21 @@ comparison — `==`, `!=`, `set(...)`, `in` — takes `fingerprint()` output on
 either side. The same shape as the sweeps already in `test_auth_gates.py`. The
 transferable statement is in 03-13's summary: an instrument built from a
 redactor cannot measure identity, and its PASS is as worthless as its FAIL.
+
+## Found during the 03-14 AUTH-05 font fix
+
+**12. The two dialog buttons are now the smallest text on the panel.**
+
+The AUTH-05 fix took the code to `WeatherTemp` (120) and the body block to
+`font37`. Both buttons — `1003` Cancel and `1004` "Get a new code" — were left at
+`font25_title` (25), because the finding was about the code and enlarging things
+nobody complained about inside a fix commit is how a fix stops being reviewable.
+
+The result is that the panel's two *actionable* elements are now its smallest
+text, on a screen the whole change exists to make readable from a seat. Their
+boxes are 96 high, so `font32_title` or `font36_title` would fit without any
+other coordinate moving. Nothing about this is known rather than reasoned: **the
+buttons were not reported as hard to read**, and the same acceptance run that
+produced the font finding is the instrument that should settle it. **Belongs to
+the resumed 03-14 acceptance run** — look at the buttons, and if they read
+badly, they are a two-line change with the geometry already in place.
