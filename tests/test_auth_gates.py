@@ -507,6 +507,193 @@ def test_dispatch_uses_an_explicit_mapping():
         'nothing and forbids nothing')
 
 
+# The subclass. It rewrites three friendly action names onto internal ones
+# before the mapping is consulted, and it owns the temporary dialog affordance,
+# so the routable set is the union of the two files and not either alone.
+SUBCLASS = 'resources/lib/addon.py'
+
+# The method that returns the mapping, in whichever file defines one. Named
+# rather than discovered, because a sweep that discovers its own subject stops
+# checking anything the moment the subject is renamed.
+ACTION_MAP_FUNCTION = '_action_map'
+
+# The method that rewrites a friendly name onto an internal one. Its keys are
+# reachable action names deliberately absent from the mapping: they are
+# translated before the lookup happens, exactly as they were before it.
+RENAME_FUNCTION = '_rename_action'
+
+# The affordance the television acceptance pass reaches all three dialogs
+# through. See the comment on test_the_dialog_affordance_stays_routable.
+DIALOG_AFFORDANCE = '_dialog_smoke'
+
+# How many distinct action names the sweep must find before its verdict means
+# anything. The tree constructs well over a dozen; ten is low enough not to be a
+# maintenance burden and high enough that a sweep reading one file, or none,
+# fails loudly instead of certifying an empty set.
+MINIMUM_CONSTRUCTED_ACTIONS = 10
+
+
+def _action_map_entries(rel):
+    """(key, attribute-name, lineno) for every entry of `rel`'s action map."""
+    entries = []
+    for node in ast.walk(_parse(rel)):
+        if not (isinstance(node, ast.FunctionDef)
+                and node.name == ACTION_MAP_FUNCTION):
+            continue
+        for dictionary in ast.walk(node):
+            if not isinstance(dictionary, ast.Dict):
+                continue
+            for key, value in zip(dictionary.keys, dictionary.values):
+                name = _constant_str(key) if key is not None else None
+                if name is None:
+                    continue
+                attribute = value.attr if isinstance(value, ast.Attribute) else None
+                entries.append((name, attribute, dictionary.lineno))
+    return entries
+
+
+def _routable_actions():
+    """Every action name the router can reach: mapped, plus rewritten."""
+    mapped = {}
+    for rel in (ROUTER, SUBCLASS):
+        for name, attribute, lineno in _action_map_entries(rel):
+            mapped[name] = (rel, attribute, lineno)
+
+    rewritten = set()
+    for rel in (ROUTER, SUBCLASS):
+        for node in ast.walk(_parse(rel)):
+            if not (isinstance(node, ast.FunctionDef)
+                    and node.name == RENAME_FUNCTION):
+                continue
+            for dictionary in ast.walk(node):
+                if not isinstance(dictionary, ast.Dict):
+                    continue
+                for key in dictionary.keys:
+                    name = _constant_str(key) if key is not None else None
+                    if name is not None:
+                        rewritten.add(name)
+    return mapped, rewritten
+
+
+def _constructed_actions():
+    """Every action name this add-on puts into an address it builds itself.
+
+    Two shapes in Python -- a dict literal carrying an 'action' key, and an
+    assignment into an existing params dict -- plus the settings file, whose
+    rows carry a whole plugin:// address in an attribute. Derived rather than
+    listed, so adding a fourteenth context-menu entry cannot quietly add a
+    fourteenth address that does nothing when it is pressed.
+    """
+    found = []
+    for rel in python_sources():
+        for node in ast.walk(_parse(rel)):
+            if isinstance(node, ast.Dict):
+                for key, value in zip(node.keys, node.values):
+                    if key is not None and _constant_str(key) == 'action':
+                        name = _constant_str(value)
+                        if name:
+                            found.append((rel, node.lineno, name))
+            elif isinstance(node, ast.Assign):
+                for target in node.targets:
+                    if not isinstance(target, ast.Subscript):
+                        continue
+                    if _constant_str(target.slice) != 'action':
+                        continue
+                    name = _constant_str(node.value)
+                    if name:
+                        found.append((rel, node.lineno, name))
+
+    contents = read(SETTINGS)
+    for lineno, line in enumerate(contents.splitlines(), start=1):
+        for match in re.finditer(r'[?&]action=([A-Za-z_][A-Za-z0-9_]*)', line):
+            found.append((SETTINGS, lineno, match.group(1)))
+    return found
+
+
+def test_every_constructed_action_is_routable():
+    """Derived, not recalled.
+
+    The mapping replacing the dynamic lookup is only as good as its coverage: a
+    name this add-on writes into one of its own addresses and then does not map
+    is a row that silently does nothing, and the way that happens is somebody
+    adding the address and forgetting the entry. So the expected set is swept
+    out of the tree on every run rather than written down once.
+    """
+    constructed = _constructed_actions()
+    distinct = set(name for _, _, name in constructed)
+    assert len(distinct) >= MINIMUM_CONSTRUCTED_ACTIONS, (
+        'the sweep found only %d distinct action names (%r). It reads dict '
+        'literals, params assignments and %s; finding almost none means it '
+        'stopped reading, not that the tree stopped building addresses.'
+        % (len(distinct), sorted(distinct), SETTINGS))
+
+    mapped, rewritten = _routable_actions()
+    unroutable = [(rel, lineno, name) for rel, lineno, name in constructed
+                  if name not in mapped and name not in rewritten]
+    assert not unroutable, (
+        'this add-on builds an address naming an action the router cannot '
+        'reach. Every one of these is a row or a context-menu entry that does '
+        'nothing when it is pressed:\n%s' % report(sorted(set(unroutable))))
+
+    crossed = ['%s -> self.%s (%s:%d)' % (name, attribute, rel, lineno)
+               for name, (rel, attribute, lineno) in sorted(mapped.items())
+               if attribute != name]
+    assert not crossed, (
+        'an entry in the action mapping routes a name to a method with a '
+        'different name. Aliasing belongs in %s, where it is one readable '
+        'table; an alias hidden inside the mapping is how a mapping stops '
+        'being the list somebody wrote down:\n%s'
+        % (RENAME_FUNCTION, '\n'.join(crossed)))
+
+
+def test_the_dialog_affordance_stays_routable():
+    """The one entry that must not be tidied away before the acceptance pass.
+
+    `_dialog_smoke` is a temporary debug affordance and it looks exactly like
+    something to delete. It is also the only way anybody reaches all three
+    dialogs: QRDialogProgress is constructed deep inside sign-in, and the two
+    export dialogs need a store with a record already in it. The television
+    acceptance pass repeats the phase-1 checklist through it, so dropping it
+    from the mapping would not fail anything -- it would make that pass produce
+    a green that meant nothing.
+
+    It is scheduled for removal, or for a debug-only gate, before release. When
+    that happens this assertion goes with it, in the same commit, deliberately.
+    """
+    mapped, _ = _routable_actions()
+    assert DIALOG_AFFORDANCE in mapped, (
+        '%r is not in the action mapping. It is the only route to all three '
+        'dialogs, and the acceptance checklist reaches them through it.'
+        % DIALOG_AFFORDANCE)
+
+
+def test_every_mapped_action_names_a_method_that_exists():
+    """A mapping is a written-down list, and a list can be written down wrong.
+
+    Replacing dynamic attribute lookup moves the failure from "calls whatever
+    the address named" to "calls nothing" -- an entry pointing at a method that
+    was renamed or deleted raises AttributeError when the mapping is built,
+    which is to say when the row is pressed and not before.
+    """
+    defined = set()
+    for rel in (ROUTER, SUBCLASS):
+        for node in ast.walk(_parse(rel)):
+            if isinstance(node, ast.FunctionDef):
+                defined.add(node.name)
+
+    mapped, _ = _routable_actions()
+    assert mapped, (
+        'no action mapping was found in %s or %s, so this sweep certifies '
+        'nothing' % (ROUTER, SUBCLASS))
+
+    missing = ['%s (%s:%d)' % (name, rel, lineno)
+               for name, (rel, attribute, lineno) in sorted(mapped.items())
+               if (attribute or name) not in defined]
+    assert not missing, (
+        'the action mapping names a method that no longer exists in %s or %s:'
+        '\n%s' % (ROUTER, SUBCLASS, '\n'.join(missing)))
+
+
 # ---------------------------------------------------------------------------
 # Endpoints that cannot be answered under the locked scope set
 # ---------------------------------------------------------------------------
