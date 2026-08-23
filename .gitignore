@@ -13,3 +13,8 @@
 # Test-run artefacts
 __pycache__/
 .pytest_cache/
+
+# Default output of tools/build_addon_zip.py. Kept out of the index because the
+# index is what the build reads: a committed archive would be shipped inside the
+# next one.
+/dist/
