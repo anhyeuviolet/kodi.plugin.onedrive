@@ -138,7 +138,8 @@ This narrowing is known to cost no future work on the one place it could have. `
 
 ### Distribution
 
-- [ ] **DIST-01**: A build produces an installable zip named `plugin.onedrive-<version>.zip` with a single top-level `plugin.onedrive/` directory
+- [x] **DIST-01**: A build produces an installable zip named `plugin.onedrive.kn-<version>.zip` with a single top-level `plugin.onedrive.kn/` directory, and its contents come from the git index rather than a filesystem walk
+  - *Corrected in phase 3 (plan 03-02).* The original text named `plugin.onedrive`, written before this add-on took its own id. Kodi resolves an installed add-on by matching the archive's top-level directory against the id in the manifest inside it and refuses a mismatch at install, so the requirement as written was unsatisfiable against the current id. Pulled forward from phase 5 because installing on the TCL Android TV 12 requires an archive and phase 3's acceptance runs on that device.
 - [ ] **DIST-02**: A self-hosted Kodi repository is published over HTTPS using the `<dir>` schema and SHA-256 checksums, never MD5 and never the flat pre-Gotham layout
 - [ ] **DIST-03**: Installing the repository on Android TV requires entering a URL exactly once
 - [ ] **DIST-04**: An N to N+1 update is confirmed to arrive without the user pressing "Check for updates"
@@ -281,7 +282,7 @@ Cross-cutting notes. `CI-06` (per-phase manual acceptance on the TCL Android TV 
 | ERR-01 | Phase 4 | Pending |
 | ERR-02 | Phase 4 | Pending |
 | ERR-03 | Phase 4 | Pending |
-| DIST-01 | Phase 5 | Pending |
+| DIST-01 | Phase 3 | Complete |
 | DIST-02 | Phase 5 | Pending |
 | DIST-03 | Phase 5 | Pending |
 | DIST-04 | Phase 5 | Pending |
@@ -293,9 +294,9 @@ Cross-cutting notes. `CI-06` (per-phase manual acceptance on the TCL Android TV 
 |-------|--------------|-------|
 | 1. Vendor Lift | VND-01..11, ID-01..05, KODI-01, KODI-02, SETUP-06, CI-06 | 20 |
 | 2. Pure Core and CI Harness | CI-01..05, BROWSE-02, BROWSE-03, BROWSE-04, BROWSE-07, BROWSE-16, SETUP-05 | 11 |
-| 3. Authentication | AUTH-01..23, SETUP-01..04 | 27 |
+| 3. Authentication | AUTH-01..23, SETUP-01..04, DIST-01 | 28 |
 | 4. Browse | BROWSE-01, BROWSE-05, BROWSE-06, BROWSE-08..14, ERR-01..03 | 13 |
-| 5. Distribution | DIST-01..05 | 5 |
+| 5. Distribution | DIST-02..05 | 4 |
 | 6. Play | PLAY-01..09 | 9 |
 | 7. Kodi Modernization | KODI-03..08, PLAY-10 | 7 |
 | 8. Release Readiness | CI-07, REL-01 | 2 |

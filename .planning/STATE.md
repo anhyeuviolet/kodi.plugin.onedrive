@@ -5,8 +5,8 @@ milestone_name: milestone
 current_phase: 03
 current_phase_name: authentication
 status: executing
-stopped_at: Completed 03-01-PLAN.md
-last_updated: "2026-08-23T02:48:06.373Z"
+stopped_at: Completed 03-02-PLAN.md
+last_updated: "2026-08-23T02:56:10.198Z"
 last_activity: 2026-08-23
 last_activity_desc: Phase 03 execution started
 progress:
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-08-22)
 ## Current Position
 
 Phase: 03 (authentication) — EXECUTING
-Plan: 2 of 14
+Plan: 3 of 14
 Status: Ready to execute
 stands, its Windows rows were descoped because Windows is not a target. Phase criterion 2 (the Kodi
 19/20/21/22 install matrix) is therefore **unmet by decision, not satisfied**, and KODI-02 stays unchecked.
@@ -72,6 +72,7 @@ Progress: [████░░░░░░] 38%
 | Phase 01 P01 | 2h | 3 tasks | 1 files |
 | Phase 01 P07 | ~2h | 3 tasks | 3 files |
 | Phase 03 P01 | 25min | 3 tasks | 6 files |
+| Phase 03 P02 | 12min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -118,10 +119,12 @@ Load-bearing choices for current work:
 - [Scope]: Phase order to the goal is 3 (auth) → 2 (browse logic only) → 4 (browse) → 6 (play), with DIST-01 alone pulled forward from Phase 5 when the add-on first needs installing on the TV — installing on Android TV requires a zip, which is a device constraint, not a distribution or "public" concern
 - [Scope]: Deferred — Phase 7, Phase 8 and the CI harness (CI-01..05), with two exceptions that hit the owner directly: REL-01 (if the E5 tenant lapses the embedded `client_id` dies for every installed copy, including the TV's) and Phase 7 criterion 4 (deleting `SourceService`, its HTML index and the third-party error reporter, and confirming nothing binds port 8586 — that is security)
 - [Scope]: SETUP-01, SETUP-02, SETUP-03 and SETUP-05 are satisfied and now checked, each read back through Graph rather than trusted from the portal UI. SETUP-04 stays open — no registration runbook exists in the repo, and it must carry the `AADSTS7000218` symptom verbatim
-- [Phase ?]: One authority constant (/common) serves both account classes; no branch, no user-facing authority setting
-- [Phase ?]: An unparseable 400 raises TransportError rather than classifying terminal - a dead grant and a proxy error page demand opposite responses
-- [Phase ?]: The poll interval is state the caller carries; next_interval() is what keeps the RFC 8628 slow_down increase permanent
-- [Phase ?]: store.read raises on a corrupt token file; {} is returned only for an absent one, so a merge cannot start from nothing and drop a refresh token
+- [Phase 3]: One authority constant (/common) serves both account classes; no branch, no user-facing authority setting
+- [Phase 3]: An unparseable 400 raises TransportError rather than classifying terminal - a dead grant and a proxy error page demand opposite responses
+- [Phase 3]: The poll interval is state the caller carries; next_interval() is what keeps the RFC 8628 slow_down increase permanent
+- [Phase 3]: store.read raises on a corrupt token file; {} is returned only for an absent one, so a merge cannot start from nothing and drop a refresh token
+- [Phase 3]: DIST-01 is corrected in place: the archive's top-level directory is plugin.onedrive.kn, from the manifest, because Kodi refuses an install whose directory disagrees with the id inside
+- [Phase 3]: The archive's member list comes from the git index with an exclusion list over first path components, never a filesystem walk and never a hand-maintained include list
 
 ### Pending Todos
 
@@ -164,6 +167,6 @@ Open concerns:
 
 ## Session Continuity
 
-Last session: 2026-08-23T02:48:06.356Z
-Stopped at: Completed 03-01-PLAN.md
+Last session: 2026-08-23T02:56:10.174Z
+Stopped at: Completed 03-02-PLAN.md
 Resume file: None
