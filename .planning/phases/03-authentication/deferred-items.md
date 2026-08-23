@@ -217,6 +217,16 @@ open with its instrument unchanged: **the next session on the television**, wher
 is still a two-line change with the geometry already in place. Recorded so this is
 not read later as "the run looked and found nothing wrong".
 
+*The premise above is now half out of date, and the item is still open.* In a later
+session on 2026-08-23 the directional-pad row and the context-menu row were run: the
+pad reaches both buttons in order, and on expiry "get a new code" arrives already
+focused. So somebody has now moved focus onto both buttons — the sentence above
+saying nobody had is superseded. **No legibility verdict came back with it.** Being
+able to reach a button is not the same reading as being able to read it, and this
+item asks the second question. It stays open with the same instrument and the same
+two-line fix, and this note exists so the d-pad pass is not later mistaken for the
+buttons having been looked at.
+
 ## Found during the 03-14 acceptance run
 
 Items 13 and 14 are **feature reports from the owner, not diagnoses**. Neither was

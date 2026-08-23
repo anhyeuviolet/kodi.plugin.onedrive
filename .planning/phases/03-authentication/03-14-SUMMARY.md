@@ -129,10 +129,10 @@ in Task 3. It is recorded as not run rather than omitted.
 | **Sign in with a work/school account completes end to end from the television** | **PASS** — a real account was added through the device authorization grant, with no address, username or password typed on the remote |
 | Back out of sign-in and the account list is exactly as it was | PASS |
 | A second sign-in, cancelled part-way, leaves no partial account | **NOT SEPARATELY REPORTED** — the single Back reading above is the one that exists |
-| On expiry, the "get a new code" action arrives **already focused** | **NOT RUN** — skipped |
+| On expiry, the "get a new code" action arrives **already focused** | **OBSERVED — PASS.** Read in a later session on the same television, **after this summary was written**; the row was NOT RUN when it was. On expiry the action arrives already focused. This is AUTH-06's focus clause and the only instrument that exists for it — `QRDialogProgress` has no automated coverage at all |
 | A fresh code carries its own countdown rather than resuming the old one | **NOT RUN** |
-| Both buttons reachable with the directional pad, in a sensible order, with the intended initial focus | **NOT RUN** — skipped |
-| The row's context menu offers re-authorise and remove | **NOT RUN** |
+| Both buttons reachable with the directional pad, in a sensible order, with the intended initial focus | **OBSERVED — PASS on the reach-and-order half.** Read in a later session, **after this summary was written**: the directional pad reaches both dialog buttons, in order. The row's third clause, the *intended initial focus* on first open, was not separately reported and is not claimed here — what is known about focus is the expiry transition, in the row above |
+| The row's context menu offers re-authorise and remove | **OBSERVED — PASS.** Read in a later session, **after this summary was written**: the per-row context menu was opened and it offers both actions. What is known is that the menu **offers** them. Whether either action carries out what it says is a different question and is the next two rows, which are still unrun |
 | Re-authorise completes without creating a second row | **NOT RUN** |
 | Remove takes the row away and leaves the add-account row | **NOT RUN** |
 | Session log swept for tracebacks | **NOT RUN** |
@@ -248,11 +248,58 @@ and a mark, which is why each row carries what it rests on.
 | **AUTH-07** | → **Complete** | Backing out of sign-in with Back returned an account list exactly as it was. The remote has no Esc key, so Back is the only form the acceptance device can produce. The code half is held independently by `test_the_signin_flow_stamps_without_writing_anything` from `c768699`, which pins the no-write property at the seam the fix touched. The repeat form (a second sign-in cancelled part-way) was not separately reported |
 | **AUTH-08** | → **Complete** | The pattern image was scanned with a phone camera and resolved to the address the dialog showed. The "encodes only the `verification_uri`" half is structural and already proven — the provider returns no `verification_uri_complete`, the encoder is fed the provider's address and nothing else, and an insecure source is refused |
 | **AUTH-17** | → **Complete** | No dialog appeared over the home screen at boot, which is the requirement's observable form, and the code half was proven by 03-10. **Named weakness**: this is a negative observation from ordinary use, and the "background service starts at login" row was not reported, so the premise that the service ran is unconfirmed on this device. It is the weakest of the five marks and is written down as such rather than smoothed over |
-| **AUTH-06** | **left Pending** | Its countdown clause passed — and only after `24702ff`, since the overflow meant the countdown was never on the screen. Its **focus clause was not observed at all**: the expiry path was skipped, so nobody has seen "get a new code" arrive already focused. The requirement is a conjunction and half of it is unmeasured. Not marked |
-| **AUTH-22** | **left Pending** | The root is the account list and the add-account row works — that much the sign-in proves. **The per-row context menu offering re-authorise and remove was never opened.** That clause is half the requirement's sentence and no reading exists for it |
+| **AUTH-06** | **left Pending here; closed later the same day** | Its countdown clause passed — and only after `24702ff`, since the overflow meant the countdown was never on the screen. Its **focus clause was not observed at all** when this table was written: the expiry path was skipped, so nobody had seen "get a new code" arrive already focused. The requirement is a conjunction and half of it was unmeasured. **Superseded — see "Readings taken after this summary was written" below**: the focus clause was observed in a later session and AUTH-06 is now Complete |
+| **AUTH-22** | **left Pending here; closed later the same day** | The root is the account list and the add-account row works — that much the sign-in proves. **The per-row context menu offering re-authorise and remove had never been opened** when this table was written. **Superseded — see "Readings taken after this summary was written" below**: the menu was opened and offers both actions, which is the requirement's own sentence, and AUTH-22 is now Complete |
 | **AUTH-03** | **left Pending** | The work/school half is now proven twice over: live through the shipped package in 03-13 and on the television here. The **personal-account half remains a deferred second run**, as 03-13 recorded — the spike already acquired a token on a personal account against this registration, so what is outstanding is a run, not a design question. The requirement says both, and both is not what happened |
 | **CI-06** | **Complete — confirmed, not re-applied** | Already checked, set in Phase 1 as a standing obligation. This run is what discharges it for Phase 3: the acceptance pass happened **on the TCL Android TV 12 itself**, no stand-in was substituted, and every row that could not be run is recorded as not run rather than left out. The prohibition held |
 | **DIST-01** | **Complete — confirmed, flag discharged** | 03-12 flagged that 03-02 had marked this Complete while 03-14 still declared it, and asked this plan to confirm rather than alter it. **Confirmed and now genuinely earned**: the archive the build wrote installed through Kodi's own file manager on the television. The install-by-URL failure is not a DIST-01 failure — DIST-01 is about the archive, and the archive was accepted |
+
+## Readings taken after this summary was written
+
+Three rows of Task 3 were run on the television in a later session on 2026-08-23, **after this
+summary had been written and its requirement table settled**. They are recorded here rather than
+folded silently into the tables above, because *when* a reading was taken is part of the reading:
+this summary's own verdict was that two requirements had an unmeasured half, and that verdict was
+correct on the evidence that existed at the time.
+
+| Row | Verdict | What it settles |
+|---|---|---|
+| On expiry, "get a new code" arrives **already focused** | **OBSERVED — PASS** | AUTH-06's focus clause |
+| The directional pad reaches **both** dialog buttons, in order | **OBSERVED — PASS** | The reach-and-order half of the d-pad row. The *intended initial focus on first open* was not separately reported and is not claimed |
+| The per-row context menu **offers** re-authorise and remove | **OBSERVED — PASS** | AUTH-22's second clause, exactly as the requirement words it |
+
+**AUTH-06 closes.** Both halves are now measured, and they were measured at different times: the
+countdown clause passed on the television during the run above, and only after `24702ff` — control
+1002 had overflowed its box since 03-06 and the countdown was the line pushed out of view, so it had
+never been visible on any device. The focus clause was read in the later session. The requirement is
+a conjunction and both halves now have a reading.
+
+**It rests entirely on the human reading, and that is worth stating plainly.** Phase-3 verification
+measured `QRDialogProgress` and found **zero automated coverage** — `set_code`, `set_remaining`,
+`set_expired`, `reset_for_new_code`, `is_new_code_requested`, `format_remaining` and `_render_text`
+are all called from `_await_authorisation` and none is touched by any test. `set_expired()` does call
+`setFocus(button)` under a once-only guard, but a `setFocus` call in an `xbmcgui.WindowXMLDialog`
+subclass is not evidence that focus landed on a real skin. There is no instrument here except a
+person in front of the television, and the mark is exactly as strong as that one reading.
+
+**AUTH-22 closes, on precisely what was seen.** The requirement asks that the root be the account
+list with an "Add an account…" row and a per-row context menu **offering** re-authorise and remove.
+The root is the account list; the add-account row was used to sign in during the run above; the menu
+was opened in the later session and was seen offering both actions. That is the requirement's
+sentence and it is now observed.
+
+**What is not known, and must not be read into it:** whether either action *works end to end*.
+Re-authorising without creating a second row, and removing a row and leaving the add-account row
+behind, are two separate checklist rows and both are still **NOT RUN**. The menu was observed
+offering the actions; the actions were not exercised. The code paths behind them are gated by tests
+— `test_the_account_list_offers_re_authorisation` reads the menu entries specifically, and
+`test_removing_an_account_deletes_its_stored_credential` covers the removal — so this is an
+unobserved behaviour with a code proof, not an unproven one, which is the same shape AUTH-17 is
+recorded in.
+
+Neither reading touches AUTH-03 or AUTH-18. AUTH-03's personal-account half is still a deferred
+second run, and AUTH-18 still has no tenant that will refuse the grant. Both stay Pending, and
+phase-3 verification confirmed both Pendings as correct judgements rather than gaps.
 
 ## What this run does **not** close
 
