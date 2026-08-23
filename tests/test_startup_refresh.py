@@ -438,19 +438,35 @@ def test_a_shutdown_stops_the_run_where_it_stands(profile):
 
 
 def test_a_shutdown_between_passes_stops_the_retry(profile):
+    """The wait between passes has to be the abort-aware one AND its answer has
+    to be read.
+
+    Only the delay reports the shutdown here. A first draft of this test scripted
+    a queue of answers instead, and the per-account `wait(0)` consumed the True
+    one pass later and stopped the run anyway -- so a version that called the
+    delay and threw its answer away passed. Distinguishing the two guards by
+    their argument is what makes this assertion about the one it names.
+    """
     stored(profile, FIRST, age_days=refresh_module.REFRESH_AFTER_DAYS + 1)
     post = Refusing()
-    answers = [False, False, True, True, True, True]
+    delays = []
 
     def wait(seconds):
-        return answers.pop(0) if answers else True
+        if seconds:
+            delays.append(seconds)
+            return True
+        return False
 
-    outcomes = check(profile, {FIRST: record(FIRST)}, post, wait=wait)
+    outcomes = check(profile, {FIRST: record(FIRST)}, post, wait=wait,
+                     delay=startup_refresh.RETRY_DELAY_SECONDS)
 
     assert outcomes == {FIRST: refresh_module.TRANSIENT}
-    assert len(post.calls) < startup_refresh.PASSES, (
-        'the retry carried on through a shutdown. The wait between passes has '
-        'to be the abort-aware one, and its answer has to be read')
+    assert delays == [startup_refresh.RETRY_DELAY_SECONDS], (
+        'the pause between passes was not the abort-aware wait, or it was not '
+        'given the retry delay: %r' % (delays,))
+    assert len(post.calls) == 1, (
+        'the retry carried on through a shutdown that the wait between passes '
+        'had already reported')
 
 
 # ---------------------------------------------------------------------------
