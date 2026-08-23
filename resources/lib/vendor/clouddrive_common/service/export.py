@@ -22,7 +22,7 @@ import datetime
 from resources.lib.vendor.clouddrive_common.utils import Utils, timeit
 from resources.lib.vendor.clouddrive_common.ui.dialog import ExportScheduleDialog, DialogProgressBG
 from calendar import weekday
-from resources.lib.vendor.clouddrive_common.remote.errorreport import ErrorReport
+from resources.lib.vendor.clouddrive_common.exception import ExceptionUtils
 from resources.lib.vendor.clouddrive_common.export import ExportManager
 from resources.lib.vendor.clouddrive_common.account import AccountManager
 from _collections import deque
@@ -100,7 +100,7 @@ class ExportService(object):
                     self.process_schedules(export_map, now, startup)
                 self.process_watch()
             except Exception as e:
-                ErrorReport.handle_exception(e)
+                Logger.error(ExceptionUtils.full_stacktrace(e))
             startup = False
             if monitor.waitForAbort(60):
                 break
@@ -200,7 +200,7 @@ class ExportService(object):
                                 KodiUtils.update_library('video')
                             
             except Exception as e:
-                ErrorReport.handle_exception(e)
+                Logger.error(ExceptionUtils.full_stacktrace(e))
                 KodiUtils.show_notification(self._common_addon.getLocalizedString(32027) + ' ' + Utils.unicode(e))
             finally:
                 export['exporting'] = False
@@ -309,7 +309,7 @@ class ExportService(object):
                             if change in changes_by_drive[driveid]:
                                 changes_by_drive[driveid].remove(change)
                     except Exception as e:
-                        ErrorReport.handle_exception(e)
+                        Logger.error(ExceptionUtils.full_stacktrace(e))
                         KodiUtils.show_notification(self._common_addon.getLocalizedString(32027) + ' ' + Utils.unicode(e))
                     finally:
                         export['exporting'] = False

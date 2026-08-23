@@ -26,7 +26,6 @@ from urllib.error import HTTPError
 from resources.lib.vendor.clouddrive_common.account import AccountManager
 from resources.lib.vendor.clouddrive_common.exception import ExceptionUtils, RequestException
 from resources.lib.vendor.clouddrive_common.html import XHTML
-from resources.lib.vendor.clouddrive_common.remote.errorreport import ErrorReport
 from resources.lib.vendor.clouddrive_common.service.base import BaseServerService, BaseHandler
 from resources.lib.vendor.clouddrive_common.ui.logger import Logger
 from resources.lib.vendor.clouddrive_common.ui.utils import KodiUtils
@@ -358,7 +357,7 @@ class Source(BaseHandler):
                     else:
                         cached_page['response_code'] = 500
                     
-                    ErrorReport.handle_exception(e)
+                    Logger.error(ExceptionUtils.full_stacktrace(e))
                     content = Utils.get_file_byte_buffer()
                     content.write(Utils.encode(ExceptionUtils.full_stacktrace(e)))
                     

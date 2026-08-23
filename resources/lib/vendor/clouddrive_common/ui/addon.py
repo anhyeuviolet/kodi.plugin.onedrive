@@ -18,6 +18,7 @@
 #-------------------------------------------------------------------------------
 
 import inspect
+import json
 import os
 import sys
 import threading
@@ -31,7 +32,8 @@ from resources.lib.vendor.clouddrive_common.account import AccountManager, Accou
     DriveNotFoundException
 from resources.lib.vendor.clouddrive_common.exception import UIException, ExceptionUtils, RequestException
 from resources.lib.vendor.clouddrive_common.export import ExportManager
-from resources.lib.vendor.clouddrive_common.remote.errorreport import ErrorReport
+from resources.lib.vendor.clouddrive_common.remote.provider import ReauthorisationRequired
+from resources.lib.vendor.clouddrive_common.remote.request import Request
 from resources.lib.vendor.clouddrive_common.service.download import DownloadServiceUtil
 from resources.lib.vendor.clouddrive_common.ui.dialog import DialogProgress, DialogProgressBG, \
     QRDialogProgress, ExportMainDialog
@@ -893,28 +895,157 @@ class CloudDriveAddon:
         if not self.cancel_operation():
             xbmcplugin.setResolvedUrl(self._addon_handle, succeeded, list_item)
     
+    # One sentence per outcome in resources/lib/auth/errors.py. That module
+    # returns a symbolic outcome and a bare code and holds no words at all, so
+    # this is the only place the pairing exists in code -- the other copy is the
+    # comment above the block in strings.po, which a translator reads. Neither
+    # file names the other's contents, and
+    # test_every_failure_outcome_renders_its_own_sentence holds the join.
+    #
+    # The unmapped outcome is deliberately absent: it renders through
+    # _FAILURE_UNMAPPED_STRING, which keeps the bare provider code on screen. A
+    # code a person can read off a television and quote is worth more than a
+    # friendly sentence that hides it.
+    _FAILURE_STRINGS = {
+        errors.PUBLIC_CLIENT_FLOWS_OFF: 30046,
+        errors.CONSENT_REQUIRED: 30047,
+        errors.ADMIN_CONSENT_REQUIRED: 30048,
+        errors.NOT_ASSIGNED_TO_APPLICATION: 30049,
+        errors.BLOCKED_BY_CONDITIONAL_ACCESS: 30050,
+        errors.BLOCKED_BY_SECURITY_DEFAULTS: 30051,
+        errors.MFA_REQUIRED: 30052,
+        errors.MFA_ENROLMENT_REQUIRED: 30053,
+        errors.PASSWORD_EXPIRED: 30054,
+        errors.APPLICATION_DISABLED: 30055,
+        errors.APPLICATION_NOT_IN_TENANT: 30056,
+        errors.DEVICE_CODE_REJECTED: 30057,
+        errors.DEVICE_CODE_EXPIRED: 30058,
+    }
+    _FAILURE_UNMAPPED_STRING = 30044
+    # Appended to any outcome the table marks administrator-must-act, and to
+    # nothing else. It is the only place the expert-level custom identifier
+    # setting is named, which is what makes the tenant-block message and that
+    # setting one feature rather than two.
+    _FAILURE_ESCAPE_HATCH_STRING = 30045
+
+    def _provider_failure(self, rex):
+        """The identity provider's own refusal carried by `rex`, or None.
+
+        What arrives here is the transport's report, not the body: the
+        exception's response field is assembled by Request with the credential
+        fields already cut short. The code survives that, because it lives in
+        the description and the description is not a credential.
+
+        The description itself never leaves this method. It is paragraph-length
+        and carries formatted links, and rendering it would put
+        provider-controlled prose on a television (T-03-44).
+        """
+        if not rex or not rex.response:
+            return None
+        text = Utils.str(rex.response)
+        failure = errors.classify(text)
+        if failure.outcome == errors.UNMAPPED and not failure.code:
+            # No code in the description. The error_codes array is the other
+            # place the refusal is named, and a proxy that truncates the
+            # paragraph leaves the array intact -- so the body is read out of
+            # the report and tried the other way before giving up.
+            start = text.find('{')
+            if start >= 0:
+                try:
+                    payload = json.loads(text[start:])
+                except (TypeError, ValueError):
+                    payload = None
+                if isinstance(payload, dict):
+                    failure = errors.classify_response(payload)
+        if failure.outcome == errors.UNMAPPED and not failure.code:
+            return None
+        return failure
+
+    def _failure_sentence(self, failure):
+        string_id = self._FAILURE_STRINGS.get(failure.outcome)
+        if string_id is None:
+            return self._addon_string(self._FAILURE_UNMAPPED_STRING) % (
+                Utils.str(failure.code) or '-')
+        sentence = self._addon_string(string_id)
+        if failure.admin_must_act:
+            sentence += '[CR]' + self._addon_string(
+                self._FAILURE_ESCAPE_HATCH_STRING)
+        return sentence
+
+    def _offer_signin_again(self, ex, httpex, add_account_cmd):
+        """Ask whether to sign in again, if that is what this failure needs.
+
+        True when the offer was made, so the caller can suppress the ordinary
+        error dialog. Two triggers, and only two:
+
+        an unauthorised response, which is the surviving half of a branch whose
+        other half read the third party's address out of the request; and
+        ReauthorisationRequired, which the refresh raises only for the outcome
+        it names NEEDS_REAUTHORISATION. A transient refresh failure raises a
+        plain RequestException instead and reaches none of this, which is the
+        whole of Pitfall E: a refresh that failed because the Wi-Fi was not up
+        yet must not sign anybody out.
+        """
+        unauthorised = httpex is not None and httpex.code == 401
+        finished = ExceptionUtils.extract_exception(
+            ex, ReauthorisationRequired) is not None
+        if not (unauthorised or finished):
+            return False
+
+        driveid = Utils.get_safe_value(self._addon_params, 'driveid')
+        if not driveid:
+            # Nothing names which account this was for, so the prompt cannot be
+            # written. The ordinary error dialog is the honest answer.
+            return False
+        account = self._account_manager.get_by_driveid('account', driveid)
+        drive = self._account_manager.get_by_driveid('drive', driveid, account)
+        if self._dialog.yesno(self._addon_name,
+                              self._common_addon.getLocalizedString(32046)
+                              % (self._get_display_name(account, drive, True) + '\n')):
+            KodiUtils.executebuiltin(add_account_cmd)
+        return True
+
     def _handle_exception(self, ex, show_error_dialog = True):
         stacktrace = ExceptionUtils.full_stacktrace(ex)
         rex = ExceptionUtils.extract_exception(ex, RequestException)
         uiex = ExceptionUtils.extract_exception(ex, UIException)
         httpex = ExceptionUtils.extract_exception(ex, HTTPError)
         urlex = ExceptionUtils.extract_exception(ex, URLError)
+        failure = self._provider_failure(rex)
         line1 = self._common_addon.getLocalizedString(32027)
         line2 = Utils.unicode(ex)
         line3 = self._common_addon.getLocalizedString(32016)
-        
+
         if uiex:
             line1 = self._common_addon.getLocalizedString(int(Utils.str(uiex)))
             line2 = Utils.unicode(uiex.root_exception)
         elif rex and rex.response:
             line1 += ' ' + Utils.unicode(rex)
             line2 = ExceptionUtils.extract_error_message(rex.response)
-        send_report = True
         add_account_cmd = 'RunPlugin('+self._addon_url + '?' + urllib.parse.urlencode({'action':'_add_account', 'content_type': self._content_type})+')'
         if isinstance(ex, AccountNotFoundException) or isinstance(ex, DriveNotFoundException):
             show_error_dialog = False
             if self._dialog.yesno(self._addon_name, self._common_addon.getLocalizedString(32063) % '\n'):
                 KodiUtils.executebuiltin(add_account_cmd)
+        elif self._offer_signin_again(ex, httpex, add_account_cmd):
+            # An unauthorised response, or a refresh whose grant is finished.
+            # Both mean the same thing to the person in front of the television
+            # and both offer the one action that helps.
+            #
+            # The branch that stood here also treated the third party's address
+            # appearing in the request as this signal. That address is gone, and
+            # so is the half that looked for it; the unauthorised half survives,
+            # because it is a genuine re-authorisation trigger.
+            show_error_dialog = False
+        elif failure:
+            # A refusal by the identity provider, rendered as the sentence its
+            # code maps to, with the escape hatch appended when no retry can
+            # clear it (AUTH-18). The provider's own description is never shown:
+            # it is paragraph-length with formatted links (T-03-44).
+            Logger.error('provider refusal: %s (%s)'
+                         % (failure.outcome, failure.code or 'no code'))
+            line1 = self._failure_sentence(failure)
+            line2 = line3 = None
         elif rex and httpex:
             if httpex.code >= 500:
                 line1 = self._common_addon.getLocalizedString(32035)
@@ -923,20 +1054,12 @@ class CloudDriveAddon:
             elif httpex.code >= 400:
                 driveid = Utils.get_safe_value(self._addon_params, 'driveid')
                 if driveid:
-                    account = self._account_manager.get_by_driveid('account', driveid)
-                    drive = self._account_manager.get_by_driveid('drive', driveid, account)
-                    if KodiUtils.get_signin_server() in rex.request or httpex.code == 401:
-                        send_report = False
-                        show_error_dialog = False
-                        if self._dialog.yesno(self._addon_name, self._common_addon.getLocalizedString(32046) % (self._get_display_name(account, drive, True) + '\n')):
-                            KodiUtils.executebuiltin(add_account_cmd)
-                    elif httpex.code == 403:
+                    if httpex.code == 403:
                         line1 = self._common_addon.getLocalizedString(32019)
                         line2 = line3 = None
                     elif httpex.code == 404:
-                        send_report = False
                         line1 = self._common_addon.getLocalizedString(32037)
-                        line2 = line2 = None
+                        line2 = None
                     else:
                         line1 = self._common_addon.getLocalizedString(32036)
                         line3 = self._common_addon.getLocalizedString(32038)
@@ -961,7 +1084,23 @@ class CloudDriveAddon:
             
         report = '[%s] [%s]/[%s]\n\n%s\n%s\n%s\n\n%s' % (self._addonid, self._addon_version, self._common_addon_version, line1, line2, line3, stacktrace)
         if rex:
-            report += '\n\n%s\nResponse:\n%s' % (rex.request, rex.response)
+            # Through the transport's redactor, not around it. What stood here
+            # concatenated the request and the response straight into a string
+            # that goes to a log file users paste into public forums verbatim,
+            # and a failing token exchange answers with a body that IS the
+            # credential -- a refresh token and a device code, in the clear,
+            # every time sign-in went wrong (D-06, T-03-41).
+            #
+            # These two fields are the transport's own reports and are already
+            # redacted at their source, so this is a second pass. It is not
+            # theatre: this handler is reachable with a RequestException any
+            # caller can construct, and the redactor at the point of writing is
+            # the one place that covers those too. The pass is idempotent -- a
+            # value already cut to eight characters and a marker comes back
+            # unchanged.
+            report += '\n\n%s\nResponse:\n%s' % (
+                Request.get_body_for_report(rex.request),
+                Request.get_body_for_report(rex.response))
         report += '\n\nshow_error_dialog: %s' % show_error_dialog
         Logger.error(report)
         if show_error_dialog:
@@ -970,15 +1109,12 @@ class CloudDriveAddon:
             if line3:
                 line1 += '\n' + line3
             self._dialog.ok(self._addon_name, line1)
-        if send_report:
-            report_error = KodiUtils.get_addon_setting('report_error', self._common_addon_id) == 'true'
-            report_error_invite = KodiUtils.get_addon_setting('report_error_invite', self._common_addon_id) == 'true'
-            if not report_error and not report_error_invite:
-                if not self._dialog.yesno(self._addon_name, self._common_addon.getLocalizedString(32050), self._common_addon.getLocalizedString(32012), self._common_addon.getLocalizedString(32013)):
-                    KodiUtils.set_addon_setting('report_error', 'true', self._common_addon_id)
-                KodiUtils.set_addon_setting('report_error_invite', 'true', self._common_addon_id)
-            ErrorReport.send_report(report)
-    
+        # The prompt inviting the user to send this report to a third party
+        # stood here, together with the two settings that remembered the answer
+        # and the call that sent it. All three are gone with the reporter. The
+        # report is written to the log and goes nowhere else (AUTH-23, T-03-42).
+
+
     def _open_common_settings(self):
         self._common_addon.openSettings()
     

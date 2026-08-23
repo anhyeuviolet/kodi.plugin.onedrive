@@ -160,6 +160,5 @@ class KodiPlayer(KodiUtils.kodi_player_class()):
                     Logger.debug('subtitle: %s' % url)
                     self.setSubtitles(url)
         except Exception as e:
-            Logger.error(e)
-            from resources.lib.vendor.clouddrive_common.remote.errorreport import ErrorReport
-            ErrorReport.handle_exception(e)
+            from resources.lib.vendor.clouddrive_common.exception import ExceptionUtils
+            Logger.error(ExceptionUtils.full_stacktrace(e))

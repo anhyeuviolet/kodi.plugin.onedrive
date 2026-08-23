@@ -29,7 +29,7 @@ from resources.lib.vendor.clouddrive_common.ui.utils import KodiUtils
 from resources.lib.vendor.clouddrive_common.utils import Utils, timeit
 from resources.lib.vendor.clouddrive_common.db import SimpleKeyValueDb
 from _collections import deque
-from resources.lib.vendor.clouddrive_common.remote.errorreport import ErrorReport
+from resources.lib.vendor.clouddrive_common.exception import ExceptionUtils
 
 
 class ExportManager(object):
@@ -134,7 +134,7 @@ class ExportManager(object):
             with KodiUtils.file(file_path, 'w') as f:
                 f.write(Utils.str(content))
         except Exception as e:
-            ErrorReport.handle_exception(e)
+            Logger.error(ExceptionUtils.full_stacktrace(e))
             return False
         return True
 
@@ -148,7 +148,7 @@ class ExportManager(object):
             req = Request(url, None, headers, download_path = download_path, on_update_download = on_update_download)
             req.request()
         except Exception as e:
-            ErrorReport.handle_exception(e)
+            Logger.error(ExceptionUtils.full_stacktrace(e))
             return False
         return req.success
 

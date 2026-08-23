@@ -200,10 +200,14 @@ class KodiUtils:
         with KodiUtils.lock:
             KodiUtils.set_addon_setting('%s.service.port' % service, Utils.str(port), addonid)
     
-    @staticmethod
-    def get_signin_server(addonid=None):
-        return KodiUtils.get_addon_setting('sign-in-server', addonid)
-    
+    # An accessor stood here that read the address of a hosted third party out
+    # of a setting. It was the only address source the error reporter and the
+    # replaced sign-in flow ever had; both are gone, so it is too. Its
+    # neighbours above and below -- the service-port helpers, the cache-expiry
+    # accessor, the notification helper -- are unrelated and stay (AUTH-23).
+    # VENDORED.md carries the name and the history; naming it here would put it
+    # back into shipped source, which is the one thing the sweep forbids.
+
     @staticmethod
     def get_cache_expiration_time(addonid=None):
         from resources.lib.vendor.clouddrive_common.utils import Utils

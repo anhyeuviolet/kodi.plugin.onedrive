@@ -19,7 +19,6 @@
 
 from resources.lib.vendor.clouddrive_common.account import AccountManager
 from resources.lib.vendor.clouddrive_common.exception import ExceptionUtils
-from resources.lib.vendor.clouddrive_common.remote.errorreport import ErrorReport
 from resources.lib.vendor.clouddrive_common.service.base import BaseServerService, BaseHandler
 from resources.lib.vendor.clouddrive_common.ui.logger import Logger
 from resources.lib.vendor.clouddrive_common.ui.utils import KodiUtils
@@ -58,7 +57,7 @@ class Download(BaseHandler):
                 else:
                     code = 500
                 
-                ErrorReport.handle_exception(e)
+                Logger.error(ExceptionUtils.full_stacktrace(e))
                 content.write(ExceptionUtils.full_stacktrace(e))
         else:
             code = 404
