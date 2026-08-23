@@ -1943,3 +1943,121 @@ def test_the_sign_in_boxes_can_hold_the_fonts_they_name():
         'the sign-in dialog does not fit the space it is drawn in. A control '
         'past the panel edge is drawn over the background, and a panel past '
         'the screen edge is cropped by the compositor:\n%s' % report(outside))
+# ---------------------------------------------------------------------------
+# A redactor is not an instrument (the transferable lesson of 03-13)
+# ---------------------------------------------------------------------------
+#
+# `refresh.fingerprint` returns the first eight characters of a token. It is
+# sized for a log: a Kodi log is a file users paste into public forums verbatim,
+# and eight characters answer "did this change" without carrying the credential.
+#
+# It answers that question for a HUMAN reading two lines. It does not answer it
+# for CODE, and the difference is not academic. Every refresh token this
+# registration issues begins `1.AXEAuM`, so three genuinely different tokens
+# render as one identical string. A harness that decided rotation by putting
+# fingerprints through a set therefore reported a confident FAIL on a run that
+# had proved nothing -- and a PASS from that same code would have been just as
+# worthless, which is the half that matters: the phase would have recorded its
+# highest-consequence requirement as proven by a check that never worked.
+#
+# What is forbidden here is narrow on purpose. Comparing a fingerprint against a
+# CONSTANT is how the function itself is tested and stays legal. What may not
+# happen is deciding whether two *tokens* differ by comparing what the redactor
+# made of them, in any of the shapes that decision is written in.
+
+FINGERPRINT = 'fingerprint'
+
+
+def _contains_fingerprint_call(node):
+    """True if anywhere under `node` a call to fingerprint() is made."""
+    for inner in ast.walk(node):
+        if isinstance(inner, ast.Call):
+            name = _func_name(inner.func)
+            if name == FINGERPRINT or name.endswith('.' + FINGERPRINT):
+                return True
+    return False
+
+
+def _is_fingerprint_call(node):
+    """True if `node` is itself a call to fingerprint(), not merely containing one."""
+    if not isinstance(node, ast.Call):
+        return False
+    name = _func_name(node.func)
+    return name == FINGERPRINT or name.endswith('.' + FINGERPRINT)
+
+
+def test_no_identity_decision_is_built_on_the_log_redactor():
+    """Nothing may decide that two tokens differ by comparing their fingerprints.
+
+    Three shapes, because the decision can be written three ways and banning one
+    would leave a gate that reads as complete:
+
+      1. a comparison with a fingerprint on two or more of its operands --
+         `fingerprint(a) == fingerprint(b)`;
+      2. a membership test whose left side is a fingerprint -- `fingerprint(a)
+         in seen`, which is how the same decision is written when the collection
+         is built up over a loop;
+      3. a fingerprint handed to a set -- a literal `{...}`, `set(...)`,
+         `frozenset(...)` or `.add(...)`. Deduplicating fingerprints has exactly
+         one purpose, and counting the survivors is the shape that was actually
+         written.
+
+    Formatting is untouched: `'%s -> %s' % (fingerprint(a), fingerprint(b))` is
+    a log line, which is the function's whole reason to exist, and it is what
+    `refresh.py` does at both of its call sites.
+
+    THE SUITE ITSELF IS SWEPT, not just shipped source. The code that got this
+    wrong was a harness, not the add-on -- the add-on was never wrong -- so a
+    gate that read only `resources/` would have been green while the defect sat
+    in the file next door.
+    """
+    offenders = []
+
+    sources = [rel for rel in tracked_files() if rel.endswith('.py')]
+    assert sources, 'no python file in the index; the sweep would read nothing'
+
+    for rel in sources:
+        tree = ast.parse(read(rel), filename=rel)
+
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Compare):
+                operands = [node.left] + list(node.comparators)
+                carrying = [side for side in operands
+                            if _contains_fingerprint_call(side)]
+                if len(carrying) >= 2:
+                    offenders.append((rel, node.lineno,
+                                      'a comparison with a fingerprint on both '
+                                      'sides'))
+                elif (carrying
+                      and any(isinstance(op, (ast.In, ast.NotIn))
+                              for op in node.ops)
+                      and _contains_fingerprint_call(node.left)):
+                    offenders.append((rel, node.lineno,
+                                      'a membership test on a fingerprint'))
+
+            elif isinstance(node, ast.Set):
+                if any(_contains_fingerprint_call(element)
+                       for element in node.elts):
+                    offenders.append((rel, node.lineno,
+                                      'a fingerprint in a set literal'))
+
+            elif isinstance(node, ast.Call):
+                name = _func_name(node.func)
+                if (name in ('set', 'frozenset') or name.endswith('.add')
+                        or name == 'add'):
+                    # CONTAINS, not IS. `set([fingerprint(a)])` hides the call
+                    # one list-literal deep and is the same decision written
+                    # with two more characters. That shape escaped the first
+                    # version of this gate and was caught by driving it, not by
+                    # reading it -- which is the standing lesson here: a gate
+                    # nobody has made fail is a gate nobody has tested.
+                    if any(_contains_fingerprint_call(argument)
+                           for argument in node.args):
+                        offenders.append((rel, node.lineno,
+                                          'a fingerprint handed to %s()' % name))
+
+    assert not offenders, (
+        'an identity decision is being made on the output of a log redactor. '
+        'fingerprint() keeps eight characters, and every refresh token this '
+        'registration issues shares its first eight, so this compares different '
+        'tokens as equal. Digest the whole value instead:\n%s' % report(offenders))

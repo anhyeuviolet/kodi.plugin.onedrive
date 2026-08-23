@@ -39,6 +39,8 @@ from pathlib import PurePosixPath
 # pattern sweep and the failure report all live in gatelib, because this is no
 # longer the only gate file. Two copies of the exclusion set drift; one does not.
 from gatelib import (
+    EXCLUDED_DOCS,
+    EXCLUDED_TOP_LEVEL,
     REPO,
     excluded as _excluded,
     python_sources,
@@ -212,6 +214,91 @@ def test_both_url_exemptions_are_load_bearing():
             'no file this sweep reads contains %r; the exemption is dead and '
             'must be deleted rather than left to widen the sweep for whatever '
             'line is written next' % (url,))
+
+
+def test_urllib_submodules_are_imported_by_name():
+    """No shipped module may reach `urllib.<submodule>` without importing it.
+
+    `import urllib` binds the package and nothing under it. A module that then
+    calls `urllib.parse.quote` is reading an attribute it never asked for, and
+    it works only when something else in the same interpreter has imported
+    `urllib.parse` first -- which `urllib.request` and `urllib.error` both do, as
+    a side effect nobody promised. This add-on runs on Python 3.8 under Kodi
+    19-21 and on 3.14 under Kodi 22, and the whole hazard is that the side
+    effect is an implementation detail of one standard library, not a contract
+    across two.
+
+    Ten files were in this state and are the reason the gate exists. It resolved
+    on every one of them, which is why nothing caught it: the failure mode is a
+    future interpreter, not this one.
+
+    PARSED, not swept. A regular expression over the text would prove that the
+    line `import urllib.parse` appears somewhere in a file, not that the module
+    reaching `urllib.parse` is the module that imports it -- and a sweep that
+    matches intent while missing behaviour is the failure this suite has already
+    been bitten by twice.
+    """
+    offenders = []
+
+    for rel in python_sources():
+        tree = ast.parse(_read(rel))
+
+        imported = set()
+        used = set()
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                for alias in node.names:
+                    if alias.name.startswith('urllib.'):
+                        imported.add(alias.name.split('.', 1)[1])
+            elif isinstance(node, ast.Attribute):
+                # The shape urllib.<submodule>.<anything>
+                inner = node.value
+                if (isinstance(inner, ast.Attribute)
+                        and isinstance(inner.value, ast.Name)
+                        and inner.value.id == 'urllib'):
+                    used.add(inner.attr)
+
+        for name in sorted(used - imported):
+            offenders.append('%s: uses urllib.%s but never imports it'
+                             % (rel, name))
+
+    assert not offenders, (
+        'a bare `import urllib` does not bind its submodules; these resolve '
+        'today only because something else imported them first, and that is '
+        'not a property of the language:\n%s' % '\n'.join(offenders))
+
+
+def test_every_exclusion_names_something_real():
+    """Nothing may be excluded that is not there to exclude.
+
+    The same argument as the exemption test above, applied to the other list
+    that can quietly stop working. An entry naming a path the git index does not
+    contain removes nothing from the sweep, and it is indistinguishable from an
+    entry that removes a great deal -- both are just strings until somebody
+    checks the tree.
+
+    This is not hypothetical. `COVERAGE.md` sat in `EXCLUDED_DOCS` from the
+    phase-1 gates onward and has never existed in any commit, and `.planning`
+    sat in `EXCLUDED_TOP_LEVEL` after the planning record was untracked. Both
+    were found by reading, months apart, which is exactly the cost this test
+    exists to remove.
+
+    The sets are read from `gatelib` rather than restated here. A copy would
+    make this test agree with itself.
+    """
+    tracked = tracked_files()
+    tops = {PurePosixPath(rel).parts[0] for rel in tracked}
+
+    missing_docs = sorted(name for name in EXCLUDED_DOCS if name not in tracked)
+    assert not missing_docs, (
+        'EXCLUDED_DOCS names %s, which the git index does not contain. An '
+        'excluded document must exist, or the entry excludes nothing: delete '
+        'it, or create the file it names.' % ', '.join(missing_docs))
+
+    missing_tops = sorted(name for name in EXCLUDED_TOP_LEVEL if name not in tops)
+    assert not missing_tops, (
+        'EXCLUDED_TOP_LEVEL names %s, which is not a top-level path in the git '
+        'index.' % ', '.join(missing_tops))
 
 
 def test_no_legacy_package_prefix():
@@ -882,11 +969,15 @@ def test_credits_content():
 # ---------------------------------------------------------------------------
 # The registration runbook (SETUP-04)
 #
-# This is what the fifth entry in EXCLUDED_DOCS buys. The runbook is excluded
-# from the literal sweeps because it must quote a response that names the two
+# This is what the runbook's entry in EXCLUDED_DOCS buys. It is excluded from
+# the literal sweeps because it must quote a response that names the two
 # credential parameters; in exchange the file is read here by name and its
 # load-bearing contents are asserted, so the exclusion is a stronger gate rather
-# than a hole. Same trade as the four documents above.
+# than a hole. Same trade as the three documents above.
+#
+# Counted by role rather than by position: the set held a fifth name,
+# COVERAGE.md, which never existed, and an ordinal in a comment is wrong the
+# moment the set changes.
 # ---------------------------------------------------------------------------
 
 RUNBOOK = 'docs/AZURE-REGISTRATION.md'

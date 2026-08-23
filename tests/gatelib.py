@@ -49,16 +49,21 @@ REPO = Path(__file__).resolve().parent.parent
 #
 #                        '.planning' stood here too until the planning record
 #                        was untracked and ignored. This set filters the git
-#                        index, so the entry had stopped excluding anything -
-#                        the same dead-name discrepancy already recorded against
-#                        COVERAGE.md below, and worth removing rather than
-#                        leaving for the next reader to check the tree over.
-#   the four documents - VENDORED.md, CREDITS.md, COVERAGE.md and README.md are
-#                        *required* to name the upstream module and the original
-#                        add-on id. Forgetting them produces a gate that can never
-#                        go green. They are covered instead by the positive
-#                        assertions in test_vendored_sha_recorded,
-#                        test_vendored_md_sections and test_credits_content.
+#                        index, so the entry had stopped excluding anything.
+#   the three documents- VENDORED.md, CREDITS.md and README.md are *required* to
+#                        name the upstream module and the original add-on id.
+#                        Forgetting them produces a gate that can never go green.
+#                        They are covered instead by the positive assertions in
+#                        test_vendored_sha_recorded, test_vendored_md_sections
+#                        and test_credits_content.
+#
+#                        COVERAGE.md stood here too, from the phase-1 gates until
+#                        now, and it has never existed in any commit. It excluded
+#                        nothing. Both dead names are gone, and
+#                        test_every_exclusion_names_something_real is what stops
+#                        the next one appearing: an entry that does no work sits
+#                        beside entries that do, and the difference is invisible
+#                        without checking the tree.
 #   the runbook        - docs/AZURE-REGISTRATION.md is *required* to quote the
 #                        AADSTS7000218 response verbatim, and that response names
 #                        'client_assertion' and 'client_secret'. Quoting it is the
@@ -72,7 +77,7 @@ REPO = Path(__file__).resolve().parent.parent
 #                        supported-account value and the public-client flag are
 #                        all present.
 EXCLUDED_TOP_LEVEL = frozenset({'tests'})
-EXCLUDED_DOCS = frozenset({'VENDORED.md', 'CREDITS.md', 'COVERAGE.md', 'README.md',
+EXCLUDED_DOCS = frozenset({'VENDORED.md', 'CREDITS.md', 'README.md',
                            'docs/AZURE-REGISTRATION.md'})
 
 TEXT_SUFFIXES = frozenset({'.py', '.xml', '.po', '.md', '.ini', '.txt'})
