@@ -57,6 +57,14 @@ REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SESSION = 'aaaaaaaaaaaa4aaaaaaaaaaaaaaaaaaa'
 PREVIOUS_SESSION = 'bbbbbbbbbbbb4bbbbbbbbbbbbbbbbbbb'
 
+# The timeout used wherever the point of the test is that the acquire is
+# REFUSED. Long enough for several attempts against the capped wait below,
+# short enough that the dozen tests which spend it in full cost the suite a
+# fraction of a second. A refused acquire has to burn its whole timeout -- that
+# is what being refused means -- so this number is the price of every one of
+# them.
+REFUSED = 0.02
+
 
 def cheap_sleep(seconds):
     """The injected wait.
@@ -185,7 +193,7 @@ def test_losing_the_race_returns_false_rather_than_raising(lock_file):
     assert holder.acquire(1) is True
     try:
         loser = RefreshLock(str(lock_file), SESSION, cheap_sleep)
-        assert loser.acquire(0.05) is False
+        assert loser.acquire(REFUSED) is False
     finally:
         holder.release()
 
@@ -195,7 +203,7 @@ def test_a_fresh_lock_is_left_alone_by_the_contender(lock_file):
     plant(lock_file, session=SESSION, age=1)
 
     loser = RefreshLock(str(lock_file), SESSION, cheap_sleep)
-    assert loser.acquire(0.05) is False
+    assert loser.acquire(REFUSED) is False
 
     assert json.loads(lock_file.read_text(encoding='utf-8')) == \
         {'session': SESSION}
@@ -214,22 +222,49 @@ def test_a_shutdown_ends_the_wait_immediately(lock_file):
         'the acquire ignored the abort signal and waited out its timeout'
 
 
-def test_release_tolerates_a_lock_someone_else_broke(lock_file):
+def test_release_tolerates_a_lock_someone_else_broke(monkeypatch, lock_file):
     """A holder whose lock was judged stale and broken is a case the design
     accepts, not an error: the next plan's adopt-the-winner path is what makes
-    it survivable. Release must not raise on the way out."""
+    it survivable. Release must not raise on the way out.
+
+    The disappearance is injected rather than staged, because staging it means
+    unlinking a file another handle still has open -- which POSIX allows and
+    Windows refuses, so a staged version would test the lock on one platform and
+    the platform on the other.
+    """
     lock = RefreshLock(str(lock_file), SESSION, cheap_sleep)
     lock.acquire(1)
 
-    breaker = RefreshLock(str(lock_file), PREVIOUS_SESSION, cheap_sleep)
-    assert breaker.acquire(1) is True
+    def already_gone(path):
+        raise FileNotFoundError(path)
+
+    monkeypatch.setattr(os, 'unlink', already_gone)
 
     lock.release()
-    breaker.release()
 
 
-def test_release_without_an_acquire_is_harmless(lock_file):
-    RefreshLock(str(lock_file), SESSION, cheap_sleep).release()
+def test_release_is_safe_to_call_twice(lock_file):
+    lock = RefreshLock(str(lock_file), SESSION, cheap_sleep)
+    lock.acquire(1)
+    lock.release()
+    lock.release()
+
+    assert not lock_file.exists()
+
+
+def test_release_without_an_acquire_removes_nothing(lock_file):
+    """An instance that never won the race does not hold the file, and must not
+    remove the file the winner does hold."""
+    holder = RefreshLock(str(lock_file), SESSION, cheap_sleep)
+    holder.acquire(1)
+
+    loser = RefreshLock(str(lock_file), SESSION, cheap_sleep)
+    assert loser.acquire(REFUSED) is False
+    loser.release()
+
+    assert lock_file.exists(), \
+        "the loser's release removed the holder's lock"
+    holder.release()
 
 
 def test_touch_moves_the_modification_time_forward(lock_file):
@@ -268,7 +303,7 @@ def test_two_threads_in_one_process_never_interleave(lock_file):
         log.append('exit-' + name)
         lock.release()
 
-    first = threading.Thread(target=contend, args=('A', 0.08))
+    first = threading.Thread(target=contend, args=('A', 0.04))
     first.start()
 
     deadline = time.time() + 5
@@ -309,7 +344,7 @@ CHILD_SOURCE = textwrap.dedent('''
 
     # The parent holds it right now. This must fail, and must fail by
     # returning rather than by raising.
-    result['refused_while_the_parent_held_it'] = lock.acquire(0.05) is False
+    result['refused_while_the_parent_held_it'] = lock.acquire(0.02) is False
     open(blocked_flag, 'w').close()
 
     deadline = time.time() + 20
@@ -450,7 +485,7 @@ def test_a_lock_younger_than_the_lifetime_is_not_broken(lock_file):
 
     lock = RefreshLock(str(lock_file), SESSION, cheap_sleep)
 
-    assert lock.acquire(0.05) is False
+    assert lock.acquire(REFUSED) is False
 
 
 def test_a_touched_lock_stays_fresh_past_its_lifetime(lock_file):
@@ -459,7 +494,7 @@ def test_a_touched_lock_stays_fresh_past_its_lifetime(lock_file):
 
     lock = RefreshLock(str(lock_file), SESSION, cheap_sleep)
 
-    assert lock.acquire(0.05) is False
+    assert lock.acquire(REFUSED) is False
 
 
 def test_a_future_dated_lock_is_not_treated_as_fresh(lock_file):
@@ -494,7 +529,50 @@ def test_a_future_dated_lock_that_becomes_sane_is_left_alone(lock_file):
     lock = RefreshLock(str(lock_file), SESSION,
                        fix_the_clock_then_report_no_abort)
 
-    assert lock.acquire(0.05) is False
+    assert lock.acquire(REFUSED) is False
+
+
+def test_a_lock_a_hair_ahead_of_the_clock_is_not_read_as_a_clock_step(
+        lock_file):
+    """The filesystem's timestamp and `time.time()` are not read through the
+    same path, and on some hosts a file touched a moment ago reads back a
+    fraction of a second in the future. Without a tolerance the guard above
+    turns into a second breaker that fires on perfectly healthy locks."""
+    plant(lock_file, session=SESSION,
+          age=-RefreshLock.FUTURE_TOLERANCE_SECONDS / 2)
+
+    lock = RefreshLock(str(lock_file), SESSION, cheap_sleep)
+
+    assert lock.acquire(REFUSED) is False
+
+
+def test_the_future_tolerance_stays_far_below_the_lifetime():
+    """The tolerance is for clock-read noise, not for slack. Widened towards the
+    lifetime it stops being a tolerance and starts being a hole in the age
+    signal."""
+    assert RefreshLock.FUTURE_TOLERANCE_SECONDS <= \
+        RefreshLock.LIFETIME_SECONDS / 10
+
+
+def test_one_future_reading_does_not_arm_the_breaker_for_the_whole_wait(
+        lock_file):
+    """The re-read counts CONSECUTIVE future readings. A count that survived an
+    intervening healthy reading would break a live lock minutes later on the
+    strength of one stale observation -- and on a host whose timestamps read
+    back marginally ahead, that is not a rare event but a routine one."""
+    plant(lock_file, session=SESSION, age=-3600)
+    state = {'fixed': False}
+
+    def fix_the_clock_once(seconds):
+        if not state['fixed']:
+            os.utime(str(lock_file), None)
+            state['fixed'] = True
+        return False
+
+    lock = RefreshLock(str(lock_file), SESSION, fix_the_clock_once)
+
+    assert lock.acquire(REFUSED) is False, \
+        'a single future reading armed the breaker for the rest of the wait'
 
 
 def test_an_unparseable_lock_file_falls_back_to_the_age_signal(lock_file):
@@ -504,7 +582,7 @@ def test_an_unparseable_lock_file_falls_back_to_the_age_signal(lock_file):
     """
     plant(lock_file, content='', age=0)
     fresh = RefreshLock(str(lock_file), SESSION, cheap_sleep)
-    assert fresh.acquire(0.05) is False, \
+    assert fresh.acquire(REFUSED) is False, \
         'a lock file caught mid-creation was broken by its contender'
 
     plant(lock_file, content='', age=RefreshLock.LIFETIME_SECONDS + 5)
