@@ -47,7 +47,8 @@ import time
 
 import pytest
 
-from resources.lib.auth import refresh as refresh_module, store
+from resources.lib.auth import (device_code, errors, refresh as refresh_module,
+                                store)
 from resources.lib.auth.lock import RefreshLock
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -669,3 +670,283 @@ def test_two_processes_adopt_rather_than_both_exchange(
         'exchanges': 0,
         'refresh_token': 'rotated-by-parent',
     }
+
+
+# ---------------------------------------------------------------------------
+# A lost race, a dead grant, and a dead network are three different things
+# ---------------------------------------------------------------------------
+
+def refused(code, error='invalid_grant'):
+    """A refusal in the shape the token endpoint actually sends one.
+
+    The description is a paragraph with the code buried in it, because that is
+    the only place the provider puts it -- there is no structured field -- and
+    a tidied one-line version would not prove the extraction survives.
+    """
+    return 400, {
+        'error': error,
+        'error_description':
+            '%s: The provided value for the input parameter refresh_token is '
+            'not valid. Trace ID: 0e4a2f1c-1111-2222-3333-444455556666 '
+            'Correlation ID: 7f3d9a55-aaaa-bbbb-cccc-ddddeeeeffff Timestamp: '
+            '2026-08-23 04:11:22Z\r\n'
+            'https://login.microsoftonline.com/error?code=%s'
+            % (code, code[len('AADSTS'):]),
+        'error_codes': [int(code[len('AADSTS'):])],
+    }
+
+
+def winner_writes_then(token_file, blob, response):
+    """A port that writes somebody else's result before answering.
+
+    This is the double-break case in one callable: two contenders both judged
+    the lock stale, the other one redeemed the refresh token and wrote while
+    this one was mid-request, and the provider then answers this one that the
+    grant it was given is not valid -- because it has been rotated.
+    """
+    def post(url, fields):
+        store.write(token_file, blob)
+        return response
+    return post
+
+
+def test_an_invalid_grant_whose_store_moved_on_is_adopted_not_a_sign_out(
+        profile, token_file, lock_file, signed_in):
+    """Half of AUTH-15, and the half that matters.
+
+    The provider said the grant is invalid. The store says the refresh token
+    has been replaced since this attempt began. That is a lost race, not a dead
+    grant, and turning it into a sign-in prompt converts a harmless collision
+    into the exact failure the whole locking design exists to avoid.
+    """
+    post = winner_writes_then(
+        token_file,
+        dict(signed_in, access_token='access-by-winner',
+             refresh_token='rotated-by-winner'),
+        refused('AADSTS700082'))
+
+    result = refresh_module.refresh(profile, ACCOUNT, new_lock(lock_file),
+                                    post, no_wait)
+
+    assert result.outcome == refresh_module.SUCCEEDED
+    assert result.outcome != refresh_module.NEEDS_REAUTHORISATION
+    assert result.adopted is True
+    assert result.exchanged is True
+    assert result.blob['refresh_token'] == 'rotated-by-winner'
+    assert stored(token_file)['refresh_token'] == 'rotated-by-winner'
+
+
+def test_an_invalid_grant_against_a_byte_identical_stored_token_is_a_dead_grant(
+        profile, token_file, lock_file, signed_in):
+    """The other half. Same response, same code, same everything except what
+    the store says -- and the store is the whole test."""
+    post = RecordingPost(refused('AADSTS700082'))
+
+    result = refresh_module.refresh(profile, ACCOUNT, new_lock(lock_file),
+                                    post, no_wait)
+
+    assert result.outcome == refresh_module.NEEDS_REAUTHORISATION
+    assert result.adopted is False
+    assert stored(token_file)['refresh_token'] == 'refresh-token-0', \
+        'a refusal changed the stored token'
+
+
+def test_the_two_invalid_grant_branches_are_told_apart_by_the_store_alone(
+        profile, token_file, lock_file, signed_in):
+    """Stated as one assertion because it is one idea: the response is not
+    evidence, and the disk is."""
+    moved_on = refresh_module.refresh(
+        profile, ACCOUNT, new_lock(lock_file),
+        winner_writes_then(token_file,
+                           dict(signed_in, access_token='access-by-winner',
+                                refresh_token='rotated-by-winner'),
+                           refused('AADSTS700082')),
+        no_wait)
+
+    store.write(token_file, dict(signed_in))
+    unchanged = refresh_module.refresh(profile, ACCOUNT, new_lock(lock_file),
+                                       RecordingPost(refused('AADSTS700082')),
+                                       no_wait)
+
+    assert (moved_on.outcome, unchanged.outcome) == (
+        refresh_module.SUCCEEDED, refresh_module.NEEDS_REAUTHORISATION)
+
+
+def test_a_store_that_moved_on_to_the_same_token_is_still_a_dead_grant(
+        profile, token_file, lock_file, signed_in):
+    """Byte-identical, so it did not move. A comparison that only checked
+    whether the file had been rewritten would pass here and sign nobody out --
+    while a genuinely dead grant would then retry forever."""
+    post = winner_writes_then(token_file, dict(signed_in),
+                              refused('AADSTS700082'))
+
+    result = refresh_module.refresh(profile, ACCOUNT, new_lock(lock_file),
+                                    post, no_wait)
+
+    assert result.outcome == refresh_module.NEEDS_REAUTHORISATION
+
+
+# ---------------------------------------------------------------------------
+# A transport failure is not a grant failure (AUTH-16, Pitfall E)
+# ---------------------------------------------------------------------------
+
+def transport_failures():
+    """Every way the network can fail to produce a protocol answer.
+
+    Each of these must leave the account exactly as it was. A box that starts
+    before its Wi-Fi, a router mid-reboot and a captive portal all arrive here,
+    and every one of them that produced a sign-in prompt would be asking the
+    user to fix something that is already fixing itself.
+    """
+    def no_route(url, fields):
+        raise OSError('[Errno 101] Network is unreachable')
+
+    def name_resolution(url, fields):
+        raise OSError('[Errno -2] Name or service not known')
+
+    def captive_portal(url, fields):
+        # The HTTP port's sentinel for a body that would not parse as JSON.
+        return 200, {'error': device_code.NON_JSON_ERROR}
+
+    def provider_having_a_moment(url, fields):
+        return 503, {'error': 'temporarily_unavailable'}
+
+    def provider_internal_error(url, fields):
+        return 500, {'error': 'server_error'}
+
+    return [
+        pytest.param(no_route, id='no-route'),
+        pytest.param(name_resolution, id='name-resolution'),
+        pytest.param(captive_portal, id='captive-portal'),
+        pytest.param(provider_having_a_moment, id='temporarily-unavailable'),
+        pytest.param(provider_internal_error, id='server-error'),
+    ]
+
+
+@pytest.mark.parametrize('post', transport_failures())
+def test_a_transport_failure_is_transient_and_marks_nothing(
+        post, profile, token_file, lock_file, signed_in):
+    result = refresh_module.refresh(profile, ACCOUNT, new_lock(lock_file),
+                                    post, no_wait)
+
+    assert result.outcome == refresh_module.TRANSIENT
+    assert result.outcome != refresh_module.NEEDS_REAUTHORISATION
+    assert stored(token_file) == signed_in, \
+        'a transport failure changed the stored blob'
+
+
+# ---------------------------------------------------------------------------
+# The refusal is classified through the table plan 03-05 built
+# ---------------------------------------------------------------------------
+
+def test_a_dead_grant_is_classified_through_the_failure_table(
+        profile, token_file, lock_file, signed_in):
+    """One place in the tree knows what a provider code means. The browse
+    phase's requirement to distinguish failure states inherits this
+    classification rather than inventing a second one."""
+    post = RecordingPost(refused('AADSTS53003'))
+
+    result = refresh_module.refresh(profile, ACCOUNT, new_lock(lock_file),
+                                    post, no_wait)
+
+    assert result.outcome == refresh_module.NEEDS_REAUTHORISATION
+    assert result.failure == errors.Failure(
+        errors.BLOCKED_BY_CONDITIONAL_ACCESS, 'AADSTS53003', True)
+
+
+def test_an_unmapped_refusal_still_carries_its_bare_code(
+        profile, token_file, lock_file, signed_in):
+    """`AADSTS700082` is the inactivity expiry -- the very failure the
+    proactive refresh exists to prevent -- and it is not in the table. A code a
+    person can read off a television and quote is worth more than a friendly
+    sentence that hides it."""
+    post = RecordingPost(refused('AADSTS700082'))
+
+    result = refresh_module.refresh(profile, ACCOUNT, new_lock(lock_file),
+                                    post, no_wait)
+
+    assert result.failure.outcome == errors.UNMAPPED
+    assert result.failure.code == 'AADSTS700082'
+
+
+def test_a_successful_refresh_carries_no_failure(
+        profile, token_file, lock_file, signed_in):
+    result = refresh_module.refresh(profile, ACCOUNT, new_lock(lock_file),
+                                    RecordingPost(rotated(1)), no_wait)
+
+    assert result.failure is None
+
+
+# ---------------------------------------------------------------------------
+# The startup check (AUTH-16)
+# ---------------------------------------------------------------------------
+
+DAY = 86400.0
+
+
+def blob_issued(days_ago, now=1000000.0, **overrides):
+    answer = {'access_token': 'access-token-0',
+              'refresh_token': 'refresh-token-0',
+              'issued_at': now - days_ago * DAY}
+    answer.update(overrides)
+    return answer
+
+
+def test_the_startup_check_skips_a_recently_issued_blob():
+    """Refreshing on every start also works and is simpler. It is not free:
+    every write is a chance to leave a temporary file behind on a device that
+    gets power-cut rather than shut down."""
+    assert refresh_module.should_refresh(blob_issued(1), now=1000000.0) is False
+
+
+def test_the_startup_check_takes_an_old_blob():
+    assert refresh_module.should_refresh(blob_issued(80), now=1000000.0) is True
+
+
+def test_the_startup_check_treats_a_missing_issue_time_as_old():
+    """A blob written before the field existed is of unknown age, and unknown
+    must mean refresh. Assuming it is fresh is the assumption that ends with an
+    expired grant and nothing to show for it."""
+    blob = blob_issued(1, now=1000000.0)
+    del blob['issued_at']
+
+    assert refresh_module.should_refresh(blob, now=1000000.0) is True
+
+
+def test_the_startup_check_declines_a_blob_with_nothing_to_refresh():
+    """An account that has never signed in has no grant to spend. Answering
+    True here would send the service to the network on every start and mark the
+    account on every failure."""
+    assert refresh_module.should_refresh({}, now=1000000.0) is False
+    assert refresh_module.should_refresh({'access_token': 'a'},
+                                         now=1000000.0) is False
+
+
+def test_the_startup_check_takes_a_blob_exactly_on_the_threshold():
+    """The boundary belongs on the refreshing side. A blob that is exactly at
+    the threshold on one start is past it on the next, so the only thing this
+    choice changes is which start does the work -- and the earlier one is the
+    one with more of the window left."""
+    assert refresh_module.should_refresh(
+        blob_issued(refresh_module.REFRESH_AFTER_DAYS,
+                    now=1000000.0), now=1000000.0) is True
+
+
+def test_the_threshold_sits_well_inside_the_ninety_day_window():
+    """Not at the edge. A threshold near ninety leaves no room for a device
+    that is switched on rarely: the whole point is that a box used once every
+    few months still refreshes before the window closes."""
+    assert refresh_module.REFRESH_TOKEN_LIFETIME_DAYS == 90
+    assert 0 < refresh_module.REFRESH_AFTER_DAYS <= (
+        refresh_module.REFRESH_TOKEN_LIFETIME_DAYS / 2), \
+        'the threshold (%s days) is not well inside the %s-day window' % (
+            refresh_module.REFRESH_AFTER_DAYS,
+            refresh_module.REFRESH_TOKEN_LIFETIME_DAYS)
+
+
+def test_the_threshold_records_its_arithmetic():
+    """The number is a judgement, and a judgement with no reasoning beside it
+    is a number the next reader will change to a rounder one."""
+    source = read_source('resources/lib/auth/refresh.py')
+    assert 'REFRESH_TOKEN_LIFETIME_DAYS' in source
+    assert 'ninety' in source or '90' in source
