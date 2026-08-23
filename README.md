@@ -78,6 +78,23 @@ Get that file onto the television — a USB stick, or a share added in Kodi's ow
 then install it with **Add-ons → Install from zip file**. Kodi refuses that until
 **Settings → System → Add-ons → Unknown sources** is on.
 
+### On Android: if Kodi shows the folders on your USB drive but none of the files
+
+Give Kodi's Android file permission the **"Allow all the time"** setting, not "Allow only while
+using the app": Android **Settings → Apps → Kodi → Permissions → Files and media**. Then browse to
+the drive again and the zip will be there.
+
+Under the default permission Kodi lists **directories** on external storage and shows **no files
+inside them at all**. There is no error, no prompt and nothing in the interface that mentions a
+permission — an empty listing looks exactly like an empty folder, which is why this costs a
+debugging session rather than a moment. Seen on a TCL television running Android TV 12 with Kodi
+21.2, and it stopped the install until the permission was changed.
+
+Installing **from a URL does not work** on Android TV, so a USB stick or a file-manager share is
+the route. Kodi's *add source* browse needs a directory listing, which a plain file URL does not
+provide, and adding a repository is not a way round it because installing a repository is itself a
+zip install.
+
 ## Attribution
 
 This add-on is not original work. It is a fork of **`plugin.onedrive`** by **Carlos Guzman**

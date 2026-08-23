@@ -287,6 +287,17 @@ Phase 1 Android 11 emulator could not have produced it.
 which 03-12 owns and which does not mention it. Every future device session pays this
 cost again if it is not written down there.
 
+*Closed 2026-08-23.* Phase-3 verification pointed out that this was the only item in
+this file assigned to an artefact the phase had already finished with: 03-12 is
+complete, so naming it as the owner left the item with no forward owner at all,
+unlike the items forward-assigned to "whoever next edits X". It is now written into
+`README.md`'s build-and-install section — under a heading phrased as the symptom, *if
+Kodi shows the folders on your USB drive but none of the files*, because a reader
+hitting this does not know it is a permission problem and would not look under one.
+The install-by-URL failure (item 16) is stated in the same place for the same reason:
+both are things a person meets while trying to get the zip onto the television, and
+that is the paragraph they are standing in when it happens.
+
 **16. Installing by URL is not viable on this device. Belongs to Phase 5 (Distribution).**
 
 Attempted during the run and it does not work. Kodi's *add source* browse needs a
