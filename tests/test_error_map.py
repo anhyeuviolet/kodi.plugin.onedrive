@@ -186,6 +186,41 @@ def test_an_unmapped_failure_never_claims_an_administrator_must_act():
 
 
 # ---------------------------------------------------------------------------
+# The whole error body
+# ---------------------------------------------------------------------------
+
+def test_a_body_with_only_an_error_codes_array_still_routes():
+    # Observed live during the spike: a rejected device code came back as
+    # invalid_grant with error_codes [7000014]. A body whose description is
+    # missing or truncated by a proxy still names the refusal in that array,
+    # and reading it is the difference between a sentence and nothing.
+    body = {'error': 'invalid_grant', 'error_codes': [7000014]}
+    failure = errors.classify_response(body)
+    assert failure.outcome == errors.DEVICE_CODE_REJECTED
+    assert failure.code == 'AADSTS7000014'
+
+
+def test_the_description_wins_over_the_error_codes_array():
+    body = {'error': 'invalid_client',
+            'error_description': REAL_7000218,
+            'error_codes': [7000014]}
+    assert errors.classify_response(body).code == 'AADSTS7000218'
+
+
+def test_a_body_with_neither_source_yields_the_unmapped_outcome():
+    failure = errors.classify_response({'error': 'invalid_grant'})
+    assert failure.outcome == errors.UNMAPPED
+    assert failure.code == ''
+
+
+def test_a_body_that_is_not_a_mapping_does_not_raise():
+    for payload in (None, '', [], REAL_53003):
+        failure = errors.classify_response(payload)
+        assert failure._fields == ('outcome', 'code', 'admin_must_act')
+    assert errors.classify_response(REAL_53003).code == 'AADSTS53003'
+
+
+# ---------------------------------------------------------------------------
 # The administrator family
 # ---------------------------------------------------------------------------
 
