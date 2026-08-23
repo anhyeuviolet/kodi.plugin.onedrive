@@ -24,6 +24,8 @@ speaking, that the continue set is an allow-list, and that the identity token is
 read for display only.
 """
 
+import pytest
+
 from resources.lib.auth import device_code, store
 
 
@@ -123,12 +125,143 @@ def test_continue_set_has_exactly_two_members(responses):
         ('authorization_pending', 'slow_down'))
 
 
+def test_an_error_code_that_exists_in_no_reference_is_terminal(fake_endpoint,
+                                                               responses):
+    """AUTH-09, and the assertion that makes the allow-list an allow-list
+    rather than a stop-list with extra steps.
+
+    Microsoft returns codes that appear in neither RFC 8628 nor the Entra
+    documentation. Under a stop-list every one of them continues the loop, so
+    the add-on polls a live endpoint forever on a failure it will never
+    recover from.
+    """
+    invented = 'AADSTS_this_code_exists_in_no_reference'
+    assert invented not in device_code.CONTINUE_ON
+
+    post = fake_endpoint(responses.terminal(invented))
+    state, payload = device_code.poll_once(post, device_code.CLIENT_ID, 'dc')
+
+    assert state == device_code.TERMINAL
+    assert payload['error'] == invented
+
+
+def test_an_empty_error_code_is_terminal(fake_endpoint, responses):
+    """A 400 with no error field at all is still not one of the two."""
+    post = fake_endpoint((400, {'error_description': 'something went wrong'}))
+    state, _payload = device_code.poll_once(post, device_code.CLIENT_ID, 'dc')
+
+    assert state == device_code.TERMINAL
+
+
+def test_slow_down_raises_the_interval_by_five(responses):
+    assert device_code.next_interval(5, device_code.SLOW_DOWN) == 10
+
+
+def test_a_pending_poll_leaves_the_interval_alone(responses):
+    assert device_code.next_interval(5, device_code.PENDING) == 5
+    assert device_code.next_interval(10, device_code.PENDING) == 10
+
+
+def test_the_slow_down_increase_is_permanent(fake_endpoint, responses):
+    """RFC 8628 section 3.5: the interval is increased by five seconds "for
+    this and all subsequent requests". The permanence is the whole point -- a
+    per-poll recomputation from the server's original interval would undo it on
+    the very next tick and the endpoint would throttle the add-on again."""
+    post = fake_endpoint(
+        responses.pending(),
+        responses.slow_down(),
+        responses.pending(),
+        responses.pending(),
+    )
+
+    interval = device_code.DEFAULT_INTERVAL
+    seen = []
+    for _ in range(4):
+        state, _payload = device_code.poll_once(
+            post, device_code.CLIENT_ID, 'dc')
+        interval = device_code.next_interval(interval, state)
+        seen.append(interval)
+
+    assert seen == [5, 10, 10, 10], \
+        'the interval came back down after the slow_down: %s' % seen
+
+
+def test_a_400_that_will_not_parse_is_a_transport_failure(fake_endpoint):
+    """The protocol answers in JSON. A body that is not JSON did not come from
+    the protocol -- it is a captive portal, a proxy error page or a truncated
+    response -- and it must surface as a transport failure rather than as a
+    terminal protocol error.
+
+    The distinction is not cosmetic: a terminal protocol error means the grant
+    is dead and the account needs re-authorising, while a transport failure
+    means the network is having a moment. Collapsing the two signs the user out
+    because their Wi-Fi dropped.
+    """
+    post = fake_endpoint((400, {
+        'error': device_code.NON_JSON_ERROR,
+        'raw': '<html><title>502 Bad Gateway</title>',
+    }))
+
+    with pytest.raises(device_code.TransportError):
+        device_code.poll_once(post, device_code.CLIENT_ID, 'dc')
+
+
+def test_a_transport_failure_is_not_in_the_continue_set():
+    """It must not loop either. Raising is what makes that unambiguous."""
+    assert device_code.NON_JSON_ERROR not in device_code.CONTINUE_ON
+
+
 def test_scope_string_is_the_locked_set():
     """AUTH-04, D-01. Exact, because this is the requested scope -- the string
     the add-on sends. The granted string that comes back is a different
     question and is never compared for equality."""
     assert device_code.SCOPES == (
         'https://graph.microsoft.com/Files.Read offline_access openid profile')
+
+
+def test_requested_scope_by_membership():
+    """AUTH-04, by membership on a split rather than on the whole string, so
+    the assertion says which permission it objects to."""
+    requested = device_code.SCOPES.split()
+
+    assert set(requested) == {
+        'https://graph.microsoft.com/Files.Read',
+        'offline_access',
+        'openid',
+        'profile',
+    }
+
+
+def test_no_write_broad_or_application_wide_grant_is_requested():
+    """The consent screen the user reads on a TV is the whole of what they can
+    judge. Anything here that is not read-only on files is a promise the add-on
+    made and cannot keep."""
+    for forbidden in ('.default', '.All', 'ReadWrite', '.Write', 'Sites.',
+                      'Directory.', 'Mail.', 'User.Read.All'):
+        assert forbidden not in device_code.SCOPES, \
+            '%r is in the requested scope' % forbidden
+
+
+def test_a_granted_scope_is_only_ever_tested_by_membership(responses):
+    """Both strings here were measured, one per account class. They differ in
+    membership -- Entra adds `email` for work/school without being asked -- and
+    in ordering, and neither contains `offline_access` even though every run
+    issued a refresh token. Any equality or prefix check on a granted scope is
+    a bug waiting for the other account class."""
+    business = responses.granted_scope_business
+    personal = responses.granted_scope_personal
+
+    assert business != personal
+    assert not business.startswith(personal)
+    assert not personal.startswith(business)
+
+    # What is actually true of both, and the only shape of check that is.
+    for granted in (business, personal):
+        parts = set(granted.split())
+        assert 'https://graph.microsoft.com/Files.Read' in parts
+        assert 'offline_access' not in parts, \
+            'the absence of offline_access from the granted scope is normal ' \
+            'and must never be read as a failure to get a refresh token'
 
 
 def test_one_authority_serves_both_account_classes():
