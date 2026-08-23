@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 03
 current_phase_name: authentication
 status: executing
-stopped_at: Completed 03-10-PLAN.md
-last_updated: "2026-08-23T05:38:25.854Z"
+stopped_at: Completed 03-11-PLAN.md
+last_updated: "2026-08-23T05:55:54.971Z"
 last_activity: 2026-08-23
 last_activity_desc: Phase 03 execution started
 progress:
   total_phases: 2
   completed_phases: 1
   total_plans: 21
-  completed_plans: 16
+  completed_plans: 18
 ---
 
 # Project State
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-08-22)
 ## Current Position
 
 Phase: 03 (authentication) — EXECUTING
-Plan: 11 of 14
+Plan: 12 of 14
 Status: Ready to execute
 stands, its Windows rows were descoped because Windows is not a target. Phase criterion 2 (the Kodi
 19/20/21/22 install matrix) is therefore **unmet by decision, not satisfied**, and KODI-02 stays unchecked.
@@ -38,7 +38,7 @@ against the tree, KODI-01 and SETUP-06 carry inline qualifications, and the ROAD
 broker" parenthetical was corrected to the measurement.
 Last activity: 2026-08-23 — Phase 03 execution started
 
-Progress: [████████░░] 76%
+Progress: [█████████░] 86%
 
 ## Performance Metrics
 
@@ -81,6 +81,7 @@ Progress: [████████░░] 76%
 | Phase 03 P08 | 22m | 3 tasks | 6 files |
 | Phase 03 P09 | 3h22m | 3 tasks | 12 files |
 | Phase 03 P10 | 16m | 2 tasks | 4 files |
+| Phase 03 P11 | 26m | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -163,6 +164,11 @@ Load-bearing choices for current work:
 - [Phase ?]: The startup keepalive is a service in the runner's list rather than a call before it: ServiceUtil.run starts each service once in its own daemon thread, so the token exchange delays no listener and the shutdown observation comes for free
 - [Phase ?]: The startup refresh takes one lock attempt of ten seconds against the plugin's three of thirty: a held lock means somebody else is already refreshing this account, so the right answer is the next pass rather than contention
 - [Phase ?]: The needs_reauth literal is written out twice rather than imported, because importing the account list would drag every dialog in the add-on into the service's import closure; a static assertion holds the two equal
+- [Phase ?]: The settings schema conversion was pulled out of Phase 7 into Phase 3: the <level> element AUTH-19 needs exists only in the versioned schema, so the requirement was unimplementable against the old file
+- [Phase ?]: resume_playing and save_resume_watched are declared at Advanced, not Basic. Their Krypton visibility condition was constantly false on any supported Kodi, so dropping it as KODI-06 requires would otherwise have put two settings that do nothing in front of an ordinary user
+- [Phase ?]: The stale-settings-row assertion was widened to read the <data> child as well as the action attribute. The versioned schema has no action attribute, so left alone the assertion would have kept running and stopped being able to fail
+- [Phase ?]: client_id declares allowempty, because empty is the value that means 'use the built-in registration' and without it the keyboard dialog will not accept the setting's own default
+- [Phase ?]: Only AUTH-19, KODI-05, KODI-06 and KODI-08 were marked Complete by 03-11. AUTH-02, AUTH-18 and AUTH-23 are declared by later plans and stay Pending
 
 ### Pending Todos
 
@@ -206,6 +212,6 @@ Open concerns:
 
 ## Session Continuity
 
-Last session: 2026-08-23T05:38:25.838Z
-Stopped at: Completed 03-10-PLAN.md
+Last session: 2026-08-23T05:53:23.959Z
+Stopped at: Completed 03-11-PLAN.md
 Resume file: None

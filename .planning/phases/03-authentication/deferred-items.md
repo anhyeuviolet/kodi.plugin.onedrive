@@ -65,3 +65,36 @@ settings dialog, and `test_vendor_gates.py` already asserts no row does that,
 because the separate module no longer exists. 03-09 left it out of the action
 mapping rather than deleting it: deleting a method is `03-12`'s kind of change
 to the vendored tree, and the modification record is that plan's file.
+
+## Found during 03-11
+
+**6. `VENDORED.md:245` describes the error reporter in the present tense.**
+
+It reads that the reporter "posts a stack trace to the same broker as the
+sign-in flow" and "is gated on the `report_error` setting". 03-09 deleted the
+module and 03-11 deleted the setting, so both clauses are now history written as
+if it were current. No gate catches it: `report_error` is not one of the broker
+literals, and `VENDORED.md` is excluded from the sweeps precisely so it may name
+what was removed.
+
+Not corrected here: `VENDORED.md` is the modification record and **03-12 owns
+it**, with 03-08's and 03-09's Vendored Tree Changes sections already queued as
+that plan's input. This is one more line for the same pass, and the shape the
+correction should take is the one `test_the_replaced_flow_is_named_in_the_two_excluded_documents`
+already asks of `README.md` and `VENDORED.md`: say it as past.
+
+**7. Two settings rows survive that nothing on a supported Kodi can reach.**
+
+`resume_playing` and `save_resume_watched` are read only inside the branch that
+tests the `iskrypton` home-window property, and that property is set only when
+`System.BuildVersion` starts with `17.`. This add-on requires Kodi 20, so the
+branch is dead and so are the two settings. The old file kept them off the
+screen with a visibility condition naming that property; KODI-06 removes the
+condition, so 03-11 declared both at Advanced instead — the same effect for an
+ordinary user, without a condition that lies about why.
+
+Deleting them belongs with deleting the branch that reads them, in
+`service/player.py` and `ui/addon.py`. That is a vendored-tree deletion of the
+same class as `KODI-07`'s, and it is **not** in any Phase 3 plan. Recorded so
+that the pair, their two strings (30011 and 30018) and the three `iskrypton`
+call sites are removed together rather than one at a time.

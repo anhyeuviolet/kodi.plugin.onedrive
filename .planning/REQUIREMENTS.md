@@ -68,7 +68,7 @@ This narrowing is known to cost no future work on the one place it could have. `
 - [x] **AUTH-16**: A proactive refresh runs on Kodi startup well inside the 90-day refresh-token lifetime
 - [ ] **AUTH-17**: The background service never opens a sign-in dialog; only the plugin may prompt interactively
 - [ ] **AUTH-18**: A tenant that blocks the app produces a specific message naming the cause and pointing at the custom `client_id` setting — not a generic failure
-- [ ] **AUTH-19**: A custom `client_id` setting exists at Expert level, empty by default
+- [x] **AUTH-19**: A custom `client_id` setting exists at Expert level, empty by default
 - [x] **AUTH-20**: Multiple accounts are supported, with tokens, delta tokens, and cache keys isolated per account
 - [x] **AUTH-21**: Account labels come from Graph; no account name is ever typed on a remote
 - [ ] **AUTH-22**: The add-on root is the account list, with an "Add an account…" row and a per-row context menu offering re-authorise and remove
@@ -111,10 +111,10 @@ This narrowing is known to cost no future work on the one place it could have. `
 - [x] **KODI-02**: The add-on installs and runs on Kodi 20 Nexus, 21 Omega, and 22 Piers. **Narrowed by decision on 2026-08-23 and deliberately left unchecked**: the multi-version install matrix was dropped along with the Windows leg, because this add-on targets one device — a TCL television running Android TV 12 — and backwards compatibility across Kodi versions is not being pursued. Uncontrolled logs from an interrupted run show Kodi 20.5 and 22.0-BETA1 installing the zip and starting both entry points, but that is not an acceptance pass and is not treated as one. If the requirement is still wanted, it is verified at the release stage; see `.planning/phases/01-vendor-lift/01-07-SUMMARY.md`
 - [ ] **KODI-03**: List items use typed InfoTag setters, and this lands in the same commit as the integer-duration fix
 - [ ] **KODI-04**: A full browse-and-play `kodi.log` contains zero `is deprecated` warnings from this add-on
-- [ ] **KODI-05**: `resources/settings.xml` uses the `<settings version="1">` schema with section, category, and group structure
-- [ ] **KODI-06**: Krypton-era visibility conditions are gone
+- [x] **KODI-05**: `resources/settings.xml` uses the `<settings version="1">` schema with section, category, and group structure
+- [x] **KODI-06**: Krypton-era visibility conditions are gone
 - [ ] **KODI-07**: The `SourceService`, its HTML index, and both the `allow_directory_listing` and `port_directory_listing` settings are deleted from the codebase
-- [ ] **KODI-08**: Third-party error reporting code and the `report_error` setting are deleted; errors go to `kodi.log` only
+- [x] **KODI-08**: Third-party error reporting code and the `report_error` setting are deleted; errors go to `kodi.log` only
 
 ### Release readiness
 
@@ -233,7 +233,7 @@ Cross-cutting notes. `CI-06` (per-phase manual acceptance on the TCL Android TV 
 | AUTH-16 | Phase 3 | Complete |
 | AUTH-17 | Phase 3 | Pending |
 | AUTH-18 | Phase 3 | Pending |
-| AUTH-19 | Phase 3 | Pending |
+| AUTH-19 | Phase 3 | Complete |
 | AUTH-20 | Phase 3 | Complete |
 | AUTH-21 | Phase 3 | Complete |
 | AUTH-22 | Phase 3 | Pending |
@@ -267,10 +267,10 @@ Cross-cutting notes. `CI-06` (per-phase manual acceptance on the TCL Android TV 
 | KODI-02 | Phase 1 | Narrowed — not met, moved out of Phase 1 |
 | KODI-03 | Phase 7 | Pending |
 | KODI-04 | Phase 7 | Pending |
-| KODI-05 | Phase 7 | Pending |
-| KODI-06 | Phase 7 | Pending |
+| KODI-05 | Phase 3 | Complete |
+| KODI-06 | Phase 3 | Complete |
 | KODI-07 | Phase 7 | Pending |
-| KODI-08 | Phase 7 | Pending |
+| KODI-08 | Phase 3 | Complete |
 | CI-01 | Phase 2 | Pending |
 | CI-02 | Phase 2 | Pending |
 | CI-03 | Phase 2 | Pending |
