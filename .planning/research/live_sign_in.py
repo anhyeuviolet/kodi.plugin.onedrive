@@ -32,16 +32,22 @@ WHAT COMES OUT OF THIS, and what has to be written down afterwards:
     fallback the label path uses when `name` is absent, whose field was never
     transcribed from the original spike
   * the `expires_in` returned for each of the three tokens
-  * the three refresh-token prefixes, in order
+  * the three refresh-token digests, in order
 
-THE STOP CONDITION: if any two of the three refresh-token prefixes match, the
+THE STOP CONDITION: if any two of the three refresh-token digests match, the
 rotation is not reaching disk. Stop and fix it. That is the phase's
 highest-consequence requirement and its breakage is invisible for ninety days.
 
+A digest over the whole token, and emphatically not `refresh.fingerprint` --
+that is a log redactor whose eight characters cannot separate tokens sharing a
+long constant leading run, which these do. See `rotation_digest`.
+
 Real credentials touch the disk while this runs. They are written to a scratch
 directory OUTSIDE this repository -- never to a Kodi profile -- and removed
-again at the end unless --keep-tokens says otherwise. Only eight-character
-prefixes are ever printed.
+again at the end unless --keep-tokens says otherwise. Nothing reversible back
+to a token is ever printed.
+
+Exit status: 0 rotation proved, 1 rotation disproved, 2 nothing measured.
 
 Usage:
     python .planning/research/live_sign_in.py
@@ -50,6 +56,7 @@ Usage:
 """
 
 import argparse
+import hashlib
 import json
 import os
 import shutil
@@ -95,6 +102,70 @@ DEFAULT_SCRATCH = os.path.join(tempfile.gettempdir(),
 #: be confused for one another -- they want opposite exit statuses, and a
 #: harness that exits non-zero on success teaches its user to ignore the status.
 STOPPED = object()
+
+# ---------------------------------------------------------------------------
+# Telling three refresh tokens apart
+#
+# NOT `refresh.fingerprint`. That function is a LOG REDACTOR: eight leading
+# characters, chosen so a Kodi log a user pastes into a public forum cannot
+# carry a credential. Its eight-character contract is deliberate and shipped
+# code depends on it, so it is not touched here.
+#
+# It is simply the wrong instrument for this question. Microsoft refresh tokens
+# share a long constant leading run -- a live run produced `1.AXEAuM` as the
+# first eight characters of three tokens that were genuinely different -- so
+# eight characters render all three identically. A comparison built on it can
+# neither prove rotation nor disprove it, which is worse than having no check:
+# its FAIL is uninformative and its PASS is unearned.
+#
+# This is the same error 03-08 caught inside the redactor itself, where a
+# 9-character user_code redacted to 8 characters became the live code with a
+# typo. Prefix length is load-bearing, and a value chosen for one purpose does
+# not transfer to another.
+#
+# A digest over the WHOLE token discriminates on every byte, is not reversible,
+# and is safe to print. Twelve hex characters is 48 bits: far past any chance of
+# collision between three values, and useless to anybody who sees it.
+# ---------------------------------------------------------------------------
+ROTATION_DIGEST_CHARACTERS = 12
+
+#: The leading run measured on this registration's tokens, kept as evidence for
+#: why the redactor's eight characters cannot answer the rotation question.
+MEASURED_SHARED_PREFIX = '1.AXEAuM'
+
+
+def rotation_digest(token):
+    """A non-reversible digest of the whole of `token`, plus its length.
+
+    Returns (digest, length), or (None, 0) if there is no token.
+
+    The guard is the point of the function existing at all. Anything already
+    shortened -- a redaction from `refresh.fingerprint`, which ends in '...' --
+    is REFUSED rather than digested, because digesting a redaction produces a
+    stable-looking value that discriminates exactly as badly as the redaction
+    did while looking authoritative. That is the failure this whole function
+    replaces, and it must not be reachable by a second road.
+    """
+    if not token:
+        return None, 0
+
+    if token.endswith('...') or len(token) <= refresh.FINGERPRINT_CHARACTERS:
+        raise ValueError(
+            'refusing to digest %r: it is a redaction, not a token. The '
+            'rotation check must see full-length tokens -- %d characters '
+            'cannot separate tokens that share %r.'
+            % (token, refresh.FINGERPRINT_CHARACTERS, MEASURED_SHARED_PREFIX))
+
+    digest = hashlib.sha256(token.encode('utf-8')).hexdigest()
+    return 'sha256:' + digest[:ROTATION_DIGEST_CHARACTERS], len(token)
+
+
+#: The three readings `verdict` can give. Three and not two, because a binary
+#: verdict computed from a non-discriminating input is precisely what produced a
+#: confident FAIL on a run that had proved nothing either way.
+PASS = 'pass'
+FAIL = 'fail'
+INCONCLUSIVE = 'inconclusive'
 
 
 def banner(text):
@@ -372,10 +443,31 @@ def rotate(profile, account_key, client_id, first_token):
     print('  wrote the first blob to the scratch profile')
     print('  (%s, keyed on the subject claim)' % profile)
 
-    prefixes = [refresh.fingerprint(blob.get('refresh_token'))]
-    expiries = [blob.get('expires_in')]
-    print('\n  refresh token #1 : %s   (expires_in %s)'
-          % (prefixes[0], expiries[0]))
+    # Digests over the whole token, never the shipped redactor's eight leading
+    # characters -- see `rotation_digest`. The length is carried alongside and
+    # printed, so the output itself shows what each digest was computed over
+    # rather than asking a reader to trust that it was the full value.
+    digests = []
+    lengths = []
+    expiries = []
+
+    def record(label, blob_, note=''):
+        digest, length = rotation_digest(blob_.get('refresh_token'))
+        digests.append(digest)
+        lengths.append(length)
+        expiries.append(blob_.get('expires_in'))
+        if digest is None:
+            print('  refresh token %s : ABSENT' % label)
+        else:
+            print('  refresh token %s : %s  (over %d characters, '
+                  'expires_in %s)%s'
+                  % (label, digest, length, expiries[-1], note))
+
+    print('\n  Each line below digests the WHOLE token. The shipped redactor\'s')
+    print('  eight characters are not shown: on this registration all three')
+    print('  tokens begin %r, so eight characters cannot tell them apart.'
+          % MEASURED_SHARED_PREFIX)
+    record('#1', blob)
 
     lock = RefreshLock(store.lock_path(profile, account_key),
                        'live-harness-%d' % os.getpid(), sleep)
@@ -390,35 +482,53 @@ def rotate(profile, account_key, client_id, first_token):
             if result.failure is not None:
                 print('  the shipped error table calls this: %r'
                       % (result.failure,))
-            return prefixes, expiries, False
+            return digests, expiries, False
 
-        prefixes.append(refresh.fingerprint(result.blob.get('refresh_token')))
-        expiries.append(result.blob.get('expires_in'))
-        print('  refresh token #%d : %s   (expires_in %s)%s'
-              % (round_number + 1, prefixes[-1], expiries[-1],
-                 '  [adopted]' if result.adopted else ''))
+        record('#%d' % (round_number + 1), result.blob,
+               '  [adopted]' if result.adopted else '')
 
-    return prefixes, expiries, True
+    return digests, expiries, True
 
 
-def verdict(prefixes):
-    """The stop condition, stated plainly."""
+def verdict(digests, complete):
+    """The stop condition, stated plainly. Returns PASS, FAIL or INCONCLUSIVE.
+
+    Three readings, because a binary verdict is only honest when its input can
+    actually separate the two cases. When the run did not produce three tokens
+    to compare, the answer is that nothing was measured -- not that rotation
+    failed. Reporting the second when the first is true sends somebody hunting
+    a bug in code that was never exercised.
+    """
     banner('THE ROTATION')
 
-    for index, prefix in enumerate(prefixes, start=1):
-        print('  #%d  %s' % (index, prefix))
+    for index, digest in enumerate(digests, start=1):
+        print('  #%d  %s' % (index, digest if digest else 'ABSENT'))
 
-    if len(set(prefixes)) == len(prefixes):
-        print('\n  PASS  all three differ. The provider rotates the refresh')
-        print('        token, and the rotated value is reaching disk through')
-        print('        the shipped store.')
-        return True
+    expected = REFRESH_ROUNDS + 1
 
-    print('\n  FAIL  two of these match. The rotation is NOT reaching disk.')
-    print('        Stop here. Every installation keeps working until the')
-    print('        original token hits its ninety-day lifetime, and then they')
-    print('        all fail on the same day with no code change to blame.')
-    return False
+    if not complete or len(digests) != expected or None in digests:
+        print('\n  INCONCLUSIVE  %d of %d tokens were observed. Rotation was'
+              % (len([d for d in digests if d]), expected))
+        print('                neither shown nor disproved; the run stopped')
+        print('                before it could be. Fix whatever ended it and')
+        print('                run again -- do not record this as a failure.')
+        return INCONCLUSIVE
+
+    if len(set(digests)) == expected:
+        print('\n  PASS  all %d digests differ, each computed over a whole'
+              % expected)
+        print('        token. The provider rotates the refresh token and the')
+        print('        rotated value is reaching disk through the shipped')
+        print('        store.')
+        return PASS
+
+    print('\n  FAIL  two of these digests match, and a digest over the whole')
+    print('        token matching means the tokens are byte-identical. The')
+    print('        rotation is NOT reaching disk. Stop here: every install')
+    print('        keeps working until the original token hits its ninety-day')
+    print('        lifetime, then they all fail on the same day with no code')
+    print('        change in the history to blame.')
+    return FAIL
 
 
 def main():
@@ -453,10 +563,10 @@ def main():
         return 1
 
     account_key = store.validate_account_key(subject)
-    prefixes, expiries, ok = rotate(profile, account_key, args.client_id, token)
+    digests, expiries, ok = rotate(profile, account_key, args.client_id, token)
 
     try:
-        rotated = verdict(prefixes) if ok else False
+        reading = verdict(digests, ok)
         print('\n  expires_in, in order: %s' % (expiries,))
         print('  They are expected to DIFFER: the provider randomises the')
         print('  lifetime deliberately, so a constant anywhere would be wrong')
@@ -471,7 +581,10 @@ def main():
             shutil.rmtree(profile, ignore_errors=True)
             print('\n  scratch profile removed; no live credential left behind')
 
-    return 0 if (ok and rotated) else 1
+    # Three statuses for the three readings. An inconclusive run is not a pass
+    # and is not a failure, and giving it either status is how it gets recorded
+    # as the wrong one.
+    return {PASS: 0, FAIL: 1, INCONCLUSIVE: 2}[reading]
 
 
 if __name__ == '__main__':

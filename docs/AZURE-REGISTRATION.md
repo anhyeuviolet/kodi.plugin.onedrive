@@ -197,10 +197,21 @@ default the scratch profile is deleted at the end. The scratch path is outside t
 the harness refuses both an in-repository path and anything that looks like a real Kodi profile —
 it deletes the account file it writes, so pointing it at a live profile would sign that account out.
 
-**The one result that matters:** it prints three refresh-token prefixes in order. *All three must
+**The one result that matters:** it prints three refresh-token digests in order. *All three must
 differ.* If any two match, the rotation is not reaching disk — stop, because every installation
 then keeps working until the original token reaches its ninety-day lifetime and they all fail on
 the same day with nothing in the history to blame.
+
+Those are SHA-256 digests over each whole token, and deliberately **not** the eight leading
+characters `refresh.fingerprint` prints into the Kodi log. That function is a redactor and its
+short length is the point of it; it is useless as a discriminator here, because the refresh tokens
+this registration issues share a long constant leading run — three genuinely different tokens all
+began `1.AXEAuM` on a measured run, so eight characters render them identically. The harness
+refuses to digest anything already shortened, so the two cannot be confused again.
+
+The exit status carries the same three readings the output does: `0` rotation proved, `1` rotation
+disproved, `2` nothing measured. An inconclusive run is not a failure and must not be recorded as
+one.
 
 Alongside that it prints the values that have to be written down, because they are measured facts
 that no documentation supplies: the granted scope string verbatim including its ordering, whether
