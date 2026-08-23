@@ -157,6 +157,13 @@ signed in to the wrong tenant.
 
 The registration is not proven by its manifest. It is proven by a sign-in.
 
+> **The two harnesses named in this section are not in the published tree.** They live under
+> `.planning/research/`, which is untracked and ignored — it is working material, and one of these
+> scripts writes real refresh tokens to disk while the other writes unredacted failure responses
+> beside itself. Both are kept on the maintainer's machine. This section is written for whoever
+> holds that copy; the steps above it need nothing but a browser and `curl`, and are what a reader
+> without it should follow.
+
 ```
 python .planning/research/verify_device_code.py --client-id efe197b3-5c14-4d67-810f-e10406742a06
 ```

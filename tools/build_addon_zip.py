@@ -69,8 +69,12 @@ MANIFEST = 'addon.xml'
 # Tracked, but development material rather than shipped source. Matched on the
 # first path component only.
 #
-#   .planning - the planning record; one file under it is measurement output
-#               from a live probe run.
+#   .planning - the planning record. No longer tracked, so on this tree the
+#               entry filters nothing; it is kept as the one line that still
+#               holds if the record is ever force-added past .gitignore, which
+#               is a thing a person can do and a convention cannot stop. What
+#               proves it still works is the synthetic tree in
+#               tests/test_build_zip.py, not this repository.
 #   tests     - the suite, including the repository gates.
 #   tools     - this build itself.
 EXCLUDED_TOP_LEVEL = frozenset({'.planning', 'tests', 'tools'})

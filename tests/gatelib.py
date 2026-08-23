@@ -44,9 +44,15 @@ REPO = Path(__file__).resolve().parent.parent
 # The single exclusion set, defined once. Widening it is how a gate quietly stops
 # checking anything, so it lives here and nowhere else.
 #
-#   .planning / tests  - not shipped source; the planning record and the gate
-#                        files are both required to name the constructs they
-#                        forbid.
+#   tests              - not shipped source, and the gate files are required to
+#                        name the constructs they forbid.
+#
+#                        '.planning' stood here too until the planning record
+#                        was untracked and ignored. This set filters the git
+#                        index, so the entry had stopped excluding anything -
+#                        the same dead-name discrepancy already recorded against
+#                        COVERAGE.md below, and worth removing rather than
+#                        leaving for the next reader to check the tree over.
 #   the four documents - VENDORED.md, CREDITS.md, COVERAGE.md and README.md are
 #                        *required* to name the upstream module and the original
 #                        add-on id. Forgetting them produces a gate that can never
@@ -65,7 +71,7 @@ REPO = Path(__file__).resolve().parent.parent
 #                        which reads the file by name and asserts the quote, the
 #                        supported-account value and the public-client flag are
 #                        all present.
-EXCLUDED_TOP_LEVEL = frozenset({'.planning', 'tests'})
+EXCLUDED_TOP_LEVEL = frozenset({'tests'})
 EXCLUDED_DOCS = frozenset({'VENDORED.md', 'CREDITS.md', 'COVERAGE.md', 'README.md',
                            'docs/AZURE-REGISTRATION.md'})
 

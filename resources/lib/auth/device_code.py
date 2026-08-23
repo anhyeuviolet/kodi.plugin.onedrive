@@ -25,9 +25,10 @@ The HTTP port is a callable the caller supplies:
 where `body` is already-parsed JSON. That is the whole coupling to the network,
 and it is what lets the entire protocol be tested without a stub library.
 
-The protocol itself is settled: `.planning/research/SPIKE-DEVICE-CODE.md` ran
-this flow three times against this project's own registration, on a work/school
-account and on a personal one. The constants below are the measured ones.
+The protocol itself is settled: this flow was run three times against this
+project's own registration, on a work/school account and on a personal one,
+before any of it was written. The constants below are the measured ones, not
+the documented ones.
 """
 
 import base64

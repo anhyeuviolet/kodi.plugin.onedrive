@@ -67,7 +67,14 @@ MEMBER_FLOOR = 30
 # the XML parser. Deleting this directory from the tree is a legitimate change;
 # it turns test_the_forbidden_list_names_real_directories red, which is where
 # this line is meant to be edited from.
-FORBIDDEN = ('.planning', 'tests', 'tools', 'repository.onedrive.kn')
+#
+# '.planning' left this list when the planning record was untracked and ignored,
+# ahead of the repository going public. It is not that the record became safe to
+# ship - it is that a name absent from the index excludes nothing, and a sweep
+# for something that cannot be there proves nothing either. The build still
+# carries the exclusion as a guard against a forced add; what proves that guard
+# works is the synthetic tree in this file, not this list.
+FORBIDDEN = ('tests', 'tools', 'repository.onedrive.kn')
 
 
 def _manifest_text():

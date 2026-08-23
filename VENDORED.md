@@ -62,8 +62,10 @@ ask for zero repository-wide occurrences of the upstream module's add-on id and 
 the dynamic-evaluation construct. Read literally that is unsatisfiable, and always was: this file
 and `CREDITS.md` are *required* to name the upstream module verbatim, and the test file is required
 to name the construct it forbids. The operative form is therefore **zero occurrences outside the
-record and planning paths**, which is exactly what the `source_scan` helper implements — it reads
-every tracked text file except `.planning/`, `tests/` and the documents in its `EXCLUDED_DOCS` set.
+record paths**, which is exactly what the `source_scan` helper implements — it reads every tracked
+text file except `tests/` and the documents in its `EXCLUDED_DOCS` set. The planning record was
+named there too until it was untracked; the sweep reads the git index, so nothing changed about
+which bytes it covers.
 The runnable form of both conditions is `test_no_hardcoded_module_id` and `test_no_eval` in
 `tests/test_vendor_gates.py`. Those two tests, not a bare `grep` over the whole checkout, are what
 "zero hits" means here.
