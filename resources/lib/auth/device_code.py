@@ -74,6 +74,29 @@ DEFAULT_INTERVAL = 5
 # this and all subsequent requests". The permanence is the part that matters.
 SLOW_DOWN_INCREMENT = 5
 
+# The sentinel an HTTP port puts in `error` when the endpoint answered with a
+# body it could not parse as JSON. The protocol answers in JSON and only in
+# JSON, so anything else did not come from the protocol.
+NON_JSON_ERROR = 'non_json_response'
+
+
+class TransportError(Exception):
+    """The endpoint answered with something that is not the protocol.
+
+    Kept apart from a terminal protocol error on purpose. A terminal protocol
+    error means the grant is dead and the account has to be authorised again; a
+    transport failure means a captive portal, a proxy error page or a truncated
+    response, and the right answer is to try later. Collapsing the two signs the
+    user out because their Wi-Fi had a moment -- which on a TV, with no keyboard
+    to sign back in with, is the worst outcome this module can produce.
+    """
+
+    def __init__(self, status, body):
+        self.status = status
+        self.body = body
+        Exception.__init__(self, 'HTTP %s: the token endpoint answered with a '
+                                 'body that is not JSON' % status)
+
 
 def request_device_code(post, client_id=CLIENT_ID):
     """Ask for a device code. Returns the parsed response as the server gave it.
@@ -109,7 +132,7 @@ def poll_once(post, client_id, device_code):
     user is typing the code into their phone -- arrives as one. That
     classification is the whole of AUTH-10.
     """
-    _status, body = post(TOKEN_ENDPOINT, {
+    status, body = post(TOKEN_ENDPOINT, {
         'grant_type': 'urn:ietf:params:oauth:grant-type:device_code',
         'client_id': client_id,
         'device_code': device_code,
@@ -119,6 +142,12 @@ def poll_once(post, client_id, device_code):
         return OK, body
 
     error = body.get('error', '')
+    if error == NON_JSON_ERROR:
+        # Not a classification. A body that would not parse carries no error
+        # code to classify, and pretending it does would put a proxy error page
+        # on the same footing as a revoked grant.
+        raise TransportError(status, body)
+
     if error not in CONTINUE_ON:
         # Everything that is not in the two-member allow-list stops the loop,
         # including codes this add-on has never seen. AUTH-18 turns the code
@@ -128,6 +157,21 @@ def poll_once(post, client_id, device_code):
     if error == 'slow_down':
         return SLOW_DOWN, body
     return PENDING, body
+
+
+def next_interval(interval, state):
+    """The interval to use from here on, given what the last poll said.
+
+    The interval is state the caller carries, not state this module remembers.
+    That is what makes the increase permanent in the only way that survives:
+    RFC 8628 section 3.5 says a slow_down raises it "for this and all
+    subsequent requests", so a loop that recomputed the wait from the server's
+    original `interval` on every tick would undo the increase immediately and
+    be throttled again. Feeding the result back in is the whole mechanism.
+    """
+    if state == SLOW_DOWN:
+        return interval + SLOW_DOWN_INCREMENT
+    return interval
 
 
 def read_identity_claims(id_token):
