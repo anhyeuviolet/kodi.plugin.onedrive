@@ -35,12 +35,22 @@ path component. The rule is an exclusion list rather than an include list on
 purpose: an include list silently drops a new source directory the day someone
 adds one, whereas an exclusion list ships it.
 
+One further class is removed, and it is *derived* rather than listed: a
+top-level directory holding an ``addon.xml`` of its own is a different add-on,
+not this one's source. ``repository.onedrive.kn/`` is the first such directory.
+Naming it in the exclusion list would work today and would silently ship the
+second one; asking the index which directories declare themselves add-ons cannot.
+
 Usage::
 
     python tools/build_addon_zip.py [--out-dir DIR]
 
 Importable so a test can drive it into a temporary directory: ``build(out_dir)``
-writes one archive and returns the path it wrote.
+writes one archive and returns the path it wrote. ``repo=`` points it at a
+different add-on's source root, which is how ``tools/build_repo.py`` builds the
+repository add-on's archive through this same code rather than a second copy of
+it, and ``minimum_members=`` lowers the floor for an add-on that is genuinely
+two files.
 """
 
 import argparse
@@ -102,29 +112,59 @@ def tracked_files(repo=REPO):
     return tuple(p for p in out.stdout.decode('utf-8').split('\0') if p)
 
 
+def sibling_addon_dirs(repo=REPO):
+    """Top-level directories in the index that carry a manifest of their own.
+
+    A directory holding an ``addon.xml`` is another add-on. Its files are not
+    this add-on's source and shipping them puts a second manifest inside this
+    archive, so they are removed - derived from the index rather than named in
+    ``EXCLUDED_TOP_LEVEL``, because a literal covers the directory that exists
+    today and silently ships the next one.
+
+    Only depth two counts: ``<dir>/addon.xml`` and nothing deeper. A manifest
+    further down is a fixture or a resource, not a sibling add-on's root, and
+    excluding its whole top-level directory on that evidence would drop shipped
+    source.
+    """
+    tops = set()
+    for rel in tracked_files(repo):
+        parts = PurePosixPath(rel).parts
+        if len(parts) == 2 and parts[1] == MANIFEST:
+            tops.add(parts[0])
+    return frozenset(tops)
+
+
 def shipped_files(repo=REPO):
     """The tracked paths that belong in the archive, sorted.
 
     Sorted so two builds from the same index produce the same member list in the
     same order.
     """
+    excluded = EXCLUDED_TOP_LEVEL | sibling_addon_dirs(repo)
     return sorted(
         rel for rel in tracked_files(repo)
-        if PurePosixPath(rel).parts[0] not in EXCLUDED_TOP_LEVEL
+        if PurePosixPath(rel).parts[0] not in excluded
     )
 
 
-def build(out_dir, repo=REPO):
-    """Write one archive into `out_dir` and return the path written."""
+def build(out_dir, repo=REPO, minimum_members=MINIMUM_MEMBERS):
+    """Write one archive into `out_dir` and return the path written.
+
+    `minimum_members` is the floor below which the index is treated as empty or
+    broken. It is a parameter rather than a constant because the repository
+    add-on is legitimately two files, and holding a two-file add-on to a
+    twenty-file floor would mean either refusing to build it or lowering the
+    floor for the add-on that actually needs one.
+    """
     repo = Path(repo)
     addon_id, version = read_identity(repo)
 
     members = shipped_files(repo)
-    if len(members) < MINIMUM_MEMBERS:
+    if len(members) < minimum_members:
         raise ValueError(
             'the git index yielded %d shipping file(s), below the floor of %d; '
             'refusing to write an archive that installs and does nothing'
-            % (len(members), MINIMUM_MEMBERS))
+            % (len(members), minimum_members))
     if MANIFEST not in members:
         raise ValueError(
             '%s is not in the member list; an archive without a manifest is not '

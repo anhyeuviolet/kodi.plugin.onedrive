@@ -58,7 +58,16 @@ MEMBER_FLOOR = 30
 
 # Development material that must not cross into the archive. Matched on the
 # first path component *inside* the top-level directory.
-FORBIDDEN = ('.planning', 'tests', 'tools')
+#
+# The last entry is a different add-on's source root, and it is written here as
+# a literal on purpose. The build derives that class from the index - a
+# top-level directory holding an addon.xml is another add-on - and a test that
+# derived it the same way would only prove the build agrees with itself. Two
+# mechanisms, the same reason the manifest is read here by pattern and there by
+# the XML parser. Deleting this directory from the tree is a legitimate change;
+# it turns test_the_forbidden_list_names_real_directories red, which is where
+# this line is meant to be edited from.
+FORBIDDEN = ('.planning', 'tests', 'tools', 'repository.onedrive.kn')
 
 
 def _manifest_text():
@@ -174,6 +183,110 @@ def test_the_planning_record_the_suite_and_the_tools_are_absent(members):
                   for top, paths in sorted(offenders.items())))
 
 
+def test_the_forbidden_list_names_real_directories():
+    """Every name in FORBIDDEN must exist in the index, or it excludes nothing.
+
+    A name that resolves to nothing sits beside three that do and the next
+    reader has to check the tree to tell them apart - the discrepancy already
+    recorded against `EXCLUDED_DOCS` in the phase-3 deferred items. This is also
+    what makes the sweep above meaningful: absence proves something only when
+    the thing was there to be excluded.
+    """
+    tops = {PurePosixPath(rel).parts[0] for rel in build_addon_zip.tracked_files(REPO)}
+    orphans = [name for name in FORBIDDEN if name not in tops]
+    assert not orphans, (
+        'these names are excluded from the archive but are not in the git '
+        'index, so they exclude nothing: %s' % (orphans,))
+
+
+def test_exactly_one_manifest_is_inside_the_archive(members):
+    assert len(members) >= MEMBER_FLOOR
+    manifests = [name for name in members
+                 if PurePosixPath(name).name == 'addon.xml']
+    assert manifests == ['%s/addon.xml' % manifest_id()], (
+        'the archive must hold exactly one addon.xml, at the root of its single '
+        'top-level directory. Found: %s' % (manifests,))
+
+
+def test_a_sibling_addon_directory_is_excluded_without_being_named(tmp_path):
+    """The rule is derived from the index, not written down.
+
+    The miniature repository's sibling is called `repository.example.test`,
+    which appears in no exclusion list anywhere. If the build were matching a
+    literal rather than asking which directories declare themselves add-ons,
+    this sibling would ship and the next one added to the real tree would too.
+    """
+    repo = _miniature_repo(tmp_path / 'repo', sibling='repository.example.test')
+
+    # The fixture really created it; otherwise the assertion below is vacuous.
+    assert (repo / 'repository.example.test' / 'addon.xml').is_file()
+
+    built = build_addon_zip.build(tmp_path / 'out', repo=repo)
+    with zipfile.ZipFile(str(built)) as handle:
+        names = handle.namelist()
+
+    assert len(names) >= 40, 'the miniature repository did not populate'
+    leaked = sorted(name for name in names
+                    if PurePosixPath(_inner(name)).parts[:1] == ('repository.example.test',))
+    assert not leaked, (
+        "a sibling add-on's source reached the archive, which puts a second "
+        'addon.xml inside it:\n' + '\n'.join(leaked))
+
+    manifests = [name for name in names if PurePosixPath(name).name == 'addon.xml']
+    assert manifests == ['plugin.example.test/addon.xml'], manifests
+
+
+def test_a_nested_manifest_does_not_exclude_its_top_level_directory(tmp_path):
+    """The derived rule is depth-two only, and that bound is load-bearing.
+
+    `resources/` holds shipped source. If a manifest anywhere beneath a
+    directory excluded that whole directory, one fixture file named addon.xml
+    would silently empty the archive of the add-on's own code.
+    """
+    repo = _miniature_repo(tmp_path / 'repo')
+    nested = repo / 'resources' / 'skins' / 'addon.xml'
+    nested.parent.mkdir(parents=True, exist_ok=True)
+    nested.write_text('<addon id="not.a.sibling" version="1.0.0"/>\n', encoding='utf-8')
+    _git(repo, 'add', '-A')
+
+    assert 'resources' not in build_addon_zip.sibling_addon_dirs(repo)
+
+    built = build_addon_zip.build(tmp_path / 'out', repo=repo)
+    with zipfile.ZipFile(str(built)) as handle:
+        inner = {_inner(name) for name in handle.namelist()}
+    assert 'resources/module_00.py' in inner, (
+        'a manifest nested under resources/ excluded the whole directory; the '
+        "add-on's own source is gone from the archive")
+    assert 'resources/skins/addon.xml' in inner
+
+
+def test_the_floor_is_a_parameter_so_a_two_file_addon_can_build(tmp_path):
+    """The repository add-on is genuinely two files and must still be buildable.
+
+    Asserted against a miniature two-file add-on rather than the real
+    repository add-on, so this states the property rather than the instance.
+    """
+    root = tmp_path / 'tiny'
+    root.mkdir()
+    _git(root, 'init', '-q')
+    (root / 'addon.xml').write_text(
+        '<addon id="repository.example.test" name="Example" version="2.0.0" '
+        'provider-name="Example"></addon>\n', encoding='utf-8')
+    (root / 'icon.png').write_bytes(b'\x89PNG\r\n\x1a\n')
+    _git(root, 'add', '-A')
+
+    with pytest.raises(ValueError) as raised:
+        build_addon_zip.build(tmp_path / 'refused', repo=root)
+    assert 'floor' in str(raised.value), str(raised.value)
+
+    built = build_addon_zip.build(tmp_path / 'out', repo=root, minimum_members=2)
+    with zipfile.ZipFile(str(built)) as handle:
+        names = sorted(handle.namelist())
+    assert names == ['repository.example.test/addon.xml',
+                     'repository.example.test/icon.png'], names
+    assert built.name == 'repository.example.test-2.0.0.zip', built.name
+
+
 def test_no_compiled_cache_reaches_the_archive(members):
     assert len(members) >= MEMBER_FLOOR
     offenders = [name for name in members
@@ -195,7 +308,7 @@ def _git(root, *args):
 
 
 def _miniature_repo(root, addon_id='plugin.example.test', version='9.9.9',
-                    tracked_extra=40, untracked=()):
+                    tracked_extra=40, untracked=(), sibling=None):
     """A throwaway repository shaped like this one, built in a temp directory.
 
     Used to drive the build over an index whose contents the test controls. The
@@ -219,6 +332,17 @@ def _miniature_repo(root, addon_id='plugin.example.test', version='9.9.9',
         directory = root / excluded
         directory.mkdir(exist_ok=True)
         (directory / 'record.py').write_text('# development material\n', encoding='utf-8')
+
+    # A second add-on's source root, named nothing like the real one, so that a
+    # build matching a literal cannot pass the test that reads this.
+    if sibling:
+        directory = root / sibling
+        directory.mkdir(exist_ok=True)
+        (directory / 'addon.xml').write_text(
+            '<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<addon id="%s" name="Sibling" version="1.2.3" provider-name="Example">\n'
+            '</addon>\n' % sibling, encoding='utf-8')
+        (directory / 'icon.png').write_bytes(b'\x89PNG\r\n\x1a\n')
 
     _git(root, 'add', '-A')
 
