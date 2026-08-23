@@ -5,8 +5,8 @@ milestone_name: milestone
 current_phase: 03
 current_phase_name: authentication
 status: executing
-stopped_at: Completed 03-09-PLAN.md
-last_updated: "2026-08-23T05:22:55.338Z"
+stopped_at: Completed 03-10-PLAN.md
+last_updated: "2026-08-23T05:38:25.854Z"
 last_activity: 2026-08-23
 last_activity_desc: Phase 03 execution started
 progress:
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-08-22)
 ## Current Position
 
 Phase: 03 (authentication) — EXECUTING
-Plan: 10 of 14
+Plan: 11 of 14
 Status: Ready to execute
 stands, its Windows rows were descoped because Windows is not a target. Phase criterion 2 (the Kodi
 19/20/21/22 install matrix) is therefore **unmet by decision, not satisfied**, and KODI-02 stays unchecked.
@@ -80,6 +80,7 @@ Progress: [████████░░] 76%
 | Phase 03 P07 | 20min | 2 tasks | 2 files |
 | Phase 03 P08 | 22m | 3 tasks | 6 files |
 | Phase 03 P09 | 3h22m | 3 tasks | 12 files |
+| Phase 03 P10 | 16m | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -159,6 +160,9 @@ Load-bearing choices for current work:
 - [Phase 03]: A plugin address selects an entry in an explicit mapping, never an attribute on an object. A stop-list was refused in the source: the namespace it filters grows with every method added, a mapping does not
 - [Phase 03]: Re-authorising as a different account writes nothing and says which account signed in — the alternative binds one person's credential to another person's row, silently, on a shared television
 - [Phase 03]: The error reporter is deleted rather than disabled, with its six call sites in five other modules rewritten to log a stack trace; KODI-08 still waits on 03-11's settings row and no shared-id gate will say so
+- [Phase ?]: The startup keepalive is a service in the runner's list rather than a call before it: ServiceUtil.run starts each service once in its own daemon thread, so the token exchange delays no listener and the shutdown observation comes for free
+- [Phase ?]: The startup refresh takes one lock attempt of ten seconds against the plugin's three of thirty: a held lock means somebody else is already refreshing this account, so the right answer is the next pass rather than contention
+- [Phase ?]: The needs_reauth literal is written out twice rather than imported, because importing the account list would drag every dialog in the add-on into the service's import closure; a static assertion holds the two equal
 
 ### Pending Todos
 
@@ -202,6 +206,6 @@ Open concerns:
 
 ## Session Continuity
 
-Last session: 2026-08-23T05:22:55.321Z
-Stopped at: Completed 03-09-PLAN.md
+Last session: 2026-08-23T05:38:25.838Z
+Stopped at: Completed 03-10-PLAN.md
 Resume file: None

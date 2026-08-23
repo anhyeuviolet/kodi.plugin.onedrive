@@ -65,7 +65,7 @@ This narrowing is known to cost no future work on the one place it could have. `
 - [ ] **AUTH-13**: An automated test proves the persisted refresh token changes across two consecutive refreshes
 - [x] **AUTH-14**: Concurrent refresh across the plugin and the service is serialised by an `os.open(..., O_CREAT|O_EXCL)` lock with a stale-lock breaker; neither `threading.Lock` nor `fcntl.lockf` is used for this
 - [x] **AUTH-15**: A refresh that loses the race and receives `invalid_grant` re-reads the store and adopts the winner's token rather than signing the user out
-- [ ] **AUTH-16**: A proactive refresh runs on Kodi startup well inside the 90-day refresh-token lifetime
+- [x] **AUTH-16**: A proactive refresh runs on Kodi startup well inside the 90-day refresh-token lifetime
 - [ ] **AUTH-17**: The background service never opens a sign-in dialog; only the plugin may prompt interactively
 - [ ] **AUTH-18**: A tenant that blocks the app produces a specific message naming the cause and pointing at the custom `client_id` setting — not a generic failure
 - [ ] **AUTH-19**: A custom `client_id` setting exists at Expert level, empty by default
@@ -230,7 +230,7 @@ Cross-cutting notes. `CI-06` (per-phase manual acceptance on the TCL Android TV 
 | AUTH-13 | Phase 3 | Pending |
 | AUTH-14 | Phase 3 | Complete |
 | AUTH-15 | Phase 3 | Complete |
-| AUTH-16 | Phase 3 | Pending |
+| AUTH-16 | Phase 3 | Complete |
 | AUTH-17 | Phase 3 | Pending |
 | AUTH-18 | Phase 3 | Pending |
 | AUTH-19 | Phase 3 | Pending |
