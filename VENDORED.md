@@ -8,7 +8,9 @@ behaviour now differs from the original.
 
 It exists so that a future upstream diff, a future licence question and a future "was that already
 broken?" all start from a written fact rather than from a guess. If you change anything under
-`resources/lib/vendor/`, add a row here in the same commit.
+`resources/lib/vendor/` or `resources/skins/`, add a row here in the same commit. **Deleting a
+vendored file counts as changing it**, and it is the one difference a diff cannot explain on its
+own, because the file is simply absent on one side.
 
 ## Upstream: the Cloud Drive Common Module
 
@@ -21,12 +23,26 @@ broken?" all start from a written fact rather than from a guess. If you change a
 | Commit date | 2023-01-21 |
 | Commit subject | `Kodi 20 fix` |
 | Licence | GPL-3.0-or-later |
-| Vendored to | `resources/lib/vendor/clouddrive_common/` |
+| Vendored to | `resources/lib/vendor/clouddrive_common/` (the Python package) and `resources/skins/default/` (the dialog skins) |
 
 The copy is pinned to that commit, not to the branch. It was taken by checking out the commit and
 comparing every copied file against the upstream blob **by git object id**, so "verbatim" is a
 measured property of the bytes rather than a claim about the copy command. All 38 copied files
 matched.
+
+**Ten of those 38 are not under `resources/lib/vendor/`.** The module's three dialog skins and their
+seven textures were merged into this add-on's own skin directory, because that is where Kodi looks
+for them:
+
+| Vendored from the module | Vendored to |
+|---|---|
+| the `pin-dialog`, `export-main-dialog` and `export-schedule-dialog` skins | `resources/skins/default/1080i/` |
+| `black.png`, `white.png`, `dialog-bg.png`, `dialogbutton-fo.png`, `dialogbutton-nofo.png`, `radio-button-off.png`, `radio-button-on.png` | `resources/skins/default/media/` |
+
+Nothing under `resources/skins/` predates the lift — the whole directory arrived with it. It is
+recorded here because the sentence above about `resources/lib/vendor/` reads, on its own, as though
+the vendored surface stopped at that path; it never did, and a modification to a skin is as much a
+divergence from upstream as a modification to a module.
 
 Upstream has exactly two branches, `krypton` and `matrix`, with `HEAD` on `matrix`. **There is no
 `master` branch any longer.** This matters because `raw.githubusercontent.com` still serves content
@@ -46,11 +62,22 @@ ask for zero repository-wide occurrences of the upstream module's add-on id and 
 the dynamic-evaluation construct. Read literally that is unsatisfiable, and always was: this file
 and `CREDITS.md` are *required* to name the upstream module verbatim, and the test file is required
 to name the construct it forbids. The operative form is therefore **zero occurrences outside the
-record and planning paths**, which is exactly what the `source_scan` helper in
-`tests/test_vendor_gates.py` implements — it reads every tracked text file except `.planning/`,
-`tests/`, and the four documents `VENDORED.md`, `CREDITS.md`, `COVERAGE.md` and `README.md`. The
-runnable form of both conditions is `test_no_hardcoded_module_id` and `test_no_eval` in that file.
-Those two tests, not a bare `grep` over the whole checkout, are what "zero hits" means here.
+record and planning paths**, which is exactly what the `source_scan` helper implements — it reads
+every tracked text file except `.planning/`, `tests/` and the documents in its `EXCLUDED_DOCS` set.
+The runnable form of both conditions is `test_no_hardcoded_module_id` and `test_no_eval` in
+`tests/test_vendor_gates.py`. Those two tests, not a bare `grep` over the whole checkout, are what
+"zero hits" means here.
+
+Two corrections to the paragraph above, both measured against the tree rather than carried forward:
+the helper now lives in `tests/gatelib.py`, which both gate files read, and `EXCLUDED_DOCS` holds
+five names, not four — `VENDORED.md`, `CREDITS.md`, `COVERAGE.md`, `README.md` and
+`docs/AZURE-REGISTRATION.md`. **`COVERAGE.md` has never existed in this repository.** It has been in
+the exclusion set since the gates were first written and excludes nothing; it is left in place and
+named here rather than quietly dropped, because an exclusion for a file that is not there is a
+different thing from an exclusion that is doing work, and the next person to read that set should
+not have to discover the difference. The exclusions that *are* doing work are paid for by positive
+assertions: `test_the_replaced_flow_is_named_in_the_two_excluded_documents` reads this file and
+`README.md` by name, and the runbook has its own assertion in the vendor gate file.
 
 ## The QR encoder
 
@@ -152,6 +179,11 @@ add-on wrapper metadata and mean nothing inside this add-on. The zip is identifi
 One row per modified vendored file. This is the table a future upstream diff starts from, which is
 why it is a table and not prose.
 
+The first block of rows is the vendor lift itself. The second block, under **Rewriting sign-in**, is
+the work that replaced the hosted sign-in flow; it is kept separate because those rows are large and
+because a reader trying to answer "what did the lift change?" and a reader trying to answer "what
+did sign-in change?" are asking different questions.
+
 | File | Change | Why |
 |---|---|---|
 | 21 files under `clouddrive_common/` | 98 import statements repointed from the upstream dotted prefix to `resources.lib.vendor.clouddrive_common` | The module now lives inside this add-on. The rewrite is anchored on a line-start `from … import` prefix, which an add-on-id literal can never match; a bare substring replacement is forbidden here because the old module id *contains* the old package name and rewriting it produces a string that still parses and fails only at runtime on a clean profile |
@@ -161,8 +193,8 @@ why it is a table and not prose.
 | `clouddrive_common/service/export.py` | `self._common_addon_id` reads `KodiUtils.common_addon_id` instead of the old literal | Same change, third site |
 | `clouddrive_common/ui/dialog.py` | QR image profile lookup is `get_addon_info("profile")` instead of `get_addon_info("profile", <old id>)` | The QR image must be written into *this* add-on's profile directory. Plus the two write guards in the row below |
 | `clouddrive_common/ui/dialog.py` | **QR write guard 1:** `KodiUtils.mkdirs(profile_path)` immediately before the encoder writes. **QR write guard 2:** the image filename is now `os.path.join(profile_path, "qr-%s.png" % uuid.uuid4().hex)` — shape `qr-<32 lowercase hex>.png` — replacing the fixed `qr.png`; `import uuid` added | Two edits upstream does not have, so a future upstream diff will show them. Guard 1: a brand-new add-on id means a brand-new `addon_data` path that may not exist on first sign-in, and the write would otherwise raise before the dialog renders — upstream never needed it because its profile always already existed. Guard 2: Kodi's texture cache is keyed by path, so one fixed name lets a second sign-in inside a single session render the *previous* image against the *new* code — a dialog that looks right showing a code that will not authorise. The existing teardown deletion in `__del__` already targets `self._image_path` and follows the new name with no edit |
-| `clouddrive_common/remote/errorreport.py` | Version lookup is `get_addon_info('version')` instead of naming the old module | Reports this add-on's version, not a version it no longer carries |
-| `clouddrive_common/remote/signin.py` | The User-Agent's third field is this add-on's own version | Same reason |
+| `clouddrive_common/remote/errorreport.py` | Version lookup is `get_addon_info('version')` instead of naming the old module | Reports this add-on's version, not a version it no longer carries. **This file has since been deleted** — see **Rewriting sign-in** below |
+| `clouddrive_common/remote/signin.py` | The User-Agent's third field is this add-on's own version | Same reason. **This file has since been deleted** — see **Rewriting sign-in** below |
 | `clouddrive_common/ui/dialog.py` | The QR encoder import became `import resources.lib.vendor.pyqrcode as pyqrcode`, still function-local inside `onInit` | The encoder is bundled now. Keeping the import function-local means the dialog constructs and its skin loads even if the encoder is unavailable; it is deliberately **not** wrapped in a handler, so a failure surfaces rather than degrading silently |
 | `pyqrcode/__init__.py`, `pyqrcode/builder.py` | Three internal self-imports rewritten to `from . import …` — `__init__.py` lines 46 and 47, `builder.py` line 33 — and two Python-2 compatibility `try`/`except ImportError` blocks reduced to their Python 3 branch: **five edits in total, across two files** | Absolute self-imports such as `import pyqrcode.tables` resolve to nothing once the package has a parent; and `try: import png` could only ever bind a *top-level* `png` — absent here, or somebody else's module if present. `tables.py`, `png.py` and `LICENSE.md` were not touched at all |
 | `clouddrive_common/ui/utils.py` | `KodiUtils.to_datetime` parses with `datetime.datetime.fromisoformat` after `re.sub(r'(\.\d{6})\d+', r'\1', s)`, replacing `dateutil.parser.parse`; `import datetime` and `import re` replace `import dateutil.parser` in the same function-local position | Removes the last dependency this add-on did not carry. The substitution truncates a seven-or-more-digit fractional-seconds field, which SharePoint emits, and is a literal no-op for six digits or fewer. It is kept even though CPython 3.11.9 already tolerates those inputs, because Kodi Nexus ships 3.11.2 and that build was not available to check. The surrounding bare handler that returns `None` on failure is unchanged |
@@ -175,6 +207,34 @@ Two things that are edits to *this repository's* own files rather than to vendor
 here because they belong to the same change: `addon.xml` now declares exactly one import,
 `xbmc.python` 3.0.1; and `.project` line 6 no longer references the module, leaving `<projects>`
 empty.
+
+### Rewriting sign-in
+
+The hosted sign-in flow was replaced by the OAuth 2.0 device authorization grant, spoken directly to
+the identity provider. That work spans twelve vendored files, deletes two of them outright and
+rewrites one skin. The protocol itself lives in `resources/lib/auth/`, which is this repository's own
+code and carries no upstream counterpart; the rows below are only the vendored side.
+
+| File | Change | Why |
+|---|---|---|
+| `clouddrive_common/remote/signin.py` | **Deleted — the whole file, 66 lines.** `Signin.get_addon_header`, `create_pin`, `fetch_tokens_info`, `refresh_tokens` and the two exception wrappers between them each composed an address against the hosted sign-in server and posted to it | Every method in it existed to talk to that server. Nothing survives a flow that talks to the provider directly, so there was nothing to keep and no partial file to leave. A deletion is the one divergence from upstream a diff cannot describe on its own, which is why it has a row rather than an absence |
+| `clouddrive_common/remote/errorreport.py` | **Deleted — the whole file, 84 lines.** `send_report` posted a stack trace to that same server; `handle_exception` assembled the same report with the raw response body appended and sent it | Its only address source was the accessor deleted from `ui/utils.py` in the same work, so it could not have functioned afterwards even if it had been kept. It was also the one path in the tree that put an unredacted response body on the wire, and a failing token exchange answers with a body that *is* the credential. Its eight call sites in five other modules were rewritten first — see the row for them below — because deleting the module with those in place stops the export subsystem and both service listeners from importing at all |
+| `clouddrive_common/remote/provider.py` | Rewritten around the new flow, 102 → 364 lines. `create_pin` → `request_device_code` and `fetch_tokens_info` → `poll_for_token`, both now delegating to `resources/lib/auth/device_code`; the `Signin` import and the `_signin` attribute removed; `refresh_access_tokens` rewritten onto `resources/lib/auth/refresh`; `get_access_tokens` and `persist_access_tokens` repointed at the per-account token store; `_post_port`, `_stop_retrying_a_settled_answer`, `_parse_body`, `_account_key`, `save_tokens`, `_lock_for`, `resolve_client_id()`, `ReauthorisationRequired`, `CLIENT_ID_SETTING` and `CLIENT_ID_PATTERN` added | This class is the seam between Kodi and the protocol, so it is where the protocol change lands. The two renames are not cosmetic: a pin issued by a third party and a device code issued by the provider are different objects with different lifetimes, and a method that keeps the old name while returning the new object is how the two get confused later. `_post_port` builds the `post(url, fields) -> (status, body)` callable that is the entire coupling between `resources/lib/auth/` and the network, which is what keeps that package free of sockets and testable without a stub library |
+| `clouddrive_common/remote/request.py` | `import re` added, plus `REDACTED_FIELDS` (five names: `access_token`, `refresh_token`, `id_token`, `device_code`, `user_code`), `REDACTED_PREFIX_CHARACTERS`, `REDACTED_MARKER`, the two compiled patterns behind them, `_keep_prefix` and `get_body_for_report`. Four sites route through it: `get_url_for_report`, the request-data report and the two response-body reports | The bearer header and one query parameter were already covered; neither is where this grant puts its credentials. A token exchange sends the device code in a form body and gets three tokens back in a JSON body, and both were being concatenated into a report string that goes straight to the Kodi log — a file users paste into forum posts verbatim. A successful token response *is* the credential. All five names in both directions, because covering four is publishing the fifth. `_keep_prefix` drops a value entirely rather than keeping eight of its nine characters, which for `user_code` would be the live code with a typo |
+| `clouddrive_common/ui/dialog.py` | `QRDialogProgress` gains `set_code`, `set_remaining`, `set_expired`, `reset_for_new_code`, `is_new_code_requested`, `format_remaining`, `_render_text`, `_addon_string`, `_is_secure_url`, two control ids and three string ids; `__del__` guarded with `getattr`; the `setFocus` call moved out of `update()` into `onInit`; `import urllib` became `import urllib.parse` | The dialog is driven once a second by the poll loop, so every per-tick call has to be free of side effects. `setFocus` at the end of `update()` was not: it returned focus to Cancel on every tick, so no focus set anywhere else could survive, and the expiry button would have been unreachable. `__del__` called `xbmcvfs.delete(None)` for any dialog abandoned before `onInit` ran — inside a destructor, where the interpreter discards the error and prints a note nobody reads. `_is_secure_url` refuses to encode a sign-in address that is not `https`, because a QR is a thing a person is told to point a camera at. `import urllib` never bound `urllib.parse`; it resolved only because something else had imported it first |
+| `clouddrive_common/ui/addon.py` | Fourteen methods added — `_action_map`, `_released_the_handle`, `_signin_request_params`, `_acquire_tokens`, `_await_authorisation`, `_poll_once`, `_identify`, `_reauthorise_account`, `_needs_reauthorisation`, `_provider_failure`, `_failure_sentence`, `_offer_signin_again`, `_addon_string` and the `_FAILURE_STRINGS` table. `_add_account` and `list_accounts` rewritten; `route`'s dynamic dispatch replaced by the explicit mapping; `_handle_exception` rebuilt; `_remove_account` extended to the token store; `_remove_drive`, `_DEFAULT_SIGNIN_TIMEOUT`, `_ip_before_pin`, the `migrated`-account cleanup block and the address-changed heuristic all deleted. Imports: `json`, `resources.lib.auth_context`, `device_code`, `errors`, `store` and `ReauthorisationRequired` in, `ErrorReport` out | This is the file the user's sign-in actually runs through, so it absorbs most of the change. Three structural properties are worth naming because they are what the gates hold: the directory handle is released and the work re-enters as an action, so a container fetch is not left blocked for the life of a device code; there is exactly one `save_account`, last, so a cancel anywhere above it returns having written nothing; and `route` dispatches through a name-to-method table rather than `getattr(self, self._action)`, so a crafted plugin address cannot reach an arbitrary method. `_remove_drive` went because there is one drive per account by measurement, so the option was unreachable |
+| `clouddrive_common/ui/utils.py` | `KodiUtils.get_signin_server` deleted. `ADDON_STRING_FLOOR = 30000` added and `KodiUtils.localize`'s boundary moved onto it from the literal `32000` | The accessor read the hosted server's address out of a setting and was the only address source the reporter and the replaced flow ever had. The boundary was correct while the only add-on ids in the tree were the module's 32000-32088; it stopped being correct when this add-on's own strings moved into the 30000 block Kodi reserves for plugins, and it failed *silently* — id 30042 went to Kodi's catalogue and came back as Kodi's 30042, so a caller got the wrong sentence rather than an error. No shipped caller passes an id in that range today, so this closes a latent fault rather than fixing a visible one |
+| `clouddrive_common/export.py`, `service/download.py`, `service/export.py`, `service/player.py`, `service/source.py` | Eight `ErrorReport.handle_exception(e)` call sites — two, one, three, one and one respectively — replaced with `Logger.error(ExceptionUtils.full_stacktrace(e))`. `ExceptionUtils` added to the imports of the three files that lacked it; the `ErrorReport` import removed from all five | The logging half of what the reporter did, without the sending half or the raw response body it appended. These five modules are outside the sign-in flow entirely; they are here because deleting the reporter without them would have broken their imports outright. `service/player.py` also now logs the full stack trace where it previously logged the bare exception and then handed it to the reporter |
+| `resources/skins/default/1080i/pin-dialog.xml` | Rebuilt around the code, 86 → 150 lines. A dedicated code label (control 1005, `font60`) and a second button (control 1004) added, and the layout reordered so the code is the largest thing on screen | The old layout was built for a short pin beside a QR image. The device code is what a person has to read off a television and type into a phone, so it is what the layout has to serve, and the expiry path needs a second button the old skin had nowhere to put. The font names matter more than they look: Kodi falls back to `font13` **silently** when it cannot resolve one — no error, no log line — and this file shipped naming `font12_title`, which Estuary does not define. Every font it names now is defined in both Estuary fontsets |
+| `clouddrive_common/ui/addon.py` (`356de0d`), `clouddrive_common/ui/utils.py` (`c3a1445`), `resources/skins/default/1080i/pin-dialog.xml` (`345999a`) | **Line endings converted from CRLF to LF across the whole of each file** | Recorded because it is invisible in review and total in a byte diff: upstream holds all three as CRLF, so **every line of all three now differs from upstream**, and a diff taken without `--ignore-cr-at-eol` shows each file as wholly rewritten and says nothing about what actually changed. It was not deliberate and nothing depends on it. It is left as it stands rather than converted back, because a conversion is itself a whole-file rewrite and doing one inside a documentation change would bury the same problem a commit deeper. Use `git diff --ignore-cr-at-eol` on these three until somebody normalises them on purpose. Upstream itself is not uniform — `remote/provider.py` and `export.py` arrived LF — so "convert everything to LF" is not the obvious repair it appears to be |
+
+Two methods survive in the vendored tree that nothing can now reach, both left deliberately and
+recorded so that a later reader does not take them for an oversight. `CloudDriveAddon._open_common_settings`
+opened a separate module's settings dialog; there is no separate module, no settings row points at
+it, and it is absent from the action mapping, so it is unreachable by construction rather than by
+convention. `AccountManager.remove_drive` in `clouddrive_common/account.py` lost its only caller when
+the per-drive removal option went. It is harmless, and it is the shape to restore if drive selection
+ever comes back.
 
 ## Service extension point
 
@@ -196,20 +256,32 @@ this change is preserved behaviour. It is deleted in the same later cleanup.
 The contract of the vendor lift was identical behaviour, so every departure from it is listed here
 with its reasoning. There are four.
 
-**1. Sign-in still goes through a third-party broker, and a fresh profile therefore shows an empty
-account list until someone completes a sign-in.** The flow posts to `drive-login.herokuapp.com`,
-which issues a short-lived code, shows it in the QR dialog, and polls until a browser elsewhere
-completes the OAuth exchange on the user's behalf. That server was long assumed dead; **it is not.**
-Measured on 2026-08-22 from the Android test instrument: `GET /ip` and `POST /pin` both answered
-`200`, a code was issued, the QR dialog rendered it, and the add-on began polling `/pin/<code>` as
-designed. So this is not a behaviour deviation at all in the sense of something broken — it is
-inherited behaviour that still functions.
+**1. Sign-in no longer goes through a third-party server. It is now the OAuth 2.0 device
+authorization grant, spoken straight to the identity provider — and a fresh profile still shows an
+empty account list until someone completes a sign-in.**
 
-What it *is* is the reason a fresh profile looks empty: nothing is signed in, and signing in needs a
-human at a browser. And it remains the reason the flow is being replaced. A third party holds the
-OAuth exchange, sees which account is being connected, and is a single point of failure and of trust
-for every user of the add-on; its liveness today does not change that. A device-code flow that talks
-to Microsoft directly is the next stage of work.
+What it used to do, in the past tense, because this is the modification record and erasing what was
+replaced is the one thing such a record must not do: the inherited flow posted to
+`drive-login.herokuapp.com`, which issued a short-lived pin, showed it in the QR dialog, and polled
+`/pin/<code>` until a browser elsewhere completed the OAuth exchange on the user's behalf. That
+server was long assumed dead and **it was not**. Measured on 2026-08-22 from the Android test
+instrument: `GET /ip` and `POST /pin` both answered `200`, a pin was issued, the dialog rendered it,
+and the add-on began polling as designed. It was removed while it still worked, and that is the
+point — a third party held the exchange, saw which account was being connected, and was a single
+point of failure and of trust for every user of the add-on. Liveness was never the objection.
+
+What happens now: the add-on asks the provider for a device code, shows the code and the provider's
+own verification address on the television, and polls the provider's token endpoint until the user
+has finished on their own phone. The application identifier it sends is public by design, which is
+what this grant is for; there is no client secret anywhere in the tree and adding one would break
+the grant. The refresh token that comes back is written to a per-account file in this add-on's
+profile directory at mode `0600`, never into the account record. The whole of the protocol lives in
+`resources/lib/auth/`, which imports no Kodi module and opens no socket.
+
+The empty account list on a fresh profile is unchanged and is still the correct result, for the same
+reason as before: nothing is signed in, and signing in needs a human with a phone. The vendored
+files this replacement touched are itemised under **Rewriting sign-in** above, including the two it
+deleted outright.
 
 **2. `allow_directory_listing` now defaults to `false` instead of `true`.** The gated service binds
 a loopback port and serves an enumerable index of the entire drive, with no authorisation check
@@ -238,16 +310,26 @@ Two further things that are not deviations but will surprise a reader of a fresh
 
 First, an **undeclared setting appears in the settings file on first service start**. The service
 base class binds its socket, discovers the port, and writes it back as `<name>.service.port` —
-once for each of the four services (`download`, `source`, `export`, `player`). None of those four
-keys is declared in `resources/settings.xml`. That is upstream behaviour, unchanged.
+once for each of the four services that bind one (`download`, `source`, `export`, `player`). None of
+those four keys is declared in `resources/settings.xml`. That is upstream behaviour, unchanged. A
+fifth service now runs alongside them, the token keepalive; it binds nothing and writes no port key.
 
-Second, the tree carries a **third-party traceback reporter**, `clouddrive_common/remote/errorreport.py`,
-which posts a stack trace to the same broker as the sign-in flow. It is gated on the `report_error`
-setting, which is declared `default="false"`, so it is off unless a user turns it on. It is a known
-liability, carried in unchanged because the contract here was preservation, and it is deleted in
-the later cleanup.
+Second, the tree **used to carry a third-party traceback reporter**,
+`clouddrive_common/remote/errorreport.py`, which posted a stack trace — with the raw response body
+appended — to the same server as the inherited sign-in flow. It was gated on a `report_error`
+setting declared `default="false"`, so it was off unless a user turned it on. Both are gone: the
+module was deleted, the setting was deleted with the sign-in-server row in the settings rewrite, and
+its eight call sites in five modules now log the stack trace instead of sending it. Nothing in this
+add-on reports anything to anyone. The rows are under **Rewriting sign-in** above; this paragraph
+survives because a reader who met the reporter in an older checkout, or in upstream, should find out
+here what happened to it.
 
-Finally, one number worth having written down: the HTTP retry loop's worst-case wall time is the
-number of tries multiplied by the timeout, plus the injected waits between attempts. At the request
-class's defaults (`tries=4`, `delay=5`, `backoff=2`) that is `4 × 30 + 5 + 10 + 20 = 155 seconds`.
-It is recorded rather than bounded; routing the wait through Kodi's abort-aware sleep is later work.
+Finally, two numbers worth having written down. The transport's own retry loop has a worst-case wall
+time of the number of tries multiplied by the timeout, plus the injected waits between attempts: at
+the request class's defaults (`tries=4`, `delay=5`, `backoff=2`) that is
+`4 × 30 + 5 + 10 + 20 = 155 seconds`. It is recorded rather than bounded; routing the wait through
+Kodi's abort-aware sleep is later work. Sign-in and refresh do **not** use those defaults — they pass
+a deliberately short profile (`tries=2`, `delay=5`, `backoff=1`) giving a worst case of
+`2 × 30 + 5 = 65 seconds`. That is the number the refresh lock's `LIFETIME_SECONDS = 90` is set
+against, and it sits twenty-five seconds clear of it. Changing either without the other is how a
+lock comes to expire underneath the request still holding it.

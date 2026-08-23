@@ -98,3 +98,52 @@ Deleting them belongs with deleting the branch that reads them, in
 same class as `KODI-07`'s, and it is **not** in any Phase 3 plan. Recorded so
 that the pair, their two strings (30011 and 30018) and the three `iskrypton`
 call sites are removed together rather than one at a time.
+
+## Found during 03-12
+
+**8. Three vendored files were silently converted from CRLF to LF.**
+
+`clouddrive_common/ui/addon.py` (in `356de0d`), `clouddrive_common/ui/utils.py`
+(in `c3a1445`) and `resources/skins/default/1080i/pin-dialog.xml` (in `345999a`)
+all arrived from upstream as CRLF and are now LF throughout. Nothing depends on
+it and none of it was deliberate, but it is total in a byte diff: **every line
+of all three now differs from upstream**, so `git diff` against the pinned
+commit shows them as wholly rewritten and says nothing about what actually
+changed. Measured, not inferred — the state of every vendored file was compared
+at the lift commit, at the phase-3 base and at HEAD.
+
+Not corrected here: converting them back is itself a whole-file rewrite of three
+files, and doing that inside a documentation change would bury the same problem
+one commit deeper. 03-12 recorded it in `VENDORED.md` instead, with the
+instruction to use `git diff --ignore-cr-at-eol` on these three until somebody
+normalises them on purpose. Note that upstream is **not** uniform — `remote/provider.py`
+and `export.py` arrived LF — so "normalise everything to LF" is not the repair
+it looks like; the target is whatever upstream holds, per file. **Belongs to a
+sweep of its own**, and the check that pays for it is a gate comparing each
+vendored file's line-ending style against the pinned upstream blob.
+
+**9. `COVERAGE.md` is in the gate harness's exclusion set and has never existed.**
+
+`EXCLUDED_DOCS` in `tests/gatelib.py` holds five names; one of them is
+`COVERAGE.md`, which is in no commit in this repository. It has been in the set
+since the phase-1 gates were written and it excludes nothing. Harmless, and
+harmless is the problem: an entry that does no work sits beside four that do,
+and the next reader has to check the tree to tell them apart.
+
+Not corrected here: 03-12's files are three documents, and `tests/gatelib.py` is
+not among them. The record now names the discrepancy. **Belongs to whoever next
+edits `EXCLUDED_DOCS`** — either delete the entry or create the document, but
+not leave it as a name that resolves to nothing.
+
+**10. The strings orphaned by 03-08 and 03-09 are still orphaned.**
+
+Item 4 above assigned `32007`, `32012`, `32013`, `32023`, `32050`, `32072` and
+`32073` to 03-12 on the grounds that they sit in the vendored module's
+32000-32088 block. 03-12 does not own them: its `files_modified` is
+`addon.xml`, `README.md` and `VENDORED.md`, and it touched no catalogue. The
+partition gate asserts that every *referenced* id resolves, not that every
+declared id is referenced, so all seven are legal where they stand.
+
+**Belongs to whichever plan next edits `resources/language/`**, with the same
+condition item 4 already states: the gate's expected set moves in the same
+commit as any deletion, because that assertion is an exact equality.
