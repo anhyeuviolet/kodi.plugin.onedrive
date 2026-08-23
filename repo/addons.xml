@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addons>
+<addon id="plugin.onedrive.kn" name="OneDrive KN" version="1.0.0" provider-name="Kenny Nguyen">
+	<requires>
+		<import addon="xbmc.python" version="3.0.1" />
+	</requires>
+	<extension point="xbmc.python.pluginsource" library="entrypoint.py">
+		<provides>image audio video</provides>
+	</extension>
+	<extension point="xbmc.service" library="service.py" />
+	<extension point="xbmc.addon.metadata">
+		<platform>all</platform>
+		<summary lang="en_GB">Microsoft OneDrive for KODI</summary>
+		<description lang="en_GB">
+Play all your media from OneDrive including Videos, Music and Pictures.
+ - Unlimited number of personal or business accounts.
+ - Search over your drive.
+ - Auto-Refreshed slideshow.
+ - Export your videos to your library (.strm files)
+ - Use OneDrive as a source
+ - This program is not affiliated with or sponsored by Microsoft.
+		</description>
+		<summary lang="he_IL">כונן OneDrive של מיקרוסופט עבור קודי</summary>
+		<description lang="he_IL">
+הפעל את כל המדיה שלך מ- OneDrive כולל וידאו, מוסיקה ותמונות.
+  - מספר בלתי מוגבל של חשבונות אישיים או עסקיים.
+  - חיפוש ומציאת הכונן שלך.
+  - ריענון מצגת אוטומטית.
+  - ייצוא קטעי הווידאו לספרייה שלך (קבצי .strm)
+  - שימוש ב-OneDrive כמקור
+  - תוכנית זו אינה מזוהה עם או בחסות מיקרוסופט.
+		</description>		
+		<license>GPL-3.0-or-later</license>
+		<source>https://github.com/anhyeuviolet/kodi.plugin.onedrive</source>
+		<forum>https://github.com/anhyeuviolet/kodi.plugin.onedrive/issues</forum>
+		<assets>
+			<icon>icon.png</icon>
+			<fanart>fanart.jpg</fanart>
+		</assets>
+		<news>
+v1.0.0:
+- First release under a new add-on id, maintained independently of the original.
+- Signing in now goes straight to Microsoft: a code appears on screen and you enter it on your phone. It no longer passes through a third-party sign-in server.
+- Self-contained: the Cloud Drive common module is bundled, so no separate module add-on is needed.
+- Requires Kodi 20 or newer.
+		</news>
+		<disclaimer lang="en_GB">
+This add-on signs in with the OAuth 2.0 device authorization grant, directly to Microsoft. It shows
+you a code; you enter that code on your own phone or computer, at the Microsoft address shown beside
+it, and Microsoft hands the token back to the add-on.
+
+No server run by this project, or by anyone else, sits in that exchange, and the add-on never sees
+your password. The application identifier it ships with is public by design: that is what this kind
+of sign-in uses instead of a secret, it only says which program is asking, and on its own it
+authorises nothing. The permission asked for is read-only access to your own files.
+
+This program is not affiliated with or sponsored by Microsoft. Kodi and myself take no
+responsibility or liability.
+		</disclaimer>
+	</extension>
+</addon>
+<addon id="repository.onedrive.kn" name="OneDrive KN Repository" version="1.0.0" provider-name="Kenny Nguyen">
+	<requires>
+		<import addon="xbmc.addon" version="12.0.0" />
+	</requires>
+	<extension point="xbmc.addon.repository">
+		<dir>
+			<info>https://anhyeuviolet.github.io/kodi.plugin.onedrive/repo/addons.xml</info>
+			<checksum verify="sha256">https://anhyeuviolet.github.io/kodi.plugin.onedrive/repo/addons.xml.sha256</checksum>
+			<datadir>https://anhyeuviolet.github.io/kodi.plugin.onedrive/repo</datadir>
+			<hashes>sha256</hashes>
+		</dir>
+	</extension>
+	<extension point="xbmc.addon.metadata">
+		<platform>all</platform>
+		<summary lang="en_GB">Updates for OneDrive KN, over the network</summary>
+		<description lang="en_GB">
+Where Kodi looks for new versions of the OneDrive KN add-on.
+
+Installing this once is the last time a file has to be carried to the television by hand. Afterwards
+Kodi checks this location on its own schedule and offers, or installs, whatever is newer.
+
+It contains no media, no accounts and no code of its own - only the address of the published files
+and the checksums that say the download arrived intact.
+		</description>
+		<license>GPL-3.0-or-later</license>
+		<source>https://github.com/anhyeuviolet/kodi.plugin.onedrive</source>
+		<forum>https://github.com/anhyeuviolet/kodi.plugin.onedrive/issues</forum>
+		<assets>
+			<icon>icon.png</icon>
+		</assets>
+		<news>
+v1.0.0:
+- First release. Points Kodi at the published OneDrive KN files over HTTPS, with SHA-256 verification of the index and of every archive.
+		</news>
+	</extension>
+</addon>
+</addons>

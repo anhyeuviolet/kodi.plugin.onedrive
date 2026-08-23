@@ -1,0 +1,12 @@
+# Every file on this branch is published verbatim and digested byte for byte.
+#
+# addons.xml is served to Kodi alongside addons.xml.sha256, and Kodi refuses the
+# repository when the digest of what it downloaded disagrees with that file. Git's
+# end-of-line conversion would rewrite the bytes on checkout, so a later checkout
+# and re-commit on a machine configured differently from the one that generated
+# the tree would silently invalidate every checksum here.
+#
+# -text disables that conversion for everything, which is correct on a branch that
+# holds no source: the archives and images are binary already, and the two text
+# files are content whose exact bytes are the contract.
+* -text
