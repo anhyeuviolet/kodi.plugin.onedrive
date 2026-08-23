@@ -10,6 +10,16 @@
 .planning/research/.cache/
 .planning/research/url-lifetime-results.log
 
+# Failing sign-in responses captured by .planning/research/verify_device_code.py.
+# The whole response body is kept unredacted, because the fields a redactor
+# would strip are the ones that diagnose it -- which is exactly why the file
+# must never reach the index. One per failure, named by the moment it happened.
+.planning/research/device-code-failure-*.json
+
+# The scratch profile a live sign-in harness writes real tokens into. Belongs
+# outside the tree entirely; this is the second line of defence, not the first.
+.planning/research/live-scratch/
+
 # Test-run artefacts
 __pycache__/
 .pytest_cache/

@@ -17,6 +17,7 @@ Usage:
 import argparse
 import base64
 import json
+import os
 import sys
 import time
 import urllib.error
@@ -84,6 +85,66 @@ def banner(text):
     print("=" * 68)
 
 
+# The two failure branches below used to print the failing response and drop it.
+# That discard is how an earlier observed failure was lost, and the response
+# class it discards -- a tenant that refuses the grant outright -- is precisely
+# the one this project cannot produce on demand, because the tenant hosting this
+# registration permits the grant. So the response gets kept instead.
+CAPTURE_PREFIX = "device-code-failure-"
+CAPTURE_SUFFIX = ".json"
+CAPTURE_COLLISION_LIMIT = 100
+
+
+def capture_failure(stage, status, body, authority):
+    """Write a failing response to a file beside this script. Returns its path.
+
+    Nothing is redacted, on purpose. This file is written by a maintainer on
+    their own machine into a path git is told to ignore, and the fields a
+    redactor would strip are the ones a diagnosis needs. The ignore rule for
+    this filename pattern is what keeps it local, and it landed in the same
+    commit as this function -- so a capture cannot be committed by accident.
+
+    The name carries a timestamp, and a collision inside the same second takes
+    a counter, so a second run can never overwrite the first run's evidence.
+    """
+    record = {
+        "stage": stage,
+        "moment": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "authority": authority,
+        "status": status,
+        "response": body,
+    }
+    directory = os.path.dirname(os.path.abspath(__file__))
+    stamp = time.strftime("%Y%m%d-%H%M%S", time.gmtime())
+
+    for attempt in range(CAPTURE_COLLISION_LIMIT):
+        tail = "" if attempt == 0 else "-%d" % attempt
+        path = os.path.join(
+            directory, CAPTURE_PREFIX + stamp + tail + CAPTURE_SUFFIX)
+        try:
+            fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+        except FileExistsError:
+            continue
+        except OSError as e:
+            print(f"\n  (the failing response could not be saved: {e})")
+            return None
+        with os.fdopen(fd, "w", encoding="utf-8") as handle:
+            json.dump(record, handle, indent=2)
+        return path
+
+    print("\n  (the failing response could not be saved: too many captures in "
+          "the same second)")
+    return None
+
+
+def report_capture(path):
+    """Say where the response went, or say nothing if it went nowhere."""
+    if path:
+        print(f"\n  Failing response saved, unredacted, to:\n    {path}")
+        print("  git is told to ignore that name. Read it where it is; do not")
+        print("  paste its contents into anything tracked.")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--client-id", required=True, help="Application (client) ID from the portal")
@@ -106,6 +167,7 @@ def main():
     if "device_code" not in dc:
         print(f"FAILED  HTTP {status}")
         print(json.dumps(dc, indent=2))
+        report_capture(capture_failure("devicecode", status, dc, args.authority))
         print("\nCommon causes:")
         print("  AADSTS700016  client_id not found in this authority -- check the GUID,")
         print("                and check signInAudience really is")
@@ -161,6 +223,7 @@ def main():
         # add-on has to turn it into one clear sentence on a TV.
         print(f"\nFAILED  HTTP {status}  error={err}")
         print(json.dumps(tok, indent=2))
+        report_capture(capture_failure("token-poll", status, tok, args.authority))
         print("\nWrite this error code down -- the add-on needs to map it to")
         print("a specific message pointing at the custom client_id setting.")
         print("  AADSTS7000218  'Allow public client flows' is still No")
