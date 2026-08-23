@@ -209,3 +209,84 @@ buttons were not reported as hard to read**, and the same acceptance run that
 produced the font finding is the instrument that should settle it. **Belongs to
 the resumed 03-14 acceptance run** — look at the buttons, and if they read
 badly, they are a two-line change with the geometry already in place.
+
+*The acceptance run happened, and it did not settle this.* The buttons were never
+looked at. Task 3's directional-pad row and its two context-menu rows were skipped,
+so nobody moved focus onto either button or had reason to read one. The item stays
+open with its instrument unchanged: **the next session on the television**, where it
+is still a two-line change with the geometry already in place. Recorded so this is
+not read later as "the run looked and found nothing wrong".
+
+## Found during the 03-14 acceptance run
+
+Items 13 and 14 are **feature reports from the owner, not diagnoses**. Neither was
+investigated during the run and neither should be read as understood. Phase 3 is
+authentication; both belong to other phases, and they are written down here because
+the run is where they were seen, not because this phase owns them.
+
+**13. Subtitles from the cloud are unreliable or broken. Likely owner: Phase 6 (Play).**
+
+Reported: subtitles appeared once, and after that the feature was inert.
+
+That is the whole of what is known. It was not reproduced in a controlled way and
+**no log was captured**, so there is no evidence beyond the sentence above. No root
+cause is offered and none should be inferred — with one uncontrolled observation, a
+subtitle track absent from Graph, a fetch that failed, a temporary file Kodi could
+not read, and a player-side selection problem are all equally consistent with
+"appeared once, then nothing", and they have nothing in common to fix.
+
+**The two missing inputs are named deliberately**, because whoever picks this up
+should collect them before reading any code: a **session log from a run that shows
+the failure**, and a **repeatable trigger** — the same file, the same subtitle
+track, the same sequence of actions, twice. Until both exist this is a report.
+
+**14. Mounting the cloud as a directory or source inside Kodi does not work. Likely owner: Phase 4 (Browse), possibly Phase 6.**
+
+Reported: the feature does not function. There is no further detail.
+
+Undiagnosed, and thinner than item 13: what "does not work" resolves to is unknown,
+and that distinction is most of the diagnosis. A refusal to add the source, a source
+that adds and lists nothing, an error dialog, a listing that appears and cannot be
+opened, and a crash are five different defects in three different layers, and the
+report separates none of them.
+
+Needed before this can be worked: **which screen it fails on, what appears instead of
+what was expected, and a log from that moment**.
+
+Two facts about the tree are worth **checking first**, and neither is a diagnosis —
+they are simply cheaper to rule out than anything else here. `SourceService` and its
+port 8586 directory listing **still exist**; they are scheduled for deletion in Phase 7,
+not gone. And Phase 1 changed `allow_directory_listing` to default to **false**, a
+recorded behaviour deviation made safe by the new add-on id meaning no user has a
+stored `true`. If the report is about that mechanism, "off by default" and "deleted on
+purpose in a phase not yet run" are both live possibilities alongside "broken", and
+they are told apart by looking, not by reasoning from here.
+
+**15. Kodi on Android 12 cannot see files on external storage under the default file permission.**
+
+On the TCL Android TV 12 running Kodi 21.2, Kodi's file browser listed **folders** on
+a USB drive but showed **no files** inside them, until the owner changed Kodi's
+Android file permission from "while using the app" to "always". After that the zip
+was visible and installed.
+
+It fails in the shape most likely to be misread: an empty listing looks like an empty
+directory, not like a permission refusal, and nothing on screen says otherwise. The
+Phase 1 Android 11 emulator could not have produced it.
+
+**Belongs with the install documentation** — `README.md`'s build-and-install section,
+which 03-12 owns and which does not mention it. Every future device session pays this
+cost again if it is not written down there.
+
+**16. Installing by URL is not viable on this device. Belongs to Phase 5 (Distribution).**
+
+Attempted during the run and it does not work. Kodi's *add source* browse needs a
+**directory listing**, which a plain file URL does not provide, and adding a
+repository is not a way around it, **because installing a repository is itself a zip
+install**.
+
+The consequence is practical and recurring: every re-test of a new build costs a USB
+round trip to the television. It is not a defect in this add-on and it does not touch
+DIST-01, which is about the archive the build writes — that archive installed through
+Kodi's own file manager. It is a distribution problem, and Phase 5 is where the hosted
+repository that would solve it already sits. Recorded rather than worked around: a
+workaround invented inside an acceptance run changes the thing being accepted.
