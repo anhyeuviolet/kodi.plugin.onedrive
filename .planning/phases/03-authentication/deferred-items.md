@@ -40,6 +40,16 @@ Not caused by and not touched by 03-09. **Belongs to whoever next works on
 `resources/lib/auth/lock.py`**: the acquire timeout in the test is the knob, not
 the lock's own `ACQUIRE_TIMEOUT_SECONDS`.
 
+*Two more observations, during the 03-14 hardware fixes.* It failed twice more,
+on runs of 8.45s and 8.73s, and passed on eight consecutive runs of 3.2–4.3s
+around them. Both failures were on the run immediately following a
+`tools/build_addon_zip.py` build, which is the same shape of cause as the
+`compileall` above. That makes three failures with the same signature and a
+usable predicate rather than a single anecdote: **the run exceeding roughly
+eight seconds is what predicts it**, not anything about the code under test. The
+suite is otherwise green at 252 passed, 1 skipped. Still not worth chasing from
+inside a fix commit, and still the same knob.
+
 **3. `AccountManager.remove_drive` has no caller.**
 
 03-09 deleted the per-drive removal option and its handler as unreachable — one
