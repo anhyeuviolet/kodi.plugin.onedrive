@@ -845,6 +845,108 @@ def test_the_account_list_offers_re_authorisation():
 
 
 # ---------------------------------------------------------------------------
+# The token blob the sign-in flow hands on (the local half of it)
+# ---------------------------------------------------------------------------
+#
+# A provider token response is not a token blob. It carries `expires_in` and no
+# `date`, and `date` is stamped locally by store.merge_token_response --
+# OAuth2._validate_access_tokens requires it, and OAuth2.prepare_request
+# computes expiry from `date + expires_in - 600`. So a raw poll response handed
+# to the vendored OAuth2 layer is rejected by the first request made with it.
+#
+# That is not a theoretical seam. It shipped, and on hardware it turned a
+# sign-in that had actually SUCCEEDED into a Kodi dialog reading "Access tokens
+# provided are not valid" -- because _acquire_tokens returned the poll payload
+# untouched and _identify passed it straight to provider.get_account.
+#
+# The stamp cannot be bought by persisting earlier: _add_account and
+# _reauthorise_account both assemble everything in memory and write in their
+# last two statements, so a cancel anywhere above leaves no partial account
+# behind (AUTH-07). merge_token_response is a pure function and writes nothing,
+# which is why it is the instrument that fits.
+#
+# This asserts the property at the one place that owns it: whatever
+# _acquire_tokens returns has been through the merge.
+
+TOKEN_MERGE = 'merge_token_response'
+
+
+def _returned_names(func):
+    """Every bare name `func` returns, ignoring `return` and `return None`."""
+    names = []
+    for node in ast.walk(func):
+        if isinstance(node, ast.Return) and isinstance(node.value, ast.Name):
+            names.append(node.value.id)
+    return names
+
+
+def test_the_signin_flow_stamps_the_token_before_returning_it():
+    acquire = _function(ROUTER, '_acquire_tokens')
+    assert acquire is not None, (
+        '%s has no _acquire_tokens; it is the only producer of a fresh token '
+        'blob in the tree, so this sweep certifies nothing without it' % ROUTER)
+
+    returned = _returned_names(acquire)
+    assert returned, (
+        '_acquire_tokens returns no name at all, so either it stopped '
+        'producing a token blob or this sweep is reading the wrong function')
+
+    contents = read(ROUTER)
+    source = ast.get_source_segment(contents, acquire) or ''
+
+    # Bound from the merge, not merely mentioned somewhere in the function.
+    merged_names = set()
+    for node in ast.walk(acquire):
+        if not isinstance(node, ast.Assign):
+            continue
+        if not any(_func_name(call.func).split('.')[-1] == TOKEN_MERGE
+                   for call in ast.walk(node.value)
+                   if isinstance(call, ast.Call)):
+            continue
+        for target in node.targets:
+            if isinstance(target, ast.Name):
+                merged_names.add(target.id)
+
+    unstamped = [name for name in returned if name not in merged_names]
+    assert not unstamped, (
+        '_acquire_tokens returns %r without putting it through '
+        'store.%s. The provider sends no `date`; `date` is stamped locally '
+        'and it is one of the four fields OAuth2._validate_access_tokens '
+        'requires. So the very first request made with that blob raises '
+        '"Access tokens provided are not valid", and a sign-in that succeeded '
+        'is reported to the user as a failure. Assignments seen to have gone '
+        'through the merge: %r\n%s'
+        % (unstamped, TOKEN_MERGE, sorted(merged_names), source))
+
+
+def test_the_signin_flow_stamps_without_writing_anything():
+    """AUTH-07, restated where the stamp lands.
+
+    The cheap way to make the blob valid is to persist it as soon as it
+    arrives, and that trades this defect for a worse one: a cancel between the
+    token arriving and the account record being written would leave a
+    credential on disk with no account to own it. So the merge is allowed here
+    and a write is not.
+    """
+    acquire = _function(ROUTER, '_acquire_tokens')
+    assert acquire is not None, '%s has no _acquire_tokens' % ROUTER
+
+    calls = _calls_in(acquire)
+    assert calls, '_acquire_tokens calls nothing, so this sweep certifies nothing'
+
+    writing = [(ROUTER, lineno, name) for name, lineno in calls
+               if name.split('.')[-1] in ('write', 'save_tokens',
+                                          'save_account', 'save_drive',
+                                          'persist_access_tokens')]
+    assert not writing, (
+        '_acquire_tokens writes. Everything from the token arriving to the '
+        'account record being saved is assembled in memory precisely so that a '
+        'cancel anywhere in it leaves nothing behind (AUTH-07), and a write '
+        'here puts a credential on disk that no account record owns:\n%s'
+        % report(writing))
+
+
+# ---------------------------------------------------------------------------
 # The failure table's outcomes and the sentences they render as (AUTH-18)
 # ---------------------------------------------------------------------------
 #

@@ -316,7 +316,31 @@ class CloudDriveAddon:
             outcome, payload = self._await_authorisation(provider, response,
                                                          request_params)
             if outcome == self._SIGNIN_AUTHORISED:
-                tokens_info = payload
+                # Stamped the moment it arrives, and never later. The provider
+                # sends `expires_in` and no `date`; `date` is stamped locally
+                # and it is one of the four fields
+                # OAuth2._validate_access_tokens requires, as well as the one
+                # OAuth2.prepare_request computes expiry from. So the raw poll
+                # response is rejected by the FIRST request made with it, and a
+                # sign-in that actually succeeded is reported to the user as a
+                # failure -- which is what it did on hardware.
+                #
+                # Through store.merge_token_response, which is the single
+                # implementation of the merge rule in the tree, against an
+                # empty previous blob because nothing is stored for this
+                # account yet. It is a pure function and writes nothing, so
+                # everything below still happens in memory: the "nothing is
+                # written until the last two statements" property of
+                # _add_account and _reauthorise_account is untouched (AUTH-07).
+                #
+                # Here rather than in _await_authorisation, whose payload is a
+                # refusal code for one of its four outcomes and which is
+                # protocol-level throughout; and rather than in
+                # provider.poll_for_token, which would have to re-derive which
+                # of its states are successes. This is the one point where a
+                # poll payload becomes the token blob the rest of the flow
+                # uses, so it is where the local half of the blob belongs.
+                tokens_info = store.merge_token_response({}, payload)
                 break
             if outcome != self._SIGNIN_NEW_CODE:
                 self._pin_dialog.close()

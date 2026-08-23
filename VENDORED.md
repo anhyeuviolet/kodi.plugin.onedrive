@@ -236,6 +236,17 @@ convention. `AccountManager.remove_drive` in `clouddrive_common/account.py` lost
 the per-drive removal option went. It is harmless, and it is the shape to restore if drive selection
 ever comes back.
 
+### Fixed on hardware
+
+A third block, kept separate for the same reason the second one is: these rows answer "what did the
+first real sign-in on a television find?", which is a different question again. Each is an
+integration defect between `resources/lib/auth/` and this vendored layer — invisible to a suite that
+tests each side on its own, and visible on the first run where the two met the live provider.
+
+| File | Change | Why |
+|---|---|---|
+| `clouddrive_common/ui/addon.py` | In `_acquire_tokens`, the authorised poll payload is returned as `store.merge_token_response({}, payload)` rather than as `payload` | A provider token response is not a token blob. It carries `expires_in` and no `date`; `date` is stamped locally, it is one of the four fields `OAuth2._validate_access_tokens` requires, and `OAuth2.prepare_request` computes expiry from `date + expires_in - 600`. So the raw payload was rejected by the first request made with it — `_identify` → `provider.get_account` — and a sign-in that had actually **succeeded** reached the television as a dialog reading "Access tokens provided are not valid". Fixed at the seam rather than by persisting the token earlier: `merge_token_response` is a pure function and writes nothing, so `_add_account` and `_reauthorise_account` still assemble everything in memory and write only in their last two statements, and a cancel anywhere above still leaves no partial account behind (AUTH-07). `_await_authorisation` was the wrong site because its payload is a refusal code for one of its four outcomes, and `provider.poll_for_token` was the wrong site because it would have to re-derive which of its states are successes. Held by `test_the_signin_flow_stamps_the_token_before_returning_it` and `test_the_signin_flow_stamps_without_writing_anything`, with the contract itself pinned behaviourally in `tests/test_oauth2_tokens.py` |
+
 ## Service extension point
 
 The module's own manifest declared `<extension point="xbmc.service" library="service.py" start="login" />`,
