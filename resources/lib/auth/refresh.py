@@ -43,8 +43,9 @@ in a test it is a capped no-op.
 """
 
 import collections
+import time
 
-from resources.lib.auth import device_code, store
+from resources.lib.auth import device_code, errors, store
 from resources.lib.auth.lock import RefreshLock
 
 # ---------------------------------------------------------------------------
@@ -89,6 +90,25 @@ Refreshed = collections.namedtuple('Refreshed',
 
 # The grant type for a refresh, per RFC 6749 section 6.
 GRANT_TYPE = 'refresh_token'
+
+# ---------------------------------------------------------------------------
+# The one response this module has to think hardest about
+#
+# `invalid_grant` is what the provider answers when the refresh token it was
+# handed cannot be redeemed. It is also, word for word, what it answers a
+# contender that lost the race: the winner redeemed that token a moment ago and
+# the provider rotated it, so the grant is not dead -- it has moved.
+#
+# Nothing in the response tells the two apart. The store does.
+INVALID_GRANT = 'invalid_grant'
+
+# Refusals that say the provider is having a moment rather than that the grant
+# is finished. RFC 6749 section 5.2 defines both, and neither is a statement
+# about this account.
+TRANSIENT_ERRORS = frozenset(('temporarily_unavailable', 'server_error'))
+
+# At and above this the provider is not answering about the grant at all.
+SERVER_ERROR_STATUS = 500
 
 # ---------------------------------------------------------------------------
 # The short request profile
@@ -153,6 +173,29 @@ LOCK_LIFETIME_SECONDS = RefreshLock.LIFETIME_SECONDS
 ACQUIRE_TIMEOUT_SECONDS = 30
 ADOPT_POLL_SECONDS = 1.0
 ADOPT_ATTEMPTS = 3
+
+# ---------------------------------------------------------------------------
+# The startup threshold (AUTH-16)
+#
+# A refresh token lasts ninety days, and the inactivity clock that expires it
+# is only reset by using it. A media player can sit unused for months, so the
+# service refreshes on Kodi start -- but not on EVERY start. Every write is a
+# chance to leave a temporary file behind on a device that gets power-cut
+# rather than shut down, and a box that is switched on daily does not need a
+# network call and an atomic write each time.
+#
+# Thirty days, not sixty and not eighty-five:
+#
+#     REFRESH_TOKEN_LIFETIME_DAYS - REFRESH_AFTER_DAYS = 90 - 30 = 60
+#
+# days of margin. A threshold near the edge of the window only works for a box
+# that is switched on often, which is the case that needs no help at all: a
+# device used once every forty-five days would skip a sixty-day threshold on
+# one start and find the grant already dead on the next.
+# ---------------------------------------------------------------------------
+REFRESH_TOKEN_LIFETIME_DAYS = 90
+REFRESH_AFTER_DAYS = 30
+SECONDS_PER_DAY = 86400
 
 # ---------------------------------------------------------------------------
 # Observing rotation without publishing a credential
@@ -261,6 +304,7 @@ def _exchange(post, client_id, token_file, blob, now, log):
         return Refreshed(TRANSIENT, blob, None, False, True)
 
     if body.get('access_token'):
+        # -- the ordinary success path ------------------------------------
         # Through the store's own merge, so the keep-the-previous-refresh-token
         # rule has exactly one implementation in the tree.
         merged = store.merge_token_response(blob, body, now=now)
@@ -270,4 +314,76 @@ def _exchange(post, client_id, token_file, blob, now, log):
                 % (fingerprint(used), fingerprint(merged.get('refresh_token'))))
         return Refreshed(SUCCEEDED, merged, None, False, True)
 
-    return Refreshed(NEEDS_REAUTHORISATION, blob, None, False, True)
+    error = body.get('error') or ''
+
+    if (error == device_code.NON_JSON_ERROR or error in TRANSIENT_ERRORS
+            or _is_server_error(status)):
+        # The provider did not answer about this grant. A captive portal's
+        # login page, a proxy's error page and the provider's own bad half
+        # hour all land here, and none of them is evidence about the account.
+        return Refreshed(TRANSIENT, blob, None, False, True)
+
+    if error == INVALID_GRANT:
+        # THE LOST RACE. Before this can mean "sign in again", the store is
+        # re-read FROM DISK -- not from `blob`, which was read before the
+        # request went out and cannot know what happened while it was in
+        # flight. If the stored refresh token has moved on, the winner
+        # redeemed the one this call was carrying and wrote its replacement:
+        # adopt it, and prompt nobody.
+        #
+        # Byte-identical is the only reading that makes this a dead grant. A
+        # weaker test -- "has the file been rewritten" -- would pass on a
+        # rewrite that stored the same token, and a dead grant would then be
+        # retried forever with nothing on screen to say why.
+        current = store.read(token_file)
+        rotated = current.get('refresh_token')
+        if rotated and rotated != used:
+            if log is not None:
+                log('refresh token %s was already redeemed; adopting %s'
+                    % (fingerprint(used), fingerprint(rotated)))
+            return Refreshed(SUCCEEDED, current, None, True, True)
+
+    # A refusal the store does not contradict. Route the code through the one
+    # table in the tree that knows what a provider code means, so the browse
+    # phase inherits this classification rather than inventing a second one.
+    return Refreshed(NEEDS_REAUTHORISATION, blob,
+                     errors.classify_response(body), False, True)
+
+
+def _is_server_error(status):
+    """True when the status says the provider, not the grant, is the problem."""
+    try:
+        return int(status) >= SERVER_ERROR_STATUS
+    except (TypeError, ValueError):
+        return False
+
+
+def should_refresh(blob, threshold_days=REFRESH_AFTER_DAYS, now=None):
+    """Should the startup check refresh this account's token?
+
+    A small predicate rather than part of `refresh`, because the service asks
+    it once per account before deciding to do anything at all, and a predicate
+    that needs a lock and an HTTP port to answer is one nothing can test.
+
+    Three rules, and the third is the one that is easy to get backwards:
+
+      * No refresh token means there is nothing to refresh with. False -- and
+        emphatically not True, which would send the service to the network on
+        every start for an account that has never signed in and mark it as
+        needing re-authorisation every time.
+      * An issue time older than the threshold means refresh.
+      * An ABSENT issue time means refresh. A blob written before the field
+        existed is of unknown age, and unknown has to mean old: assuming it is
+        fresh is the assumption that ends with an expired grant.
+    """
+    blob = blob or {}
+    if not blob.get('refresh_token'):
+        return False
+
+    issued_at = blob.get('issued_at')
+    if not isinstance(issued_at, (int, float)):
+        return True
+
+    if now is None:
+        now = time.time()
+    return (now - issued_at) >= threshold_days * SECONDS_PER_DAY
