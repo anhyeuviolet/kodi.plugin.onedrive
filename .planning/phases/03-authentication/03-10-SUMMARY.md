@@ -53,6 +53,7 @@ key-decisions:
 patterns-established:
   - "Pattern 1: a per-account loop that must be independent is written so that one account's failure is a value, not an exception — every failure mode of one account, including a record it cannot read, returns an outcome and the loop continues"
   - "Pattern 2: the abort-aware wait is read in three places — before the run, between passes, and before each account — because each answers a different question about how long the shutdown has been waiting"
+  - "Pattern 3 (03-09's Pattern 2, met again): when two guards can both satisfy an assertion, the test distinguishes them by an argument rather than by a scripted sequence — a queue of answers lets the wrong guard pass the test, and the mutation is what exposes it"
 
 requirements-completed: [AUTH-16]
 
@@ -244,6 +245,7 @@ token exchange begins. The four are otherwise untouched.
 | 1 | RED — the startup keepalive | `34f1a01` | `tests/test_startup_refresh.py` |
 | 1 | GREEN — the startup keepalive | `488d80c` | `resources/lib/startup_refresh.py`, `tests/test_auth_gates.py` |
 | 2 | Run it from the service entry point | `4a1478d` | `service.py` |
+| — | The between-passes assertion, rewritten stronger after its mutation survived | `7dcab84` | `tests/test_startup_refresh.py` |
 
 ## Gate State After This Plan
 
@@ -260,14 +262,27 @@ Neither was touched.
 
 Sixteen assertions added in `tests/test_startup_refresh.py`. No assertion anywhere was weakened.
 
-**Mutation checks.** Each of the four rules this module exists for was mutated and the mutation
-caught: recording the marker on a transport failure (caught by
-`test_a_transport_failure_marks_nothing_and_changes_nothing`); dropping the threshold and refreshing
-unconditionally (`test_a_recently_issued_token_costs_no_request`, via a port whose being called is
-itself the failure); writing the marker into the token blob instead of the record (the byte-for-byte
-comparison in `test_a_grant_failure_marks_the_record_and_leaves_the_token_file_alone`); and rebuilding
-the record from scratch rather than copying it (the drives comparison in the same test). Every restore
-was from a copy held by the harness, and nothing restored the working tree.
+**Mutation checks: seven run, six caught on the first pass, one survivor fixed.**
+
+| Mutation | Caught by |
+|---|---|
+| The marker is written on any non-success | `test_a_transport_failure_marks_nothing_and_changes_nothing` |
+| The threshold is ignored and every account refreshed | `test_a_recently_issued_token_costs_no_request` |
+| The record is rebuilt rather than copied | `test_a_grant_failure_marks_the_record_and_leaves_the_token_file_alone` |
+| The pass bound is loosened | `test_the_retry_is_bounded` |
+| The marker key drifts from the reader's | `test_the_marker_key_is_the_one_the_account_list_reads` |
+| A successful refresh rewrites every record | `test_a_working_account_is_not_rewritten` |
+| **The wait between passes is called and its answer thrown away** | **survived — see below** |
+
+The survivor is the useful one. `test_a_shutdown_between_passes_stops_the_retry` scripted a queue of
+answers for the abort-aware wait, and the per-account `wait(0)` consumed the True one pass later and
+stopped the run anyway — so a version that called the delay and ignored what it said passed a test
+named after reading it. The two guards are now distinguished by their argument: only a non-zero wait
+reports the shutdown, and the test asserts both that the pause between passes *was* the abort-aware
+wait given the retry delay, and that exactly one request was made. Re-run: seven of seven caught.
+
+The harness held its own copy of the target, asserted its restore byte for byte after each mutation
+and again at the end, and touched nothing else. Nothing restored the working tree.
 
 ## Deviations from Plan
 
@@ -346,3 +361,8 @@ inside Kodi. Three things are therefore still open, all of them 03-14's:
 No new items. The five carried in `deferred-items.md` are untouched, and item 3 —
 `AccountManager.remove_drive` having no caller — was re-read while working in that file and remains
 correct as recorded: this plan reads `get_accounts` and `save_account` and calls neither removal path.
+
+## Self-Check: PASSED
+
+Both created files exist and are tracked; all five commits resolve; no tracked file was deleted
+anywhere in this plan's range.
