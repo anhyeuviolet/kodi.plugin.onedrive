@@ -125,6 +125,10 @@ msgstr ""
 # to nothing else. It is the only place the escape hatch is named, which is
 # what makes the tenant-block message and the custom identifier setting one
 # feature rather than two.
+#
+# 30059 is not part of that pairing. It belongs to re-authorisation: the one
+# case where the exchange succeeded and the answer is still no, because the
+# person signed in as somebody else on their phone.
 
 msgctxt "#30036"
 msgid "Sign in to OneDrive"
@@ -216,6 +220,10 @@ msgstr ""
 
 msgctxt "#30058"
 msgid "The sign-in code expired before it was used. Get a new code and try again."
+msgstr ""
+
+msgctxt "#30059"
+msgid "You signed in as %s, which is a different account. Nothing was changed."
 msgstr ""
 
 msgctxt "#30067"

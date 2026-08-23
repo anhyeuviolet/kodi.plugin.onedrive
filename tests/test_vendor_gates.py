@@ -436,13 +436,16 @@ def test_addon_xml_imports():
 # rather than renumbered, so there is no 30012.
 #
 # 30036-30058 is the sign-in copy: the dialog, the countdown, the account-list
-# labels and one sentence per outcome in resources/lib/auth/errors.py. It was
+# labels and one sentence per outcome in resources/lib/auth/errors.py. 30059 is
+# re-authorisation's one refusal that is not a provider outcome -- the person
+# signed in as somebody else on their phone -- and was added when that handler
+# was written, because it was the one case nobody anticipated. It was
 # added as one contiguous block in one commit, with this set widened in the
 # same commit, because the assertion below is an exact equality -- an addition
 # that leaves this set alone turns a green gate red and hands the next plan a
 # failure it did not cause.
 ADDON_STRING_IDS = (set(range(30000, 30012)) | set(range(30017, 30021))
-                    | set(range(30030, 30036)) | set(range(30036, 30059))
+                    | set(range(30030, 30036)) | set(range(30036, 30060))
                     | set(range(30067, 30070)))
 # The vendored module's contiguous block, left exactly where it was: the module
 # resolves some of these dynamically and one is persisted, so a mechanical
@@ -466,8 +469,9 @@ def _po_ids(rel):
 
 
 def test_string_ids_partitioned():
-    assert len(ADDON_STRING_IDS) == 48, (
-        'the add-on owns 25 renumbered ids plus the 23 the sign-in copy added')
+    assert len(ADDON_STRING_IDS) == 49, (
+        'the add-on owns 25 renumbered ids, the 23 the sign-in copy added, and '
+        "re-authorisation's wrong-account refusal")
     assert len(MODULE_STRING_IDS) == 89, 'the module owns 89 ids'
 
     sets = {}

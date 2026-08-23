@@ -820,9 +820,28 @@ def test_the_account_list_offers_re_authorisation():
     contents = read(ROUTER)
     source = ast.get_source_segment(contents, listing) or ''
     assert '_reauthorise_account' in source, (
-        'the per-row menu does not offer re-authorisation, so an account whose '
-        'credentials went stale has no way back except removal and a fresh '
-        'sign-in (AUTH-22)')
+        'list_accounts never names the re-authorise action, so no row can '
+        'reach it (AUTH-22)')
+
+    # The option specifically, not merely the name somewhere in the method.
+    # Naming the action while building the stale row's default address, and not
+    # putting it in the menu, would leave every healthy account with no way to
+    # sign in again short of removing it -- and that is the shape the first
+    # draft of this assertion missed.
+    menu = [child for child in ast.walk(listing)
+            if isinstance(child, ast.Call)
+            and _func_name(child.func).endswith('context_options.append')]
+    assert menu, (
+        'list_accounts builds no per-row menu at all, so this sweep certifies '
+        'nothing')
+    offered = [child for child in menu
+               if 'reauthorise' in (ast.get_source_segment(contents, child) or '')]
+    assert offered, (
+        'the per-row menu does not offer re-authorisation. An account whose '
+        'credentials went stale then has no way back except removal and a '
+        'fresh sign-in, and the background service has no way to reach a user '
+        'at all (AUTH-17, AUTH-22). The %d menu entries built here are: %r'
+        % (len(menu), [ast.get_source_segment(contents, m) for m in menu]))
 
 
 # ---------------------------------------------------------------------------

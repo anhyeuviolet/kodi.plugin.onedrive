@@ -25,7 +25,8 @@ import time
 import urllib
 from urllib.error import HTTPError, URLError
 
-from resources.lib.auth import device_code, errors
+from resources.lib import auth_context
+from resources.lib.auth import device_code, errors, store
 from resources.lib.vendor.clouddrive_common.account import AccountManager, AccountNotFoundException, \
     DriveNotFoundException
 from resources.lib.vendor.clouddrive_common.exception import UIException, ExceptionUtils, RequestException
@@ -141,25 +142,63 @@ class CloudDriveAddon:
                 drive['display_name'] = self._get_display_name(account, drive, with_format)
         return accounts
                     
+    # The key the background service writes onto an account record when a
+    # refresh comes back as a provider grant failure. The service never prompts
+    # -- it runs at Kodi start with nobody in front of the television -- so this
+    # list is the entire channel by which that failure reaches a person
+    # (AUTH-17). It lives on the record and not in the token file, because an
+    # unreadable token file is one of the failures being signalled.
+    #
+    # Plan 03-10 is the writer; this is the reader. The two are coupled by this
+    # name and by nothing else.
+    NEEDS_REAUTH_KEY = 'needs_reauth'
+
+    def _needs_reauthorisation(self, account):
+        return bool(Utils.get_safe_value(account, self.NEEDS_REAUTH_KEY, False))
+
     def list_accounts(self):
         accounts = self.get_accounts(with_format=True)
         listing = []
         for account_id in accounts:
             account = accounts[account_id]
-            size = len(account['drives'])
+            stale = self._needs_reauthorisation(account)
+            # One row per account. Drive resolution is a single call to
+            # /me/drive, which answers with the default drive and only that, so
+            # this loop runs exactly once per account -- and the branch that
+            # used to offer per-drive removal when it ran more than once has
+            # gone with the endpoints that could have produced a second drive.
             for drive in account['drives']:
                 context_options = []
                 params = {'action':'_search', 'content_type': self._content_type, 'driveid': drive['id']}
                 cmd = 'ActivateWindow(%d,%s?%s)' % (xbmcgui.getCurrentWindowId(), self._addon_url, urllib.parse.urlencode(params))
                 context_options.append((self._common_addon.getLocalizedString(32039), cmd))
+                params['action'] = '_reauthorise_account'
+                reauthorise_cmd = 'RunPlugin('+self._addon_url + '?' + urllib.parse.urlencode(params)+')'
+                context_options.append((self._addon_string(30042), reauthorise_cmd))
                 params['action'] = '_remove_account'
                 context_options.append((self._common_addon.getLocalizedString(32006), 'RunPlugin('+self._addon_url + '?' + urllib.parse.urlencode(params)+')'))
-                if size > 1:
-                    params['action'] = '_remove_drive'
-                    cmd =  'RunPlugin('+self._addon_url + '?' + urllib.parse.urlencode(params)+')'
-                    context_options.append((self._common_addon.getLocalizedString(32007), cmd))
-                list_item = xbmcgui.ListItem(drive['display_name'])
+                label = drive['display_name']
+                if stale:
+                    # Marked in the label rather than only in a context menu
+                    # nobody opens. The colour is a hex value, not a name: a
+                    # name resolves through the skin's colour theme and an
+                    # unresolved one fails silently, which is the whole shape
+                    # of Pitfall 5.
+                    label = '%s [COLOR FFFF6666][%s][/COLOR]' % (
+                        label, self._addon_string(30043))
+                list_item = xbmcgui.ListItem(label)
                 list_item.addContextMenuItems(context_options)
+                if stale:
+                    # Default action is signing in again, not browsing. Browsing
+                    # would make its first request with the credential that
+                    # already failed and show the user a network error instead
+                    # of the one thing that fixes it. Not a folder, for the same
+                    # reason _add_account's row is not: it releases the handle
+                    # and re-enters as an action.
+                    params['action'] = '_reauthorise_account'
+                    url = self._addon_url + '?' + urllib.parse.urlencode(params)
+                    listing.append((url, list_item))
+                    continue
                 params = {'action':'_list_drive', 'content_type': self._content_type, 'driveid': drive['id']}
                 url = self._addon_url + '?' + urllib.parse.urlencode(params)
                 listing.append((url, list_item, True))
@@ -196,35 +235,36 @@ class CloudDriveAddon:
     _SIGNIN_NEW_CODE = 'new_code'
     _SIGNIN_REFUSED = 'refused'
 
-    def _add_account(self):
-        if self._addon_handle is not None and self._addon_handle >= 0:
-            # Kodi is holding a directory handle for this invocation and will
-            # go on holding it until the plugin returns. Sign-in now runs for
-            # as long as the server says the code lives -- three spike runs
-            # differed by nearly fifteen minutes -- and a container fetch
-            # blocked for a quarter of an hour is not a listing that is slow,
-            # it is an add-on that is broken.
-            #
-            # So the handle is released here and the work re-enters as an
-            # action. RunPlugin invokes a plugin with sys.argv[1] == '-1', so
-            # the second invocation arrives here with a negative handle, falls
-            # past this guard and does the work. The context-menu entries in
-            # list_accounts already use exactly this mechanism, so it is this
-            # file's own idiom rather than an import, and resources/lib/addon.py
-            # already guards on a negative handle.
-            #
-            # Observed rather than settled. It follows from documented
-            # behaviour and from this tree's own patterns, but it has not been
-            # run; plan 03-14 runs it on the television.
-            xbmcplugin.endOfDirectory(self._addon_handle, succeeded=False,
-                                      updateListing=False, cacheToDisc=False)
-            KodiUtils.executebuiltin('RunPlugin(%s?%s)' % (
-                self._addon_url,
-                urllib.parse.urlencode({'action': '_add_account',
-                                        'content_type': self._content_type})))
-            return
+    def _released_the_handle(self, params):
+        """True if this invocation handed the directory handle back.
 
-        request_params = {
+        Kodi holds a directory handle for the whole of a plugin invocation. A
+        sign-in runs for as long as the server says the code lives -- three
+        spike runs differed by nearly fifteen minutes -- and a container fetch
+        blocked for a quarter of an hour is not a listing that is slow, it is an
+        add-on that is broken.
+
+        So the handle is released and the work re-enters as an action.
+        RunPlugin invokes a plugin with sys.argv[1] == '-1', so the second
+        invocation arrives with a negative handle, gets False from here and does
+        the work. The context-menu entries in list_accounts already use exactly
+        this mechanism, so it is this file's own idiom rather than an import,
+        and resources/lib/addon.py already guards on a negative handle.
+
+        Observed rather than settled. It follows from documented behaviour and
+        from this tree's own patterns, but it has not been run; plan 03-14 runs
+        it on the television.
+        """
+        if self._addon_handle is None or self._addon_handle < 0:
+            return False
+        xbmcplugin.endOfDirectory(self._addon_handle, succeeded=False,
+                                  updateListing=False, cacheToDisc=False)
+        KodiUtils.executebuiltin('RunPlugin(%s?%s)' % (
+            self._addon_url, urllib.parse.urlencode(params)))
+        return True
+
+    def _signin_request_params(self):
+        return {
             'waiting_retry': lambda request, remaining: self._progress_dialog_bg.update(
                 int((request.current_delay - remaining)/request.current_delay*100),
                 heading=self._common_addon.getLocalizedString(32043) % ('' if request.current_tries == 1 else ' again'),
@@ -235,13 +275,21 @@ class CloudDriveAddon:
             'cancel_operation': self.cancel_operation,
             'wait': self._system_monitor.waitForAbort
         }
-        provider = self.get_provider()
+
+    def _acquire_tokens(self, provider, request_params):
+        """The device-code exchange, from first code to authorised payload.
+
+        Returns the token response, or None if the user cancelled, Kodi is
+        shutting down, or the provider refused. Shared by adding an account and
+        by re-authorising one, because it is the same exchange either way -- the
+        only thing that differs is what is done with what comes back.
+        """
         self._progress_dialog.update(0, self._common_addon.getLocalizedString(32008))
 
         response = provider.request_device_code(request_params)
         self._progress_dialog.close()
         if self.cancel_operation():
-            return
+            return None
         if not response or not Utils.get_safe_value(response, 'device_code', ''):
             raise Exception('Unable to retrieve a device code')
 
@@ -276,7 +324,7 @@ class CloudDriveAddon:
                     # it through the failure handler.
                     self._dialog.ok(self._addon_name,
                                     self._addon_string(30044) % Utils.str(payload))
-                return
+                return None
             # A fresh code, with its own expiry and its own interval. Reusing
             # the previous response's would put a countdown on screen that the
             # server never agreed to.
@@ -288,6 +336,30 @@ class CloudDriveAddon:
             self._pin_dialog.set_code(response['user_code'])
         self._pin_dialog.close()
 
+        if self.cancel_operation():
+            return None
+        return tokens_info
+
+    def _identify(self, provider, request_params, tokens_info):
+        """The account the token that just arrived belongs to.
+
+        Label from the `name` claim, key from the `sub` claim -- both carried by
+        the identity token itself, at no extra request and no extra permission.
+        """
+        self._progress_dialog.update(25, self._common_addon.getLocalizedString(32064),' ',' ')
+        try:
+            return provider.get_account(request_params = request_params, access_tokens = tokens_info)
+        except Exception as e:
+            raise UIException(32065, e)
+
+    def _add_account(self):
+        if self._released_the_handle({'action': '_add_account',
+                                      'content_type': self._content_type}):
+            return
+
+        request_params = self._signin_request_params()
+        provider = self.get_provider()
+        tokens_info = self._acquire_tokens(provider, request_params)
         if self.cancel_operation() or not tokens_info:
             return
 
@@ -296,11 +368,7 @@ class CloudDriveAddon:
         # nothing and there is no partial account to leave behind. That is a
         # structural property rather than a chain of guards each of which has to
         # be right (AUTH-07).
-        self._progress_dialog.update(25, self._common_addon.getLocalizedString(32064),' ',' ')
-        try:
-            account = provider.get_account(request_params = request_params, access_tokens = tokens_info)
-        except Exception as e:
-            raise UIException(32065, e)
+        account = self._identify(provider, request_params, tokens_info)
         if self.cancel_operation():
             return
 
@@ -318,6 +386,65 @@ class CloudDriveAddon:
             # inside the account record. A token in the record is a token in
             # whatever the record is stored in and copied wherever the record is
             # copied (AUTH-11).
+            provider.save_tokens(account['id'], tokens_info)
+            self._account_manager.save_account(account)
+        except Exception as e:
+            raise UIException(32021, e)
+
+        self._progress_dialog.close()
+        KodiUtils.executebuiltin('Container.Refresh')
+
+    def _reauthorise_account(self, driveid):
+        """Sign in again for an account that already exists.
+
+        This is the far end of the background service's silent failure. The
+        service refreshes at Kodi start with nobody in front of the television,
+        so it may not prompt; when a refresh comes back as a provider grant
+        failure it writes NEEDS_REAUTH_KEY onto the record and stops. The list
+        renders that record distinctly and points it here, and the user chooses
+        to sign in (AUTH-17). It is also how a tenant-block message reaches
+        somebody who was signed in and then got blocked.
+        """
+        if self._released_the_handle({'action': '_reauthorise_account',
+                                      'content_type': self._content_type,
+                                      'driveid': driveid}):
+            return
+
+        existing = self._account_manager.get_by_driveid('account', driveid)
+        request_params = self._signin_request_params()
+        provider = self.get_provider()
+        tokens_info = self._acquire_tokens(provider, request_params)
+        if self.cancel_operation() or not tokens_info:
+            return
+
+        signed_in = self._identify(provider, request_params, tokens_info)
+        if self.cancel_operation():
+            return
+
+        if Utils.str(signed_in['id']) != Utils.str(existing['id']):
+            # A different account signed in on the phone. Writing this blob
+            # against the record that was chosen would bind one person's
+            # credential to another person's row, and every request afterwards
+            # would read the wrong drive under the right label -- silently, and
+            # on a device more than one person uses. So nothing is written and
+            # the user is told which account actually signed in.
+            self._progress_dialog.close()
+            Logger.notice('re-authorisation abandoned: a different account '
+                          'signed in')
+            self._dialog.ok(self._addon_name, self._addon_string(30059)
+                            % Utils.unicode(signed_in['name']))
+            return
+
+        # Assembled in memory, written last, exactly as adding an account is.
+        # The stored drives are kept rather than fetched again: the drive id is
+        # what every list row and every stored export references, and refetching
+        # it to arrive at the same value only adds a request that can fail.
+        account = dict(existing)
+        account['name'] = signed_in['name']
+        account.pop(self.NEEDS_REAUTH_KEY, None)
+
+        self._progress_dialog.update(75, self._common_addon.getLocalizedString(32020))
+        try:
             provider.save_tokens(account['id'], tokens_info)
             self._account_manager.save_account(account)
         except Exception as e:
@@ -426,17 +553,29 @@ class CloudDriveAddon:
             Logger.debug('poll: network unreachable (%s); still waiting' % e)
         return device_code.PENDING, None
 
-    def _remove_drive(self, driveid):
-        account = self._account_manager.get_by_driveid('account', driveid)
-        drive = self._account_manager.get_by_driveid('drive', driveid, account)
-        if self._dialog.yesno(self._addon_name, self._common_addon.getLocalizedString(32023) % self._get_display_name(account, drive, True)):
-            self._account_manager.remove_drive(driveid, account)
-            KodiUtils.executebuiltin('Container.Refresh')
-    
+    # The per-drive removal option and its handler stood here. Drive resolution
+    # is a single call to GET /me/drive, which answers with the default drive
+    # and only that -- GET /drives is 403 on both account classes and is not a
+    # v1.0 endpoint at all, and GET /me/drives is 403 accessDenied for personal
+    # accounts. An account therefore carries exactly one drive, the branch that
+    # offered this option when it carried more than one can never be taken, and
+    # the option was unreachable rather than merely unused. The measurement is
+    # in the commit body; the document-library work deferred out of this
+    # milestone would need drive selection again, and the shape to restore is
+    # OneDrive.get_drives together with this handler.
+
     def _remove_account(self, driveid):
         account = self._account_manager.get_by_driveid('account', driveid)
         if self._dialog.yesno(self._addon_name, self._common_addon.getLocalizedString(32022) % self._get_display_name(account, with_format=True)):
             self._account_manager.remove_account(account['id'])
+            # The record is what the list reads, so removing it alone makes the
+            # removal look complete. The token file and the lock file sit beside
+            # it under accounts/, and an account removed and then re-added would
+            # inherit the stale blob -- producing a refresh refused against a
+            # credential the user believes they just replaced, with no visible
+            # cause (AUTH-20, T-03-43). Both files go, tolerating either being
+            # absent already.
+            store.remove_account(auth_context.profile_path(), account['id'])
             KodiUtils.executebuiltin('Container.Refresh')
         
     def _list_drive(self, driveid):
@@ -880,8 +1019,8 @@ class CloudDriveAddon:
         """
         actions = {
             '_add_account': self._add_account,
+            '_reauthorise_account': self._reauthorise_account,
             '_remove_account': self._remove_account,
-            '_remove_drive': self._remove_drive,
             '_list_drive': self._list_drive,
             '_list_folder': self._list_folder,
             '_list_exports': self._list_exports,
