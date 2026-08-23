@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 03
 current_phase_name: authentication
 status: executing
-stopped_at: Completed 03-02-PLAN.md
-last_updated: "2026-08-23T02:56:10.198Z"
+stopped_at: Completed 03-03-PLAN.md
+last_updated: "2026-08-23T03:20:18.119Z"
 last_activity: 2026-08-23
 last_activity_desc: Phase 03 execution started
 progress:
   total_phases: 2
   completed_phases: 1
   total_plans: 21
-  completed_plans: 8
+  completed_plans: 10
 ---
 
 # Project State
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-08-22)
 ## Current Position
 
 Phase: 03 (authentication) — EXECUTING
-Plan: 3 of 14
+Plan: 4 of 14
 Status: Ready to execute
 stands, its Windows rows were descoped because Windows is not a target. Phase criterion 2 (the Kodi
 19/20/21/22 install matrix) is therefore **unmet by decision, not satisfied**, and KODI-02 stays unchecked.
@@ -38,7 +38,7 @@ against the tree, KODI-01 and SETUP-06 carry inline qualifications, and the ROAD
 broker" parenthetical was corrected to the measurement.
 Last activity: 2026-08-23 — Phase 03 execution started
 
-Progress: [████░░░░░░] 38%
+Progress: [█████░░░░░] 48%
 
 ## Performance Metrics
 
@@ -73,6 +73,7 @@ Progress: [████░░░░░░] 38%
 | Phase 01 P07 | ~2h | 3 tasks | 3 files |
 | Phase 03 P01 | 25min | 3 tasks | 6 files |
 | Phase 03 P02 | 12min | 2 tasks | 3 files |
+| Phase 03 P03 | 30 min | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -125,6 +126,10 @@ Load-bearing choices for current work:
 - [Phase 3]: store.read raises on a corrupt token file; {} is returned only for an absent one, so a merge cannot start from nothing and drop a refresh token
 - [Phase 3]: DIST-01 is corrected in place: the archive's top-level directory is plugin.onedrive.kn, from the manifest, because Kodi refuses an install whose directory disagrees with the id inside
 - [Phase 3]: The archive's member list comes from the git index with an exclusion list over first path components, never a filesystem walk and never a hand-maintained include list
+- [Phase 03]: The gate harness lives in tests/gatelib.py and nowhere else; a second gate file imports it rather than restating the exclusion set, because two exclusion sets drift and a drifting one is how a gate stops checking anything
+- [Phase 03]: docs/AZURE-REGISTRATION.md is the fifth entry in EXCLUDED_DOCS and is paid for by test_runbook_contains_aadsts7000218; the credential pattern is never softened to let a required quote through
+- [Phase 03]: The unanswerable-endpoint gate matches the whole parsed path, never a prefix: /me/ normalises to /me and is the call sign-in makes first, so a prefix test written against /me/drives would miss the only failure that breaks sign-in outright
+- [Phase 03]: tests/test_auth_gates.py is written once in plan 03-03 and is not edited again by any later plan in this phase; a plan that wants to change an assertion rather than satisfy it must raise it instead
 
 ### Pending Todos
 
@@ -152,6 +157,7 @@ Open concerns:
 - ~~01-07 acceptance pass: the install matrix on Kodi 19/20/21.3/22 and the Windows acceptance row cannot run from this shell.~~ **Closed 2026-08-23, and not by being solved.** The session blocker later cleared, and the leg was then dropped by decision — Windows is not a target. The Android row remains filled and clean; the Windows rows remain unfilled and are recorded as such. **KODI-02 is not met and stays unchecked.**
 - **The Kodi 19 refusal has only uncontrolled evidence.** A harvested log from an unobserved run shows Kodi 19.5 refusing the zip for the declared reason (`The dependency on xbmc.python version 3.0.1 could not be satisfied`), on an unverified profile. KODI-01 is left checked on that basis and flagged, not silently accepted — the maintainer decides whether to re-run it once cleanly.
 - **The Phase 1 acceptance row ran on an Android 11 emulator, one API level below the TCL Android TV 12 it stands in for.** Nothing about API 31, real GPU, D-pad focus, readability or low-end performance is established. The first run on the TCL is recorded against Phase 3.
+- Plans 03-08 and 03-09 both verify with pytest tests/test_auth_gates.py -k (broker or redact) and neither can be green there: the broker sweep also reads the settings row (03-11) and the manifest disclaimer (03-12), and the redaction sweep also reads ui/addon.py and errorreport.py (03-09). Read the named sites; do not weaken the sweeps.
 
 ## Deferred Items
 
@@ -167,6 +173,6 @@ Open concerns:
 
 ## Session Continuity
 
-Last session: 2026-08-23T02:56:10.174Z
-Stopped at: Completed 03-02-PLAN.md
+Last session: 2026-08-23T03:19:09.957Z
+Stopped at: Completed 03-03-PLAN.md
 Resume file: None
