@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 03
 current_phase_name: authentication
 status: executing
-stopped_at: Completed 03-08-PLAN.md
-last_updated: "2026-08-23T04:49:25.115Z"
+stopped_at: Completed 03-09-PLAN.md
+last_updated: "2026-08-23T05:22:55.338Z"
 last_activity: 2026-08-23
 last_activity_desc: Phase 03 execution started
 progress:
   total_phases: 2
   completed_phases: 1
   total_plans: 21
-  completed_plans: 15
+  completed_plans: 16
 ---
 
 # Project State
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-08-22)
 ## Current Position
 
 Phase: 03 (authentication) — EXECUTING
-Plan: 9 of 14
+Plan: 10 of 14
 Status: Ready to execute
 stands, its Windows rows were descoped because Windows is not a target. Phase criterion 2 (the Kodi
 19/20/21/22 install matrix) is therefore **unmet by decision, not satisfied**, and KODI-02 stays unchecked.
@@ -38,7 +38,7 @@ against the tree, KODI-01 and SETUP-06 carry inline qualifications, and the ROAD
 broker" parenthetical was corrected to the measurement.
 Last activity: 2026-08-23 — Phase 03 execution started
 
-Progress: [███████░░░] 71%
+Progress: [████████░░] 76%
 
 ## Performance Metrics
 
@@ -79,6 +79,7 @@ Progress: [███████░░░] 71%
 | Phase 03 P06 | 25min | 2 tasks | 2 files |
 | Phase 03 P07 | 20min | 2 tasks | 2 files |
 | Phase 03 P08 | 22m | 3 tasks | 6 files |
+| Phase 03 P09 | 3h22m | 3 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -155,6 +156,9 @@ Load-bearing choices for current work:
 - [Phase ?]: A provider refusal during sign-in is shown with dialog.ok, not raised: raising routes it through the failure handler, which still offers to send an error report to the third party this phase is removing
 - [Phase ?]: Request path literals stay written out at the call site rather than behind a constant, because test_no_unanswerable_provider_endpoint can only read a whole literal
 - [Phase ?]: VENDORED.md is left to 03-12 even though 03-08 deletes a vendored file; the change record is handed over in 03-08-SUMMARY.md rather than written by two plans into one document
+- [Phase 03]: A plugin address selects an entry in an explicit mapping, never an attribute on an object. A stop-list was refused in the source: the namespace it filters grows with every method added, a mapping does not
+- [Phase 03]: Re-authorising as a different account writes nothing and says which account signed in — the alternative binds one person's credential to another person's row, silently, on a shared television
+- [Phase 03]: The error reporter is deleted rather than disabled, with its six call sites in five other modules rewritten to log a stack trace; KODI-08 still waits on 03-11's settings row and no shared-id gate will say so
 
 ### Pending Todos
 
@@ -198,6 +202,6 @@ Open concerns:
 
 ## Session Continuity
 
-Last session: 2026-08-23T04:49:14.134Z
-Stopped at: Completed 03-08-PLAN.md
+Last session: 2026-08-23T05:22:55.321Z
+Stopped at: Completed 03-09-PLAN.md
 Resume file: None
