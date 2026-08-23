@@ -31,7 +31,8 @@ import time
 
 import pytest
 
-from resources.lib.auth import store
+from resources.lib.auth import device_code, store
+from resources.lib.auth.lock import RefreshLock
 
 
 def test_write_then_read_round_trips(store_path):
@@ -352,3 +353,206 @@ def test_a_corrupt_store_is_not_silently_read_as_no_account(store_path):
 
     with pytest.raises(ValueError):
         store.read(str(store_path))
+
+
+# ---------------------------------------------------------------------------
+# One file and one lock per account (AUTH-20)
+# ---------------------------------------------------------------------------
+#
+# The account key is the pairwise subject identifier out of the identity token.
+# It is per-application and per-user, and the spike measured two users in one
+# tenant returning different values, which is the direct evidence for keying on
+# it. It is URL-safe base64 and therefore filename-safe as written -- which is
+# exactly why it must be *asserted* rather than trusted. A key that reaches the
+# filesystem unvalidated is a path traversal with extra steps, even when
+# today's issuer would never emit one (T-03-16).
+
+ACCOUNT_A = 'AAAAAAAAAAAAAAAAAAAAAJ1zzz-first_account'
+ACCOUNT_B = 'AAAAAAAAAAAAAAAAAAAAAJ1zzz-second-account'
+
+SESSION = 'aaaaaaaaaaaa4aaaaaaaaaaaaaaaaaaa'
+
+
+def no_wait(seconds):
+    return False
+
+
+@pytest.fixture
+def profile(tmp_path):
+    """The resolved profile directory.
+
+    It arrives already translated from `special://profile/addon_data/...` by the
+    Kodi layer. Nothing under `resources/lib/auth/` translates a Kodi path or
+    learns that such a thing exists.
+    """
+    path = tmp_path / 'addon_data'
+    path.mkdir()
+    return str(path)
+
+
+def test_two_accounts_get_two_token_files_and_two_lock_files(profile):
+    paths = [
+        store.token_path(profile, ACCOUNT_A),
+        store.token_path(profile, ACCOUNT_B),
+        store.lock_path(profile, ACCOUNT_A),
+        store.lock_path(profile, ACCOUNT_B),
+    ]
+
+    assert len(set(paths)) == 4, 'two accounts share a path: %s' % paths
+
+
+def test_the_lock_sits_beside_the_token_file_it_protects(profile):
+    """One pair per account, in one directory. The lock is meaningless anywhere
+    else: it exists to serialise writes to that file."""
+    token = store.token_path(profile, ACCOUNT_A)
+    lock = store.lock_path(profile, ACCOUNT_A)
+
+    assert os.path.dirname(token) == os.path.dirname(lock)
+    assert token != lock
+
+
+def test_neither_accounts_write_is_visible_in_the_others_file(profile):
+    """T-03-20, proven on a real filesystem rather than argued from the path
+    derivation."""
+    store.accounts_dir(profile, create=True)
+
+    store.write(store.token_path(profile, ACCOUNT_A),
+                {'access_token': 'a-token', 'refresh_token': 'a-refresh'})
+    store.write(store.token_path(profile, ACCOUNT_B),
+                {'access_token': 'b-token', 'refresh_token': 'b-refresh'})
+
+    assert store.read(store.token_path(profile, ACCOUNT_A)) == {
+        'access_token': 'a-token', 'refresh_token': 'a-refresh'}
+    assert store.read(store.token_path(profile, ACCOUNT_B)) == {
+        'access_token': 'b-token', 'refresh_token': 'b-refresh'}
+
+
+def test_two_accounts_refreshing_at_once_do_not_contend(profile):
+    """Isolation by construction: two accounts do not need to take turns,
+    because their locks are different names and the lock is a name."""
+    store.accounts_dir(profile, create=True)
+
+    first = RefreshLock(store.lock_path(profile, ACCOUNT_A), SESSION, no_wait)
+    second = RefreshLock(store.lock_path(profile, ACCOUNT_B), SESSION, no_wait)
+
+    assert first.acquire(1) is True
+    assert second.acquire(1) is True, \
+        'the second account waited on the first account s lock'
+
+    first.release()
+    second.release()
+
+
+def test_removing_an_account_removes_its_token_and_its_lock(profile):
+    """Easy to forget, and forgetting it means a removed-and-re-added account
+    inherits a stale blob and fails later for no visible reason."""
+    store.accounts_dir(profile, create=True)
+    store.write(store.token_path(profile, ACCOUNT_A), {'access_token': 'a'})
+    lock = RefreshLock(store.lock_path(profile, ACCOUNT_A), SESSION, no_wait)
+    lock.acquire(1)
+    lock.release()
+    open(store.lock_path(profile, ACCOUNT_A), 'w').close()
+
+    store.remove_account(profile, ACCOUNT_A)
+
+    assert not os.path.exists(store.token_path(profile, ACCOUNT_A))
+    assert not os.path.exists(store.lock_path(profile, ACCOUNT_A))
+
+
+def test_removing_one_account_leaves_the_other_untouched(profile):
+    store.accounts_dir(profile, create=True)
+    store.write(store.token_path(profile, ACCOUNT_A), {'access_token': 'a'})
+    store.write(store.token_path(profile, ACCOUNT_B), {'access_token': 'b'})
+
+    store.remove_account(profile, ACCOUNT_A)
+
+    assert store.read(store.token_path(profile, ACCOUNT_B)) == \
+        {'access_token': 'b'}
+
+
+def test_removing_an_account_that_was_never_there_is_not_an_error(profile):
+    store.accounts_dir(profile, create=True)
+
+    store.remove_account(profile, ACCOUNT_A)
+
+
+def test_a_re_added_account_starts_with_nothing_inherited(profile):
+    store.accounts_dir(profile, create=True)
+    store.write(store.token_path(profile, ACCOUNT_A),
+                {'access_token': 'stale', 'refresh_token': 'stale-refresh'})
+
+    store.remove_account(profile, ACCOUNT_A)
+
+    assert store.read(store.token_path(profile, ACCOUNT_A)) == {}
+
+
+def test_the_profile_path_is_used_exactly_as_it_arrives(profile):
+    """No translation, no `special://`, no Kodi. The path is resolved once by
+    the caller and passed in whole."""
+    assert store.token_path(profile, ACCOUNT_A).startswith(profile)
+    assert store.lock_path(profile, ACCOUNT_A).startswith(profile)
+
+
+def test_the_subject_claim_out_of_an_identity_token_is_an_acceptable_key(
+        responses):
+    """The validator has to accept the thing the issuer actually emits, or it
+    is a gate that fails closed on every sign-in."""
+    claims = device_code.read_identity_claims(responses.id_token(
+        sub='AAAAAAAAAAAAAAAAAAAAAJ1zzzabcDEF-_09'))
+
+    assert store.validate_account_key(claims['sub']) == claims['sub']
+
+
+UNSAFE_KEYS = [
+    '..',
+    '.',
+    '../../etc/passwd',
+    'a/b',
+    'a\\b',
+    '/absolute',
+    '',
+    'has space',
+    'has.dot',
+    'nul\x00byte',
+    'quote"',
+    'tilde~',
+    'colon:name',
+]
+
+
+@pytest.mark.parametrize('key', UNSAFE_KEYS)
+def test_an_unsafe_account_key_is_rejected(key):
+    """T-03-16. Rejected rather than sanitised: a sanitiser silently maps two
+    different keys onto one file, which is the cross-account leak this
+    requirement exists to prevent, arriving by a different road."""
+    with pytest.raises(ValueError):
+        store.validate_account_key(key)
+
+
+def test_an_absurdly_long_key_is_rejected():
+    """Filenames have limits, and the failure when one is exceeded arrives as an
+    OSError from the middle of a credential write."""
+    with pytest.raises(ValueError):
+        store.validate_account_key('A' * 4096)
+
+
+@pytest.mark.parametrize('key', ['..', '../../etc/passwd', 'a/b', ''])
+def test_every_path_producer_validates_before_it_joins(profile, key):
+    """The validator is worth nothing if one of the three entry points forgets
+    to call it, so all three are asserted rather than the validator alone."""
+    with pytest.raises(ValueError):
+        store.token_path(profile, key)
+    with pytest.raises(ValueError):
+        store.lock_path(profile, key)
+    with pytest.raises(ValueError):
+        store.remove_account(profile, key)
+
+
+def test_a_rejected_key_touches_nothing_on_disk(profile):
+    accounts = store.accounts_dir(profile, create=True)
+
+    with pytest.raises(ValueError):
+        store.remove_account(profile, '../../addon_data')
+
+    assert os.path.isdir(accounts)
+    assert os.listdir(accounts) == []
