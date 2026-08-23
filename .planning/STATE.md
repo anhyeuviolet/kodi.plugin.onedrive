@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.4.0
 milestone_name: milestone
-current_phase: 01
-current_phase_name: vendor-lift
-status: verifying
-stopped_at: "Phase 1 record gaps closed; acceptance device and drive-type scope corrected"
-last_updated: "2026-08-23T00:00:00.000Z"
+current_phase: 2
+current_phase_name: Pure Core and CI Harness
+status: planning
+stopped_at: Phase 1 record gaps closed; acceptance device and drive-type scope corrected
+last_updated: "2026-08-23T00:38:50.710Z"
 last_activity: 2026-08-23
-last_activity_desc: Record corrections and scope narrowing applied
+last_activity_desc: Phase 01 complete, transitioned to Phase 2
 progress:
   total_phases: 1
   completed_phases: 1
@@ -27,16 +27,16 @@ See: .planning/PROJECT.md (updated 2026-08-22)
 
 ## Current Position
 
-Phase: 01 (vendor-lift) — VERIFIED, record gaps closed
-Plan: 7 of 7 — all closed
-Status: All plans closed. 01-07 closed 2026-08-23 under a scope reduction: its Android acceptance row
+Phase: 2 — Pure Core and CI Harness
+Plan: Not started
+Status: Ready to plan
 stands, its Windows rows were descoped because Windows is not a target. Phase criterion 2 (the Kodi
 19/20/21/22 install matrix) is therefore **unmet by decision, not satisfied**, and KODI-02 stays unchecked.
 Verification found four record-accuracy gaps and no functional blocker; all four are now closed — the
 QR encoder's provenance is in `VENDORED.md` and `CREDITS.md`, two modification counts were corrected
 against the tree, KODI-01 and SETUP-06 carry inline qualifications, and the ROADMAP's "already-dead
 broker" parenthetical was corrected to the measurement.
-Last activity: 2026-08-23 — record gaps closed; acceptance device and drive-type scope corrected
+Last activity: 2026-08-23 — Phase 01 complete, transitioned to Phase 2
 
 Progress: [██████████] 100%
 
@@ -44,7 +44,7 @@ Progress: [██████████] 100%
 
 **Velocity:**
 
-- Total plans completed: 0
+- Total plans completed: 7
 - Average duration: —
 - Total execution time: 0.0 hours
 
@@ -52,7 +52,7 @@ Progress: [██████████] 100%
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 01 | 7 | - | - |
 
 **Recent Trend:**
 

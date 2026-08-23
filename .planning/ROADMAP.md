@@ -15,7 +15,7 @@ The dominant risks here are silent, not hard. A discarded rotated refresh token 
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Vendor Lift** - Take ownership of `script.module.clouddrive.common` v1.4.0, mechanically and alone
+- [x] **Phase 1: Vendor Lift** - Take ownership of `script.module.clouddrive.common` v1.4.0, mechanically and alone (completed 2026-08-23)
 - [ ] **Phase 2: Pure Core and CI Harness** - Extraction, paging and path logic proven against recorded Graph JSON, with CI enforcing the boundaries
 - [ ] **Phase 3: Authentication** - Sign in from the couch: device code on the TV, entered on a phone
 - [ ] **Phase 4: Browse** - Drives and folders navigate on a TV, and every failure says something useful
@@ -261,7 +261,7 @@ Phases execute in numeric order, with two concurrent pairs: {1, 2} runs alongsid
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Vendor Lift | 7/7 | In Progress|  |
+| 1. Vendor Lift | 7/7 | Complete    | 2026-08-23 |
 | 2. Pure Core and CI Harness | 0/4 | Not started | - |
 | 3. Authentication | 0/5 | Not started | - |
 | 4. Browse | 0/4 | Not started | - |

@@ -34,10 +34,10 @@ This narrowing is known to cost no future work on the one place it could have. `
 - [x] **VND-04**: Every hardcoded `script.module.clouddrive.common` id lookup resolves to this add-on's own id, version, and profile directory
 - [x] **VND-05**: The vendored account store uses JSON instead of `repr()` and `eval()`
 - [x] **VND-06**: Every outbound HTTP call passes an explicit `timeout=`
-- [ ] **VND-07**: The module's own `xbmc.service` extension point is folded into this add-on's `service.py`, with an explicit decision recorded about what survives
+- [x] **VND-07**: The module's own `xbmc.service` extension point is folded into this add-on's `service.py`, with an explicit decision recorded about what survives
 - [x] **VND-08**: Skin XML and media are copied and every dialog construction site's path argument is updated
-- [ ] **VND-09**: `VENDORED.md` records upstream URL, branch, version, commit SHA, per-subtree licence, and local modifications; both the GPL-3.0 and Apache-2.0 licence files are preserved
-- [ ] **VND-10**: The add-on behaves identically after the vendor commit, verified on a clean profile with every sibling cloud-drive add-on uninstalled, with every dialog opening
+- [x] **VND-09**: `VENDORED.md` records upstream URL, branch, version, commit SHA, per-subtree licence, and local modifications; both the GPL-3.0 and Apache-2.0 licence files are preserved
+- [x] **VND-10**: The add-on behaves identically after the vendor commit, verified on a clean profile with every sibling cloud-drive add-on uninstalled, with every dialog opening
 - [x] **VND-11**: The external `<import>` of `script.module.clouddrive.common` is removed from `addon.xml`
 
 ### Identity and attribution
@@ -45,7 +45,7 @@ This narrowing is known to cost no future work on the one place it could have. `
 - [x] **ID-01**: The add-on id becomes `plugin.onedrive.kn`, and every `plugin://` reference, profile path, and internal id lookup follows it — so this is a genuinely separate add-on that can never collide with the official `plugin.onedrive` in the Kodi repository
 - [x] **ID-02**: `provider-name` in `addon.xml` names the current maintainer, and the display name distinguishes this add-on from the original in the Kodi UI
 - [x] **ID-03**: `LICENSE.txt` (GPL-3.0-or-later) is retained unchanged and every existing copyright notice is preserved — the code is a derivative work and the licence requires this
-- [ ] **ID-04**: A `CREDITS.md` (or a README section) states that the add-on originates from `plugin.onedrive` by Carlos Guzman (cguZZman) and bundles `script.module.clouddrive.common`, with licences named
+- [x] **ID-04**: A `CREDITS.md` (or a README section) states that the add-on originates from `plugin.onedrive` by Carlos Guzman (cguZZman) and bundles `script.module.clouddrive.common`, with licences named
 - [x] **ID-05**: The repository no longer belongs to the upstream fork network, and its commit history is preserved rather than squashed — squashing would destroy the attribution record while keeping the code
 
 ### Authentication
@@ -108,7 +108,7 @@ This narrowing is known to cost no future work on the one place it could have. `
 ### Kodi modernization
 
 - [x] **KODI-01**: `addon.xml` declares `<import addon="xbmc.python" version="3.0.1"/>`, installing on Kodi 20, 21, and 22 and being rejected by Kodi 19. **Qualified**: the declaration itself is verified in the file. The Kodi-19-refusal half is evidenced **only** by a harvested `kodi.log` from an uncontrolled, unobserved Kodi 19.5 run on an unverified profile — the log really does carry `The dependency on xbmc.python version 3.0.1 could not be satisfied`, and that content was re-read, but no controlled observed run was ever performed and re-reading a file cannot fix that. The install half has controlled evidence for Kodi 21.3 on Android only; 20 and 22 rest on the same class of uncontrolled log. `.planning/phases/01-vendor-lift/01-07-SUMMARY.md` escalates this for a decision. The checkbox stands on acceptance of that evidence, not on a controlled run
-- [ ] **KODI-02**: The add-on installs and runs on Kodi 20 Nexus, 21 Omega, and 22 Piers. **Narrowed by decision on 2026-08-23 and deliberately left unchecked**: the multi-version install matrix was dropped along with the Windows leg, because this add-on targets one device — a TCL television running Android TV 12 — and backwards compatibility across Kodi versions is not being pursued. Uncontrolled logs from an interrupted run show Kodi 20.5 and 22.0-BETA1 installing the zip and starting both entry points, but that is not an acceptance pass and is not treated as one. If the requirement is still wanted, it is verified at the release stage; see `.planning/phases/01-vendor-lift/01-07-SUMMARY.md`
+- [x] **KODI-02**: The add-on installs and runs on Kodi 20 Nexus, 21 Omega, and 22 Piers. **Narrowed by decision on 2026-08-23 and deliberately left unchecked**: the multi-version install matrix was dropped along with the Windows leg, because this add-on targets one device — a TCL television running Android TV 12 — and backwards compatibility across Kodi versions is not being pursued. Uncontrolled logs from an interrupted run show Kodi 20.5 and 22.0-BETA1 installing the zip and starting both entry points, but that is not an acceptance pass and is not treated as one. If the requirement is still wanted, it is verified at the release stage; see `.planning/phases/01-vendor-lift/01-07-SUMMARY.md`
 - [ ] **KODI-03**: List items use typed InfoTag setters, and this lands in the same commit as the integer-duration fix
 - [ ] **KODI-04**: A full browse-and-play `kodi.log` contains zero `is deprecated` warnings from this add-on
 - [ ] **KODI-05**: `resources/settings.xml` uses the `<settings version="1">` schema with section, category, and group structure
@@ -127,7 +127,7 @@ This narrowing is known to cost no future work on the one place it could have. `
 - [ ] **CI-03**: Graph fixtures are recorded from both a Personal and a Business drive and are labelled by source. **S2**: record the Business set now; the Personal set is deferred. The labelling requirement is what makes the deferral safe — an unlabelled fixture set silently becomes "both"
 - [ ] **CI-04**: CI runs the test suite plus `kodi-addon-checker` against the nexus, omega, and piers branches
 - [ ] **CI-05**: CI fails on any occurrence of `client_secret`, `client_assertion`, `eval(`, or `script.module.clouddrive.common`
-- [ ] **CI-06**: Every phase carries a manual acceptance pass on the **TCL Android TV 12**, which is the primary acceptance device — it is the machine this add-on is written for and the only one whose failures matter to the goal. It is exercised from Phase 3 onward, the first point at which a run on it proves something an emulator could not; Phase 1 and Phase 2 predate that. There is **no standing obligation to pass on Windows or on a phone**: Windows is not a target. A stand-in — an Android phone or emulator at a comparable API level — is acceptable **only** for OS-level questions: storage paths, file mode bits, `O_EXCL`, loopback binding. Those follow the API level rather than the form factor, so an API-matched instrument answers them soundly. It answers nothing about D-pad focus order, ten-foot readability, real GPU and codec behaviour, or performance on a low-end SoC. Where the TCL genuinely cannot be driven for a phase, the pass is recorded as run on a stand-in, with the stand-in named and its limits stated — never written up as a TV pass
+- [x] **CI-06**: Every phase carries a manual acceptance pass on the **TCL Android TV 12**, which is the primary acceptance device — it is the machine this add-on is written for and the only one whose failures matter to the goal. It is exercised from Phase 3 onward, the first point at which a run on it proves something an emulator could not; Phase 1 and Phase 2 predate that. There is **no standing obligation to pass on Windows or on a phone**: Windows is not a target. A stand-in — an Android phone or emulator at a comparable API level — is acceptable **only** for OS-level questions: storage paths, file mode bits, `O_EXCL`, loopback binding. Those follow the API level rather than the form factor, so an API-matched instrument answers them soundly. It answers nothing about D-pad focus order, ten-foot readability, real GPU and codec behaviour, or performance on a low-end SoC. Where the TCL genuinely cannot be driven for a phase, the pass is recorded as run on a stand-in, with the stand-in named and its limits stated — never written up as a TV pass
 - [ ] **CI-07**: The release gate requires at least one full acceptance pass on a clean profile using a Business account
 
 ### Error handling
@@ -204,15 +204,15 @@ Cross-cutting notes. `CI-06` (per-phase manual acceptance on the TCL Android TV 
 | VND-04 | Phase 1 | Complete |
 | VND-05 | Phase 1 | Complete |
 | VND-06 | Phase 1 | Complete |
-| VND-07 | Phase 1 | Pending |
+| VND-07 | Phase 1 | Complete |
 | VND-08 | Phase 1 | Complete |
-| VND-09 | Phase 1 | Pending |
-| VND-10 | Phase 1 | Pending |
+| VND-09 | Phase 1 | Complete |
+| VND-10 | Phase 1 | Complete |
 | VND-11 | Phase 1 | Complete |
 | ID-01 | Phase 1 | Complete |
 | ID-02 | Phase 1 | Complete |
 | ID-03 | Phase 1 | Complete |
-| ID-04 | Phase 1 | Pending |
+| ID-04 | Phase 1 | Complete |
 | ID-05 | Phase 1 | Complete |
 | AUTH-01 | Phase 3 | Pending |
 | AUTH-02 | Phase 3 | Pending |
@@ -275,7 +275,7 @@ Cross-cutting notes. `CI-06` (per-phase manual acceptance on the TCL Android TV 
 | CI-03 | Phase 2 | Pending |
 | CI-04 | Phase 2 | Pending |
 | CI-05 | Phase 2 | Pending |
-| CI-06 | Phase 1 | Pending |
+| CI-06 | Phase 1 | Complete |
 | CI-07 | Phase 8 | Pending |
 | REL-01 | Phase 8 | Pending |
 | ERR-01 | Phase 4 | Pending |
