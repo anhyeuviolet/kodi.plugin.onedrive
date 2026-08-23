@@ -1,28 +1,179 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<settings >
-    <category label="30067">
-    	<setting label="30000" type="lsep"/>
-    	<setting label="30004" type="bool" id="set_subtitle" default="true" value="true"/>
-    	<setting label="30011" type="bool" id="resume_playing" default="true" visible="!String.IsEmpty(window(home).property(iskrypton))" />
-    	<setting label="30018" type="bool" id="save_resume_watched" default="true" visible="!String.IsEmpty(window(home).property(iskrypton))" />
-    	<setting label="30017" type="bool" id="ask_resume" default="true" visible="String.IsEmpty(window(home).property(iskrypton))" />
-    	<setting label="30001" type="lsep"/>
-    	<setting label="30003" type="bool" id="clean_folder" default="true" value="true"/>
-    	<setting label="30019" type="bool" id="no_extension_strm" default="false" value="false"/>
-    	<setting label="30020" type="bool" id="hide_export_progress" default="false" value="false"/>
-    	<setting label="30002" type="lsep"/>
-		<setting label="30068" type="bool" id="allow_directory_listing" default="false"/>
-		<setting label="30069" type="number" id="port_directory_listing" default="8586"/>
-    	<setting label="30005" type="lsep"/>
-		<setting label="30006" type="number" id="slideshow_refresh_interval" default="5" value="5"/>
-		<setting label="30010" type="bool" id="slideshow_recursive" default="false" value="false"/>
-    </category>
-    <category label="30032">
-		<setting label="30033" type="text" id="sign-in-server" default="https://drive-login.herokuapp.com"/>
-		<setting label="30034" type="number" id="cache-expiration-time" default="5"/>
-		<setting label="30035" type="action" option="close" action="RunPlugin(plugin://plugin.onedrive.kn/?action=_clear_cache)"/>
-    </category>
-	<category label="30030">
-		<setting label="30031" type="bool" id="report_error" default="false"/>
-    </category>
+<!--
+	The versioned settings schema. The file this add-on inherited used the
+	format that came before it, which has no concept of a setting's level, and
+	the one setting below that must not sit beside the ordinary options is only
+	expressible here.
+
+	Every identifier carried over from the old file is unchanged. An identifier
+	is what a stored value is keyed by, so renaming one does not migrate a
+	choice, it silently discards it.
+-->
+<settings version="1">
+	<section id="plugin.onedrive.kn">
+		<category id="services" label="30067">
+			<!--
+				The four separators of the old file are the four groups here;
+				their labels are the same strings.
+			-->
+			<group id="1" label="30000">
+				<setting id="set_subtitle" type="boolean" label="30004">
+					<level>0</level>
+					<default>true</default>
+					<control type="toggle"/>
+				</setting>
+				<!--
+					These two are read only under the Krypton branch in the
+					player and the browser, and the property that branch tests
+					is set only when the build version starts with "17.". This
+					add-on requires Kodi 20, so on every version that can
+					install it they do nothing. The old file kept them off the
+					screen with a visibility condition naming that property;
+					the condition is gone (KODI-06) and Advanced is what keeps
+					them out of an ordinary user's way in its place. Deleting
+					them belongs with deleting the branch that reads them.
+				-->
+				<setting id="resume_playing" type="boolean" label="30011">
+					<level>2</level>
+					<default>true</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="save_resume_watched" type="boolean" label="30018">
+					<level>2</level>
+					<default>true</default>
+					<control type="toggle"/>
+				</setting>
+				<!--
+					The other side of that branch, and the one that is actually
+					reached on a supported Kodi. Its condition was the same test
+					the other way round, so it was always true; dropping it
+					changes nothing anyone can see.
+				-->
+				<setting id="ask_resume" type="boolean" label="30017">
+					<level>0</level>
+					<default>true</default>
+					<control type="toggle"/>
+				</setting>
+			</group>
+			<group id="2" label="30001">
+				<setting id="clean_folder" type="boolean" label="30003">
+					<level>0</level>
+					<default>true</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="no_extension_strm" type="boolean" label="30019">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="hide_export_progress" type="boolean" label="30020">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+			</group>
+			<group id="3" label="30002">
+				<!--
+					Off by default, and that is a recorded deviation from
+					upstream rather than an accident: on it binds a loopback
+					listener that asks for nothing and serves an enumerable
+					index of the whole drive to any application on the box.
+					VENDORED.md carries the reasoning and a gate asserts the
+					value, in either schema, so a conversion cannot lose it.
+				-->
+				<setting id="allow_directory_listing" type="boolean" label="30068">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="port_directory_listing" type="integer" label="30069">
+					<level>0</level>
+					<default>8586</default>
+					<control type="edit" format="integer"/>
+				</setting>
+			</group>
+			<group id="4" label="30005">
+				<setting id="slideshow_refresh_interval" type="integer" label="30006">
+					<level>0</level>
+					<default>5</default>
+					<control type="edit" format="integer"/>
+				</setting>
+				<setting id="slideshow_recursive" type="boolean" label="30010">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+			</group>
+		</category>
+		<category id="advanced" label="30032">
+			<group id="1">
+				<setting id="sign-in-server" type="string" label="30033">
+					<level>0</level>
+					<default>https://drive-login.herokuapp.com</default>
+					<control type="edit" format="string"/>
+				</setting>
+				<setting id="cache-expiration-time" type="integer" label="30034">
+					<level>0</level>
+					<default>5</default>
+					<control type="edit" format="integer"/>
+				</setting>
+				<!--
+					The old row carried no identifier, because the format did
+					not need one for an action. This one does; it names no
+					stored value, so there is nothing for it to key.
+				-->
+				<setting id="clear_cache" type="action" label="30035">
+					<level>0</level>
+					<data>RunPlugin(plugin://plugin.onedrive.kn/?action=_clear_cache)</data>
+					<control type="button" format="action">
+						<close>true</close>
+					</control>
+				</setting>
+			</group>
+			<group id="2">
+				<!--
+					The escape hatch, and the only reason this file is in the
+					versioned schema. A tenant may refuse the registration built
+					into this add-on; string 30045 points a user at this box by
+					name, at this level, in this category, so the three must
+					stay in step.
+
+					Empty means "use the one built in". Empty is therefore a
+					value the user must be able to type, which is what
+					allowempty is for. Without it the keyboard dialog refuses
+					to give the setting back its default.
+
+					The shape is a GUID and the schema cannot say so; the code
+					says it instead. resolve_client_id() in remote/provider.py
+					matches it against CLIENT_ID_PATTERN and falls back to the
+					built-in identifier for anything else, silently, because a
+					mistyped character should not produce an add-on that will
+					not sign in and does not explain why.
+
+					There is deliberately no companion setting for the
+					authority. This setting changes WHICH application asks for
+					the credential; a configurable authority would change WHERE
+					the credential is sent, and the two look alike on a settings
+					screen and are not alike at all (AUTH-19).
+				-->
+				<setting id="client_id" type="string" label="30070" help="30071">
+					<level>3</level>
+					<default></default>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="edit" format="string"/>
+				</setting>
+			</group>
+		</category>
+		<category id="collaboration" label="30030">
+			<group id="1">
+				<setting id="report_error" type="boolean" label="30031">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+			</group>
+		</category>
+	</section>
 </settings>

@@ -444,9 +444,13 @@ def test_addon_xml_imports():
 # same commit, because the assertion below is an exact equality -- an addition
 # that leaves this set alone turns a green gate red and hands the next plan a
 # failure it did not cause.
+#
+# 30070-30071 are the label and the help of the custom application identifier,
+# added with the setting itself when the settings file moved to the versioned
+# schema. They are the last pair, for the same reason and under the same rule.
 ADDON_STRING_IDS = (set(range(30000, 30012)) | set(range(30017, 30021))
                     | set(range(30030, 30036)) | set(range(30036, 30060))
-                    | set(range(30067, 30070)))
+                    | set(range(30067, 30070)) | set(range(30070, 30072)))
 # The vendored module's contiguous block, left exactly where it was: the module
 # resolves some of these dynamically and one is persisted, so a mechanical
 # renumber cannot see them and would invalidate stored data.
@@ -525,9 +529,10 @@ def test_localize_owns_this_addons_block():
 
 
 def test_string_ids_partitioned():
-    assert len(ADDON_STRING_IDS) == 49, (
-        'the add-on owns 25 renumbered ids, the 23 the sign-in copy added, and '
-        "re-authorisation's wrong-account refusal")
+    assert len(ADDON_STRING_IDS) == 51, (
+        'the add-on owns 25 renumbered ids, the 23 the sign-in copy added, '
+        "re-authorisation's wrong-account refusal, and the label and help of "
+        'the custom application identifier')
     assert len(MODULE_STRING_IDS) == 89, 'the module owns 89 ids'
 
     sets = {}
@@ -613,8 +618,17 @@ def test_directory_listing_default_off():
         'enumerable index of the whole drive. This is a recorded deviation, '
         'not an accident' % (default,))
 
-    stale = [n.get('id') for n in tree.iter('setting')
-             if '_open_common_settings' in (n.get('action') or '')]
+    # The old schema put a row's built-in function in an `action` attribute;
+    # the versioned one puts it in a `<data>` child. Reading only the attribute
+    # would leave this assertion permanently, invisibly green once the file was
+    # converted -- it would still run, and it would no longer be able to fail.
+    # Both forms are read so that the conversion costs the gate nothing.
+    stale = []
+    for n in tree.iter('setting'):
+        data = n.find('data')
+        written = [n.get('action') or '', (data.text or '') if data is not None else '']
+        if any('_open_common_settings' in w for w in written):
+            stale.append(n.get('id'))
     assert not stale, (
         "a settings row still opens the module's own settings dialog, which "
         'no longer exists as a separate add-on: %r' % (stale,))

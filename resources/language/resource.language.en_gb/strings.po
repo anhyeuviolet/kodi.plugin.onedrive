@@ -238,6 +238,20 @@ msgctxt "#30069"
 msgid "     Source server port  -  http://localhost:<port>/source"
 msgstr ""
 
+# The custom application registration. 30070 is the label of the one setting a
+# user whose tenant refuses the built-in registration depends on, and 30071 is
+# the help beneath it. 30045 -- the sentence appended to every outcome the
+# error table marks administrator-must-act -- names this setting by category
+# and by level, so the wording of the three is one feature and not three.
+
+msgctxt "#30070"
+msgid "Client ID of your own app registration"
+msgstr ""
+
+msgctxt "#30071"
+msgid "Leave this empty to use the registration built into the add-on. Fill it in only if your organisation blocks that one: paste the Application (client) ID of an app registration of your own. Anything that is not a valid ID is ignored and the built-in one is used."
+msgstr ""
+
 # The ids below belong to the bundled Cloud Drive common module and are
 # left exactly as the module numbers them. Several are resolved at runtime
 # rather than from a literal -- one from an exception message, two from a
