@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 03
 current_phase_name: authentication
 status: executing
-stopped_at: Completed 03-07-PLAN.md
-last_updated: "2026-08-23T04:23:45.099Z"
+stopped_at: Completed 03-08-PLAN.md
+last_updated: "2026-08-23T04:49:25.115Z"
 last_activity: 2026-08-23
 last_activity_desc: Phase 03 execution started
 progress:
   total_phases: 2
   completed_phases: 1
   total_plans: 21
-  completed_plans: 14
+  completed_plans: 15
 ---
 
 # Project State
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-08-22)
 ## Current Position
 
 Phase: 03 (authentication) — EXECUTING
-Plan: 8 of 14
+Plan: 9 of 14
 Status: Ready to execute
 stands, its Windows rows were descoped because Windows is not a target. Phase criterion 2 (the Kodi
 19/20/21/22 install matrix) is therefore **unmet by decision, not satisfied**, and KODI-02 stays unchecked.
@@ -38,7 +38,7 @@ against the tree, KODI-01 and SETUP-06 carry inline qualifications, and the ROAD
 broker" parenthetical was corrected to the measurement.
 Last activity: 2026-08-23 — Phase 03 execution started
 
-Progress: [███████░░░] 67%
+Progress: [███████░░░] 71%
 
 ## Performance Metrics
 
@@ -78,6 +78,7 @@ Progress: [███████░░░] 67%
 | Phase 03 P05 | 35min | 2 tasks | 4 files |
 | Phase 03 P06 | 25min | 2 tasks | 2 files |
 | Phase 03 P07 | 20min | 2 tasks | 2 files |
+| Phase 03 P08 | 22m | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -149,6 +150,11 @@ Load-bearing choices for current work:
 - [Phase ?]: A lost race is told from a dead grant by re-reading the store from disk and comparing the stored refresh token byte-for-byte against the rejected one; nothing in the provider's response distinguishes them
 - [Phase ?]: Refresh failures classify into three outcomes (succeeded, transient, needs-reauthorisation) and only a provider grant refusal produces the third, so a box that boots before its network never asks for a sign-in
 - [Phase ?]: The startup threshold is 30 days against the 90-day window, not 60: a device switched on once every forty-five days would skip a sixty-day threshold and find the grant already dead on the next start
+- [Phase ?]: The refresh transport is built from refresh.REQUEST_TRIES/REQUEST_DELAY_SECONDS/REQUEST_BACKOFF through one factory, pinned by a static gate on the argument names rather than the numbers, so the 65-second worst case and RefreshLock's 90-second lifetime cannot move apart
+- [Phase ?]: A credential shorter than twice the eight-character report prefix is redacted entirely: keeping eight of a nine-character user_code is the live code with one character missing
+- [Phase ?]: A provider refusal during sign-in is shown with dialog.ok, not raised: raising routes it through the failure handler, which still offers to send an error report to the third party this phase is removing
+- [Phase ?]: Request path literals stay written out at the call site rather than behind a constant, because test_no_unanswerable_provider_endpoint can only read a whole literal
+- [Phase ?]: VENDORED.md is left to 03-12 even though 03-08 deletes a vendored file; the change record is handed over in 03-08-SUMMARY.md rather than written by two plans into one document
 
 ### Pending Todos
 
@@ -192,6 +198,6 @@ Open concerns:
 
 ## Session Continuity
 
-Last session: 2026-08-23T04:20:57.622Z
-Stopped at: Completed 03-07-PLAN.md
+Last session: 2026-08-23T04:49:14.134Z
+Stopped at: Completed 03-08-PLAN.md
 Resume file: None
