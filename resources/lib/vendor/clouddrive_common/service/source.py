@@ -20,7 +20,7 @@
 import datetime
 import json
 import time
-import urllib
+import urllib.parse
 from urllib.error import HTTPError
 
 from resources.lib.vendor.clouddrive_common.account import AccountManager

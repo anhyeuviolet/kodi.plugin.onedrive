@@ -21,7 +21,7 @@
 from threading import Lock
 import threading
 import time
-import urllib
+import urllib.parse
 
 class KodiUtils:
     HOME_WINDOW = 10000

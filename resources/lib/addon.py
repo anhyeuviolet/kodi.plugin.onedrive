@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 
-import urllib
+import urllib.parse
 
 from resources.lib.vendor.clouddrive_common.ui.addon import CloudDriveAddon
 from resources.lib.vendor.clouddrive_common.utils import Utils

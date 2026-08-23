@@ -19,7 +19,7 @@
 import datetime
 import re
 import threading
-import urllib
+import urllib.parse
 
 from resources.lib.vendor.clouddrive_common.ui.logger import Logger
 from resources.lib.vendor.clouddrive_common.ui.utils import KodiUtils

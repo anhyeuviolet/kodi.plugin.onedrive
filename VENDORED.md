@@ -205,10 +205,16 @@ did sign-in change?" are asking different questions.
 | `clouddrive_common/service/source.py` | `content_value = Utils.str(cached_page['content'].getvalue())` — the cached response body is decoded at the write site | The page cache stored `bytes`, a shape JSON cannot carry. It is coerced where it is produced rather than special-cased in the serializer, which is the exact inverse of what the read path already does with `Utils.encode`. Every body written is HTML or a JSON string, so the decode is total |
 | `clouddrive_common/remote/request.py` | `Request.HTTP_TIMEOUT_SECONDS = 30`, passed as `urllib.request.urlopen(req, timeout=self.HTTP_TIMEOUT_SECONDS)` | The one outbound HTTP call in the tree could previously block forever. **The value is unmeasured** — 15 to 30 seconds is a recommended range, not a measurement of this add-on on a real network, and nothing in this repository can tell a correct 30 from a wrong one. One value serves both the metadata path and the chunked download path because the timeout applies per socket operation, not to a whole transfer: it bounds how long a single `read` may block, so a large download never trips it as long as bytes keep arriving |
 
+| 8 files under `clouddrive_common/` | `import urllib` → `import urllib.parse`, and in `remote/request.py` → `import urllib.request`. One line each: `export.py`, `remote/oauth2.py`, `remote/provider.py`, `remote/request.py`, `service/player.py`, `service/source.py`, `ui/addon.py`, `ui/utils.py` | `import urllib` binds the package and **not** its submodules, so every `urllib.parse.…` call in these files was reaching an attribute nobody had asked for. It resolved anyway, because some other import in the same interpreter had pulled `urllib.parse` in as a side effect — an implementation detail, not a guarantee. This add-on has to run on Python 3.8 under Kodi 19–21 and 3.14 under Kodi 22, and a side effect that holds on one is not evidence about the other. `ui/dialog.py` already had the correct form and was the model. `test_urllib_submodules_are_imported_by_name` parses the tree and holds it |
+
 Two things that are edits to *this repository's* own files rather than to vendored ones, recorded
 here because they belong to the same change: `addon.xml` now declares exactly one import,
 `xbmc.python` 3.0.1; and `.project` line 6 no longer references the module, leaving `<projects>`
 empty.
+
+The `urllib` row above has two counterparts in this repository's own code, changed in the same
+sweep for the same reason and listed here rather than given rows of their own: `resources/lib/addon.py`
+and `resources/lib/provider/onedrive.py`.
 
 ### Rewriting sign-in
 

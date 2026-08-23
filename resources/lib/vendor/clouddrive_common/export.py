@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 
 import json
 import os
-import urllib
+import urllib.parse
 
 from resources.lib.vendor.clouddrive_common.remote.request import Request
 from resources.lib.vendor.clouddrive_common.ui.logger import Logger

@@ -20,7 +20,7 @@
 import json
 import re
 import time
-import urllib
+import urllib.parse
 
 from resources.lib.vendor.clouddrive_common.exception import ExceptionUtils, RequestException
 from resources.lib.vendor.clouddrive_common.remote.request import Request

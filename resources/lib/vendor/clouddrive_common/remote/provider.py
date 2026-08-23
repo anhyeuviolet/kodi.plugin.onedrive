@@ -19,7 +19,7 @@
 
 import json
 import re
-import urllib
+import urllib.parse
 
 from resources.lib import auth_context
 from resources.lib.auth import device_code, refresh, store

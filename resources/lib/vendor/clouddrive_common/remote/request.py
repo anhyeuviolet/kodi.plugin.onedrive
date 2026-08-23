@@ -27,7 +27,7 @@ from resources.lib.vendor.clouddrive_common.utils import Utils
 from http.cookiejar import CookieJar
 from resources.lib.vendor.clouddrive_common.ui.utils import KodiUtils
 from urllib.error import HTTPError
-import urllib
+import urllib.request
 
 
 class Request(object):

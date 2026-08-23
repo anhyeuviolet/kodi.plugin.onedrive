@@ -22,7 +22,7 @@ from resources.lib.vendor.clouddrive_common.remote.provider import Provider
 from resources.lib.vendor.clouddrive_common.utils import Utils
 from resources.lib.vendor.clouddrive_common.exception import ExceptionUtils
 
-import urllib
+import urllib.parse
 from urllib.error import HTTPError
 
 class OneDrive(Provider):

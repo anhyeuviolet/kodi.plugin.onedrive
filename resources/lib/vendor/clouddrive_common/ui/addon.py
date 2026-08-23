@@ -23,7 +23,7 @@ import os
 import sys
 import threading
 import time
-import urllib
+import urllib.parse
 from urllib.error import HTTPError, URLError
 
 from resources.lib import auth_context
