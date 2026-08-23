@@ -25,12 +25,12 @@ import time
 import urllib
 from urllib.error import HTTPError, URLError
 
+from resources.lib.auth import device_code, errors
 from resources.lib.vendor.clouddrive_common.account import AccountManager, AccountNotFoundException, \
     DriveNotFoundException
 from resources.lib.vendor.clouddrive_common.exception import UIException, ExceptionUtils, RequestException
 from resources.lib.vendor.clouddrive_common.export import ExportManager
 from resources.lib.vendor.clouddrive_common.remote.errorreport import ErrorReport
-from resources.lib.vendor.clouddrive_common.remote.request import Request
 from resources.lib.vendor.clouddrive_common.service.download import DownloadServiceUtil
 from resources.lib.vendor.clouddrive_common.ui.dialog import DialogProgress, DialogProgressBG, \
     QRDialogProgress, ExportMainDialog
@@ -45,7 +45,6 @@ from resources.lib.vendor.clouddrive_common.cache.cache import Cache
 
 
 class CloudDriveAddon:
-    _DEFAULT_SIGNIN_TIMEOUT = 120
     _addon = None
     _addon_handle = None
     _addonid = None
@@ -71,8 +70,7 @@ class CloudDriveAddon:
     _image_file_extensions = KodiUtils.get_supported_media("picture")
     _account_manager = None
     _action = None
-    _ip_before_pin = None
-    
+
     def __init__(self):
         self._addon = KodiUtils.get_addon()
         self._addonid = self._addon.getAddonInfo('id')
@@ -165,6 +163,11 @@ class CloudDriveAddon:
                 params = {'action':'_list_drive', 'content_type': self._content_type, 'driveid': drive['id']}
                 url = self._addon_url + '?' + urllib.parse.urlencode(params)
                 listing.append((url, list_item, True))
+        # The row still carries a plugin address rather than a RunPlugin
+        # command, because a directory item's path is not a builtin. What
+        # changed is what happens on the other side: _add_account releases the
+        # handle immediately and re-enters as an action, so Kodi is not left
+        # holding a container fetch for the life of a device code.
         list_item = xbmcgui.ListItem(self._common_addon.getLocalizedString(32005))
         params = {'action':'_add_account', 'content_type': self._content_type}
         url = self._addon_url + '?' + urllib.parse.urlencode(params)
@@ -172,7 +175,55 @@ class CloudDriveAddon:
         xbmcplugin.addDirectoryItems(self._addon_handle, listing, len(listing))
         xbmcplugin.endOfDirectory(self._addon_handle, True)
     
+    def _addon_string(self, string_id):
+        """A string from THIS add-on's own catalogue.
+
+        Deliberately not KodiUtils.localize. That helper sends every id below
+        32000 to xbmc.getLocalizedString, which reads Kodi's own catalogue --
+        correct before this add-on was renumbered into the 30000 block Kodi
+        reserves for plugins, and silently the wrong sentence ever since. The
+        vendored module's own 32000-32088 still go through _common_addon, which
+        is what keeps the two blocks readable apart.
+        """
+        return self._addon.getLocalizedString(string_id)
+
+    # -- signing in --------------------------------------------------------
+    #
+    # What one pass of the poll loop can end as. Four and only four, so a
+    # caller cannot quietly forget one.
+    _SIGNIN_AUTHORISED = 'authorised'
+    _SIGNIN_ABANDONED = 'abandoned'
+    _SIGNIN_NEW_CODE = 'new_code'
+    _SIGNIN_REFUSED = 'refused'
+
     def _add_account(self):
+        if self._addon_handle is not None and self._addon_handle >= 0:
+            # Kodi is holding a directory handle for this invocation and will
+            # go on holding it until the plugin returns. Sign-in now runs for
+            # as long as the server says the code lives -- three spike runs
+            # differed by nearly fifteen minutes -- and a container fetch
+            # blocked for a quarter of an hour is not a listing that is slow,
+            # it is an add-on that is broken.
+            #
+            # So the handle is released here and the work re-enters as an
+            # action. RunPlugin invokes a plugin with sys.argv[1] == '-1', so
+            # the second invocation arrives here with a negative handle, falls
+            # past this guard and does the work. The context-menu entries in
+            # list_accounts already use exactly this mechanism, so it is this
+            # file's own idiom rather than an import, and resources/lib/addon.py
+            # already guards on a negative handle.
+            #
+            # Observed rather than settled. It follows from documented
+            # behaviour and from this tree's own patterns, but it has not been
+            # run; plan 03-14 runs it on the television.
+            xbmcplugin.endOfDirectory(self._addon_handle, succeeded=False,
+                                      updateListing=False, cacheToDisc=False)
+            KodiUtils.executebuiltin('RunPlugin(%s?%s)' % (
+                self._addon_url,
+                urllib.parse.urlencode({'action': '_add_account',
+                                        'content_type': self._content_type})))
+            return
+
         request_params = {
             'waiting_retry': lambda request, remaining: self._progress_dialog_bg.update(
                 int((request.current_delay - remaining)/request.current_delay*100),
@@ -186,40 +237,65 @@ class CloudDriveAddon:
         }
         provider = self.get_provider()
         self._progress_dialog.update(0, self._common_addon.getLocalizedString(32008))
-        
-        self._ip_before_pin = Request(KodiUtils.get_signin_server() + '/ip', None).request()
-        pin_info = provider.create_pin(request_params)
+
+        response = provider.request_device_code(request_params)
         self._progress_dialog.close()
         if self.cancel_operation():
             return
-        if not pin_info:
-            raise Exception('Unable to retrieve a pin code')
+        if not response or not Utils.get_safe_value(response, 'device_code', ''):
+            raise Exception('Unable to retrieve a device code')
 
-        tokens_info = {}
         request_params['on_complete'] = lambda request: self._progress_dialog_bg.close()
-        self._pin_dialog = QRDialogProgress.create(self._addon_name,
-                                      KodiUtils.get_signin_server() + '/signin/%s' % pin_info['pin'], 
-                                      self._common_addon.getLocalizedString(32009), 
-                                      self._common_addon.getLocalizedString(32010) % ('[B]%s[/B]' % KodiUtils.get_signin_server(), '[B][COLOR lime]%s[/COLOR][/B]' % pin_info['pin']))
+        # Two sentences: what to do, and the one that stops a personal account
+        # abandoning halfway. Those users are asked to sign in a second time on
+        # the phone and read it as the add-on having failed.
+        line1 = self._addon_string(30037) + '[CR]' + self._addon_string(30041)
+        # The address the server returned, passed through untouched and never
+        # composed. It is login.microsoft.com/device, which is not the address
+        # most documentation cites, and the field that would let the code
+        # travel inside it is absent from the response -- so the code goes in
+        # its own control and the image carries the address alone (AUTH-08).
+        line2 = '[B]%s[/B]' % Utils.str(response['verification_uri'])
+        self._pin_dialog = QRDialogProgress.create(
+            self._addon_name, response['verification_uri'], line1, line2, '',
+            code=response['user_code'])
         self._pin_dialog.show()
-        max_waiting_time = time.time() + self._DEFAULT_SIGNIN_TIMEOUT
-        while not self.cancel_operation() and max_waiting_time > time.time():
-            remaining = round(max_waiting_time-time.time())
-            percent = int(remaining/self._DEFAULT_SIGNIN_TIMEOUT*100)
-            self._pin_dialog.update(percent, line3='[CR]'+self._common_addon.getLocalizedString(32011) % str(int(remaining)) + '[CR][CR]Your source id is: %s' % Utils.get_source_id(Utils.unicode(self._ip_before_pin)))
-            if int(remaining) % 5 == 0 or remaining == 1:
-                tokens_info = provider.fetch_tokens_info(pin_info, request_params = request_params)
-                if self.cancel_operation() or tokens_info:
-                    break
-            if self._system_monitor.waitForAbort(1):
+
+        tokens_info = None
+        while True:
+            outcome, payload = self._await_authorisation(provider, response,
+                                                         request_params)
+            if outcome == self._SIGNIN_AUTHORISED:
+                tokens_info = payload
                 break
+            if outcome != self._SIGNIN_NEW_CODE:
+                self._pin_dialog.close()
+                if outcome == self._SIGNIN_REFUSED:
+                    # Shown rather than raised. A refusal by the identity
+                    # provider is an answer, not a fault, and raising would put
+                    # it through the failure handler.
+                    self._dialog.ok(self._addon_name,
+                                    self._addon_string(30044) % Utils.str(payload))
+                return
+            # A fresh code, with its own expiry and its own interval. Reusing
+            # the previous response's would put a countdown on screen that the
+            # server never agreed to.
+            response = provider.request_device_code(request_params)
+            if not response or not Utils.get_safe_value(response, 'device_code', ''):
+                self._pin_dialog.close()
+                raise Exception('Unable to retrieve a device code')
+            self._pin_dialog.reset_for_new_code(line1, line2, '')
+            self._pin_dialog.set_code(response['user_code'])
         self._pin_dialog.close()
-        
-        if self.cancel_operation() or time.time() >= max_waiting_time:
+
+        if self.cancel_operation() or not tokens_info:
             return
-        if not tokens_info:
-            raise Exception('Unable to retrieve the auth2 tokens')
-        
+
+        # Everything below is assembled in memory. Nothing is written until the
+        # last two statements, so a cancel anywhere above returns having written
+        # nothing and there is no partial account to leave behind. That is a
+        # structural property rather than a chain of guards each of which has to
+        # be right (AUTH-07).
         self._progress_dialog.update(25, self._common_addon.getLocalizedString(32064),' ',' ')
         try:
             account = provider.get_account(request_params = request_params, access_tokens = tokens_info)
@@ -227,7 +303,7 @@ class CloudDriveAddon:
             raise UIException(32065, e)
         if self.cancel_operation():
             return
-        
+
         self._progress_dialog.update(50, self._common_addon.getLocalizedString(32017))
         try:
             account['drives'] = provider.get_drives(request_params = request_params, access_tokens = tokens_info)
@@ -235,36 +311,120 @@ class CloudDriveAddon:
             raise UIException(32018, e)
         if self.cancel_operation():
             return
-        
+
         self._progress_dialog.update(75, self._common_addon.getLocalizedString(32020))
         try:
-            account['access_tokens'] = tokens_info
+            # The credential goes to this account's own file at mode 0600, not
+            # inside the account record. A token in the record is a token in
+            # whatever the record is stored in and copied wherever the record is
+            # copied (AUTH-11).
+            provider.save_tokens(account['id'], tokens_info)
             self._account_manager.save_account(account)
         except Exception as e:
             raise UIException(32021, e)
-        if self.cancel_operation():
-            return
-        
-        self._progress_dialog.update(90)
-        try:
-            accounts = self._account_manager.get_accounts()
-            for drive in account['drives']:
-                driveid = drive['id']
-                Logger.debug('Looking for account %s...' % driveid)
-                if driveid in accounts:
-                    drive = accounts[driveid]['drives'][0]
-                    Logger.debug(drive)
-                    if drive['id'] == driveid and drive['type'] == 'migrated':
-                        Logger.debug('Account %s removed.' % driveid)
-                        self._account_manager.remove_account(driveid)
-                        
-        except Exception as e:
-            pass
-        if self.cancel_operation():
-            return
-        
+
         self._progress_dialog.close()
         KodiUtils.executebuiltin('Container.Refresh')
+
+    def _await_authorisation(self, provider, response, request_params):
+        """Drive the dialog and the poll until one of the four outcomes.
+
+        Two clocks and one sleep.
+
+        The sleep is the abort-aware wait, one second, and it is simultaneously
+        the countdown's tick and the shutdown check -- so Kodi shutting down is
+        noticed within a second no matter where the poll interval stands. Never
+        time.sleep and never xbmc.sleep: neither observes the abort flag, and a
+        loop that can run for a quarter of an hour must not be the reason a
+        shutdown hangs.
+
+        The two deadlines are the code's expiry and the next poll time, and
+        neither is derived from the other. The loop this replaces disambiguated
+        them with a modulus on the remaining seconds, which couples the
+        countdown's refresh rate to the poll interval and breaks the moment a
+        slow_down answer raises that interval.
+        """
+        code = response['device_code']
+        interval = Utils.get_safe_value(response, 'interval', 0)
+        try:
+            interval = int(interval)
+        except (TypeError, ValueError):
+            interval = 0
+        if interval <= 0:
+            # RFC 8628 section 3.4: five seconds if the server did not say.
+            interval = device_code.DEFAULT_INTERVAL
+
+        expires_in = Utils.get_safe_value(response, 'expires_in', 0)
+        try:
+            expires_in = int(expires_in)
+        except (TypeError, ValueError):
+            expires_in = 0
+        # The server's own value for THIS code and nothing else. The provider
+        # randomises it -- three observed runs differed by nearly fifteen
+        # minutes -- so the two-minute constant this replaces was wrong by
+        # measurement, and no constant takes its place (AUTH-06).
+        deadline = time.time() + max(expires_in, device_code.DEFAULT_INTERVAL)
+        next_poll = time.time()
+        expired = False
+
+        while True:
+            if self.cancel_operation():
+                return self._SIGNIN_ABANDONED, None
+            if self._pin_dialog.is_new_code_requested():
+                return self._SIGNIN_NEW_CODE, None
+
+            now = time.time()
+            if not expired and now >= deadline:
+                # Stop polling: the code is dead and the endpoint would only
+                # say so. The dialog moves to its expiry state, which is also
+                # what puts focus on the second action, so it arrives ready to
+                # press on a remote with no pointer.
+                expired = True
+                self._pin_dialog.set_expired()
+
+            if not expired:
+                self._pin_dialog.set_remaining(int(deadline - now))
+                if now >= next_poll:
+                    state, payload = self._poll_once(provider, code,
+                                                     request_params)
+                    if state == device_code.OK:
+                        return self._SIGNIN_AUTHORISED, payload
+                    if state == device_code.TERMINAL:
+                        failure = errors.classify_response(payload)
+                        Logger.error('sign-in refused: %s (%s)'
+                                     % (failure.outcome,
+                                        failure.code or 'no code'))
+                        return self._SIGNIN_REFUSED, (failure.code
+                                                      or failure.outcome)
+                    # RFC 8628 section 3.5: a slow_down raises the interval for
+                    # this and every subsequent request. Feeding the result
+                    # back in is the whole of the permanence -- recomputing it
+                    # from the server's original value would undo the increase
+                    # on the next tick and earn another slow_down.
+                    interval = device_code.next_interval(interval, state)
+                    next_poll = time.time() + interval
+
+            if self._system_monitor.waitForAbort(1):
+                return self._SIGNIN_ABANDONED, None
+
+    def _poll_once(self, provider, code, request_params):
+        """One poll, with a network failure reported as "keep waiting".
+
+        A body that would not parse carries no error code to classify, and a
+        connection that never completed says nothing about the grant. Treating
+        either as a refusal would end a sign-in because a hotel Wi-Fi had a
+        moment -- and the user is standing in front of a television with the
+        code already typed into their phone.
+        """
+        try:
+            return provider.poll_for_token(code, request_params)
+        except device_code.TransportError as e:
+            Logger.debug('poll: not a protocol answer (%s); still waiting' % e)
+        except RequestException as e:
+            Logger.debug('poll: transport failed (%s); still waiting' % e)
+        except URLError as e:
+            Logger.debug('poll: network unreachable (%s); still waiting' % e)
+        return device_code.PENDING, None
 
     def _remove_drive(self, driveid):
         account = self._account_manager.get_by_driveid('account', driveid)
@@ -641,13 +801,13 @@ class CloudDriveAddon:
                     else:
                         line1 = self._common_addon.getLocalizedString(32036)
                         line3 = self._common_addon.getLocalizedString(32038)
-                else:
-                    if KodiUtils.get_signin_server()+'/pin/' in rex.request and httpex.code == 404 and self._ip_before_pin:
-                        ip_after_pin = Request(KodiUtils.get_signin_server() + '/ip', None).request()
-                        if self._ip_before_pin != ip_after_pin:
-                            send_report = False
-                            line1 = self._common_addon.getLocalizedString(32072)
-                            line2 = self._common_addon.getLocalizedString(32073) % (self._ip_before_pin, ip_after_pin,)
+                # The address-changed heuristic that stood here is gone with
+                # the third party it questioned. It compared the address seen
+                # before the code was issued against one fetched a second time
+                # from inside the failure handler -- a second live request to
+                # the same third party, made while reporting a failure. Both
+                # ends of the comparison were that server; neither exists now.
+                # Strings 32072 and 32073 are orphaned by this.
         elif urlex:
             reason = Utils.str(urlex.reason)
             line3 = self._common_addon.getLocalizedString(32074)
