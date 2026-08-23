@@ -40,10 +40,12 @@ from pathlib import PurePosixPath
 # longer the only gate file. Two copies of the exclusion set drift; one does not.
 from gatelib import (
     REPO,
+    excluded as _excluded,
     python_sources,
     read as _read,
     report as _report,
     source_scan,
+    text_files,
     tracked_files,
 )
 
@@ -67,8 +69,20 @@ FOREIGN_NOTICES = {
 LICENSE_SHA256 = '0b383d5a63da644f628d99c33976ea6487ed89aaa59f0b3257992deac1171e6b'
 
 # This repository's own URL legitimately embeds the upstream-derived repository
-# name. It is the one place the bare add-on id literal is correct.
+# name. It is one of the two places the bare add-on id literal is correct.
 OWN_REPO_URL = 'https://github.com/anhyeuviolet/kodi.plugin.onedrive'
+
+# The other. GitHub Pages derives the site path from the git repository name, so
+# the published repository's URLs carry that same name whether anyone wants them
+# to or not - renaming the git repository is the only way to change it, and that
+# would break the URL already declared to every installed copy.
+#
+# It is exempt on exactly the grounds OWN_REPO_URL is: the literal here names a
+# *location*, not an add-on id, and nothing resolves it through
+# xbmcaddon.Addon(id). Subtracted as an exact string rather than by loosening the
+# pattern, so the sweep still catches `plugin.onedrive` one character either side
+# of this URL, and so widening the exemption is a visible edit to this line.
+OWN_PAGES_URL = 'https://anhyeuviolet.github.io/kodi.plugin.onedrive'
 
 # The dotted path the module lives at after the lift.
 VENDORED_PREFIX = 'resources.lib.vendor.clouddrive_common'
@@ -155,9 +169,49 @@ def test_gpl_headers_intact():
 def test_addon_id_everywhere():
     # Negative lookahead: grep -E cannot express this, re can.
     pattern = re.compile(r'plugin\.onedrive(?!\.kn)')
-    hits = source_scan(pattern, transform=lambda line: line.replace(OWN_REPO_URL, ''))
+    exempt = (OWN_REPO_URL, OWN_PAGES_URL)
+
+    def subtract(line):
+        for url in exempt:
+            line = line.replace(url, '')
+        return line
+
+    hits = source_scan(pattern, transform=subtract)
     assert not hits, (
-        'the bare add-on id survives outside %s:\n%s' % (OWN_REPO_URL, _report(hits)))
+        'the bare add-on id survives outside %s:\n%s'
+        % (' and '.join(exempt), _report(hits)))
+
+
+def test_both_url_exemptions_are_load_bearing():
+    """Each exempt URL must contain the forbidden literal and must still be in use.
+
+    An exemption that names a string no *swept* file contains has stopped doing
+    work, and it sits beside one that has not - the same drift `EXCLUDED_DOCS`
+    suffers and the same reason `FOREIGN_NOTICES` is checked for orphans. The
+    carrier must be a file the sweep actually reads, so this cannot be satisfied
+    by the copy of the literal in this gate file: `tests/` is excluded, and a
+    test that certified itself would certify nothing.
+    """
+    pattern = re.compile(r'plugin\.onedrive(?!\.kn)')
+    for url in (OWN_REPO_URL, OWN_PAGES_URL):
+        # What is exempt is a *location*. Shortening an entry towards the bare
+        # literal - to `plugin.onedrive`, say - would subtract the forbidden
+        # string from every line in the tree and switch the sweep off entirely
+        # while leaving it green, which is the one failure mode an exemption
+        # list has. Only an absolute https URL can name a location.
+        assert url.startswith('https://') and len(url) > len('https://') + 8, (
+            '%r is not an absolute https URL; only a location may be exempt, '
+            'and an entry shortened towards the bare add-on id disables the '
+            'sweep for every line in the tree' % (url,))
+        assert pattern.search(url), (
+            '%r is in the exemption list but does not contain the literal the '
+            'sweep forbids, so subtracting it accomplishes nothing' % (url,))
+        carriers = [rel for rel, contents in text_files()
+                    if url in contents and not _excluded(rel)]
+        assert carriers, (
+            'no file this sweep reads contains %r; the exemption is dead and '
+            'must be deleted rather than left to widen the sweep for whatever '
+            'line is written next' % (url,))
 
 
 def test_no_legacy_package_prefix():

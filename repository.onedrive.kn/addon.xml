@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	The repository add-on. It ships no code: its whole content is the four URLs
+	below, which tell Kodi where to fetch the index, how to verify it, and where
+	the add-on archives live.
+
+	The element and attribute set here was checked against Kodi rather than
+	recalled. Two sources, both read on 2026-08-23:
+
+	  - https://kodi.wiki/view/Add-on_repositories (marked "updated for v19")
+	  - Kodi's own Omega branch: xbmc/addons/Repository.cpp
+	    (ParseDirConfiguration, FetchIndex, ResolvePathAndHash),
+	    xbmc/addons/addoninfo/AddonInfoBuilder.cpp and
+	    addons/repository.xbmc.org/addon.xml, which is Team Kodi's own
+	    repository add-on as it ships in Omega.
+
+	Four details are worth stating, because a manifest written from memory gets
+	each of them wrong:
+
+	  - <dir> is mandatory. The flat form, with <info> and friends directly under
+	    the extension element, was removed in Kodi 20; Omega's constructor logs an
+	    error and serves nothing.
+	  - There is no compressed="..." attribute and no zip="..." attribute here.
+	    Both appear in the wiki's examples and neither is read by
+	    ParseDirConfiguration. compressed applied to Kodi 15 and earlier; zip was
+	    dropped in v17.
+	  - checksum carries verify="sha256". Without that attribute Kodi fetches the
+	    checksum file, uses it only to notice that addons.xml changed, and never
+	    verifies anything - the wiki says so in as many words. With it, FetchIndex
+	    digests the response and refuses a mismatch.
+	  - <hashes>sha256</hashes>, not "true". "true" is a deprecated alias for md5,
+	    and Kodi logs md5 as broken. Kodi asks for a content-sha256 header first
+	    and falls back to <archive-url>.sha256, which is the file the generator
+	    writes beside every archive, because GitHub Pages sends no such header.
+
+	Every URL below is derived by tools/build_repo.py into the tree it publishes,
+	so this file is the one place they are written. Changing one moves the file
+	the generator writes, and tests/test_build_repo.py asserts the two agree.
+-->
+<addon id="repository.onedrive.kn" name="OneDrive KN Repository" version="1.0.0" provider-name="Kenny Nguyen">
+	<requires>
+		<import addon="xbmc.addon" version="12.0.0" />
+	</requires>
+	<extension point="xbmc.addon.repository">
+		<dir>
+			<info>https://anhyeuviolet.github.io/kodi.plugin.onedrive/repo/addons.xml</info>
+			<checksum verify="sha256">https://anhyeuviolet.github.io/kodi.plugin.onedrive/repo/addons.xml.sha256</checksum>
+			<datadir>https://anhyeuviolet.github.io/kodi.plugin.onedrive/repo</datadir>
+			<hashes>sha256</hashes>
+		</dir>
+	</extension>
+	<extension point="xbmc.addon.metadata">
+		<platform>all</platform>
+		<summary lang="en_GB">Updates for OneDrive KN, over the network</summary>
+		<description lang="en_GB">
+Where Kodi looks for new versions of the OneDrive KN add-on.
+
+Installing this once is the last time a file has to be carried to the television by hand. Afterwards
+Kodi checks this location on its own schedule and offers, or installs, whatever is newer.
+
+It contains no media, no accounts and no code of its own - only the address of the published files
+and the checksums that say the download arrived intact.
+		</description>
+		<license>GPL-3.0-or-later</license>
+		<source>https://github.com/anhyeuviolet/kodi.plugin.onedrive</source>
+		<forum>https://github.com/anhyeuviolet/kodi.plugin.onedrive/issues</forum>
+		<assets>
+			<icon>icon.png</icon>
+		</assets>
+		<news>
+v1.0.0:
+- First release. Points Kodi at the published OneDrive KN files over HTTPS, with SHA-256 verification of the index and of every archive.
+		</news>
+	</extension>
+</addon>
