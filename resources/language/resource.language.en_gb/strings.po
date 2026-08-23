@@ -104,6 +104,120 @@ msgctxt "#30035"
 msgid "Clear cache now"
 msgstr ""
 
+# Everything sign-in shows, taken as one contiguous block so the copy reads as
+# a group in this file. Written for a television: short sentences, no links, no
+# provider jargon, and no instruction that needs a keyboard.
+#
+# 30044 and 30046 onward are one sentence per outcome in
+# resources/lib/auth/errors.py. That module returns a symbolic outcome and a
+# bare failure code and holds no words at all, so these are the only place the
+# sentences exist and the two cannot drift apart. The pairing:
+#
+#   30044 unmapped                       30052 mfa_required
+#   30046 public_client_flows_off        30053 mfa_enrolment_required
+#   30047 consent_required               30054 password_expired
+#   30048 admin_consent_required         30055 application_disabled
+#   30049 not_assigned_to_application    30056 application_not_in_tenant
+#   30050 blocked_by_conditional_access  30057 device_code_rejected
+#   30051 blocked_by_security_defaults   30058 device_code_expired
+#
+# 30045 is appended to any outcome the table marks administrator-must-act, and
+# to nothing else. It is the only place the escape hatch is named, which is
+# what makes the tenant-block message and the custom identifier setting one
+# feature rather than two.
+
+msgctxt "#30036"
+msgid "Sign in to OneDrive"
+msgstr ""
+
+msgctxt "#30037"
+msgid "On your phone or computer, open the address below and enter this code."
+msgstr ""
+
+msgctxt "#30038"
+msgid "This code expires in %s"
+msgstr ""
+
+msgctxt "#30039"
+msgid "This code has expired."
+msgstr ""
+
+msgctxt "#30040"
+msgid "Get a new code"
+msgstr ""
+
+msgctxt "#30041"
+msgid "You may be asked to sign in again on your phone. That is expected."
+msgstr ""
+
+msgctxt "#30042"
+msgid "Sign in again"
+msgstr ""
+
+msgctxt "#30043"
+msgid "Sign-in needed"
+msgstr ""
+
+msgctxt "#30044"
+msgid "Sign-in failed. Error code: %s"
+msgstr ""
+
+msgctxt "#30045"
+msgid "You can also use your own app registration: put its Client ID in this add-on's settings, under Advanced, at Expert level."
+msgstr ""
+
+msgctxt "#30046"
+msgid "Your app registration is not set up for sign-in on a device. Turn on 'Allow public client flows' for it. Adding a secret will not help."
+msgstr ""
+
+msgctxt "#30047"
+msgid "This app has not been given permission to read your files. Sign in again and choose Accept."
+msgstr ""
+
+msgctxt "#30048"
+msgid "Your organisation must approve this app before you can use it. Ask an administrator to approve it."
+msgstr ""
+
+msgctxt "#30049"
+msgid "Your account is not assigned to this app. Ask an administrator to assign it."
+msgstr ""
+
+msgctxt "#30050"
+msgid "Your organisation's access policy blocks sign-in from a device like this. Ask an administrator."
+msgstr ""
+
+msgctxt "#30051"
+msgid "Your organisation's security defaults block sign-in from a device like this. Ask an administrator."
+msgstr ""
+
+msgctxt "#30052"
+msgid "Your organisation asks for a second sign-in step. Finish it on your phone, then try again."
+msgstr ""
+
+msgctxt "#30053"
+msgid "Your organisation asks you to set up a second sign-in step first. Set it up on your phone, then try again."
+msgstr ""
+
+msgctxt "#30054"
+msgid "Your password has expired. Change it on your phone, then try again."
+msgstr ""
+
+msgctxt "#30055"
+msgid "This app is turned off in your organisation. Ask an administrator to turn it back on."
+msgstr ""
+
+msgctxt "#30056"
+msgid "This app is not registered in your organisation. Ask an administrator to add it."
+msgstr ""
+
+msgctxt "#30057"
+msgid "The sign-in code was refused. Get a new code and try again."
+msgstr ""
+
+msgctxt "#30058"
+msgid "The sign-in code expired before it was used. Get a new code and try again."
+msgstr ""
+
 msgctxt "#30067"
 msgid "Services"
 msgstr ""
