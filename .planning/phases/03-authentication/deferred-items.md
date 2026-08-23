@@ -147,3 +147,30 @@ declared id is referenced, so all seven are legal where they stand.
 **Belongs to whichever plan next edits `resources/language/`**, with the same
 condition item 4 already states: the gate's expected set moves in the same
 commit as any deletion, because that assertion is an exact equality.
+
+## Found during 03-13
+
+**11. Nothing stops the next `refresh.fingerprint` comparison from being written.**
+
+03-13's harness decided rotation by putting `refresh.fingerprint()` values
+through a set. That function is a log redactor — eight leading characters, sized
+so a pasted Kodi log cannot carry a credential — and every refresh token this
+registration issues begins `1.AXEAuM`, so it rendered three different tokens
+identically and produced a confident FAIL on a run that had proved nothing. Fixed
+inside the harness by digesting whole tokens, with a guard that refuses any input
+that is already shortened.
+
+The shipped code was never wrong: `test_refresh.py::test_two_consecutive_refreshes_leave_three_distinct_refresh_tokens`
+compares whole tokens read back from disk. But nothing *asserts* that it must,
+and nothing stops the next equality or identity comparison from being built on
+`fingerprint()` again. It is the obvious function to reach for, it is right there
+in the module, and the result looks authoritative while discriminating on eight
+characters of a constant prefix.
+
+Not fixed here: 03-13's files are the two research scripts, `.gitignore` and the
+runbook, and `tests/` is not among them. **Belongs to whoever next edits
+`tests/test_refresh.py`**, and the check that pays for it is a gate asserting no
+comparison — `==`, `!=`, `set(...)`, `in` — takes `fingerprint()` output on
+either side. The same shape as the sweeps already in `test_auth_gates.py`. The
+transferable statement is in 03-13's summary: an instrument built from a
+redactor cannot measure identity, and its PASS is as worthless as its FAIL.

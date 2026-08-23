@@ -172,7 +172,7 @@ Plans:
   - **KODI-08** — third-party error reporting. Not a choice: AUTH-23 removes the accessor supplying the reporter's only URL, so the reporter either goes or is left with a broken reference.
   - **BROWSE-08, sign-in path only** — `get_account()` and `get_drives()`. Sign-in calls both, `GET /me` cannot answer under AUTH-04's locked scope set, and `/drives` is measured 403 on both account classes. The rest of the drive work stays in Phase 4.
 
-**Plans**: 12/14 plans executed
+**Plans**: 13/14 plans executed
 
 Plans:
 
@@ -188,7 +188,7 @@ Plans:
 - [x] 03-10-PLAN.md — The background service's proactive refresh, which never prompts
 - [x] 03-11-PLAN.md — The versioned settings schema, the Expert-level custom `client_id`, and the last broker rows
 - [x] 03-12-PLAN.md — The disclaimer, the README and the modification record
-- [ ] 03-13-PLAN.md — Live sign-in against the real registration, and the failure capture that no longer discards
+- [x] 03-13-PLAN.md — Live sign-in against the real registration, and the failure capture that no longer discards
 - [ ] 03-14-PLAN.md — First run and acceptance on the TCL Android TV 12
 
 **UI hint**: yes
@@ -293,7 +293,7 @@ Phases execute in numeric order, with two concurrent pairs: {1, 2} runs alongsid
 |-------|----------------|--------|-----------|
 | 1. Vendor Lift | 7/7 | Complete    | 2026-08-23 |
 | 2. Pure Core and CI Harness | 0/4 | Not started | - |
-| 3. Authentication | 12/14 | In Progress|  |
+| 3. Authentication | 13/14 | In Progress|  |
 | 4. Browse | 0/4 | Not started | - |
 | 5. Distribution | 0/3 | Not started | - |
 | 6. Play | 0/4 | Not started | - |

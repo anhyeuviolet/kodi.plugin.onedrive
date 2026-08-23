@@ -22,7 +22,7 @@ This narrowing is known to cost no future work on the one place it could have. `
 - [x] **SETUP-01**: An Azure application is registered with `signInAudience: AzureADandPersonalMicrosoftAccount` and `requestedAccessTokenVersion: 2`, verified by reading the manifest back rather than trusting the portal UI. **Satisfied before Phase 1**: registration `efe197b3-5c14-4d67-810f-e10406742a06`, both values read back through Graph — not from the portal UI, which is exactly what this requirement asks for. Evidence: `.planning/research/SPIKE-DEVICE-CODE.md`
 - [x] **SETUP-02**: `allowPublicClient: true` is set on that registration; leaving the `false` default makes the token endpoint demand a client secret. **Satisfied before Phase 1**: the manifest read back shows `isFallbackPublicClient: true`, which is the Graph API name for the same setting the portal labels "Allow public client flows". Device code flow completed against it in three live runs, which it could not have done at the `false` default. Evidence: `.planning/research/SPIKE-DEVICE-CODE.md`
 - [x] **SETUP-03**: No client secret or certificate exists on the registration, and none appears anywhere in the repository. **Satisfied before Phase 1**: `passwordCredentials` and `keyCredentials` both empty in the manifest read back through Graph, and no secret has ever been committed. Evidence: `.planning/research/SPIKE-DEVICE-CODE.md`
-- [ ] **SETUP-04**: A written registration runbook lives in the repo, including the `AADSTS7000218` symptom of skipping SETUP-02. **Still open** — `git ls-files` finds no such runbook. The registration exists and works, but nothing in the repo tells anyone how to recreate it, which is the whole point of this requirement
+- [x] **SETUP-04**: A written registration runbook lives in the repo, including the `AADSTS7000218` symptom of skipping SETUP-02. **Satisfied by 03-03 and completed by 03-13**: `docs/AZURE-REGISTRATION.md` is tracked, quotes the `AADSTS7000218` response verbatim and forbids the client-secret "fix" it invites, and carries the manifest values needed to recreate the registration. `tests/test_vendor_gates.py::test_runbook_contains_aadsts7000218` asserts all of that by name, so the document cannot silently lose it. 03-13 added the acceptance section: what a live sign-in through the shipped package returned, and what it could not tell anyone
 - [x] **SETUP-05**: Two test accounts are available — one personal Microsoft account and one work/school account. **Satisfied before Phase 1**: tokens were acquired live from two distinct work/school accounts in the E5 tenant and from one personal Microsoft account, the last confirmed genuine by the well-known MSA tenant id `9188040d-6c67-4c5b-b112-36a304b66dad`. Evidence: `.planning/research/SPIKE-DEVICE-CODE.md`. **Narrowed by S2**: both accounts exist and both work, but the drive being exercised from here on is the Business one; Personal-drive fixtures and passes are deferred, not dropped
 - [x] **SETUP-06**: A clean test environment exists — a Kodi profile with no sibling cloud-drive add-ons installed, plus an Android instrument running Kodi and reachable over `adb`. The **TCL Android TV 12 is the primary acceptance device** — it is what this add-on is written for; a phone or emulator stands in for it only on API-level questions (see CI-06). **Qualified**: no Android phone was ever connected. An emulator stood in — AVD `kodi_api30`, system image `android-30;google_apis;x86_64`, Android 11 / API 30, software-rendered through SwiftShader — recorded as an approved substitution in `.planning/phases/01-vendor-lift/01-01-SUMMARY.md` deviation 1. Its storage-regime, file-mode and `adb` claims hold; D-pad focus, ten-foot readability, real GPU and codec behaviour and low-end performance are untested, and its API level is one below the TCL's
 
@@ -51,7 +51,7 @@ This narrowing is known to cost no future work on the one place it could have. `
 ### Authentication
 
 - [ ] **AUTH-01**: A user signs in by reading a code off the TV and entering it on a phone, without typing a URL, username, or password on the remote
-- [ ] **AUTH-02**: The add-on ships a public `client_id` and requires no Azure setup, no server, and no token copy-paste from the user
+- [x] **AUTH-02**: The add-on ships a public `client_id` and requires no Azure setup, no server, and no token copy-paste from the user. **Verified live by 03-13**: the harness took the built-in `CLIENT_ID` with no argument and acquired a real token from the live provider through the shipped auth package. No registration was made, no broker or server was contacted — `AUTH-23` removed the last of that — and the user's only input was a code typed on a phone, which is not a token
 - [ ] **AUTH-03**: Sign-in works for both a personal Microsoft account and a work/school account against the chosen authority — verified end-to-end with the project's own registration, not a first-party client
 - [x] **AUTH-04**: The requested scope set is `https://graph.microsoft.com/Files.Read offline_access openid profile`, fully qualified, with no `Files.Read.All`, no write scope, and no `.default`
 - [ ] **AUTH-05**: The device-code dialog renders the code at the largest font the skin offers, legible from a sofa
@@ -62,7 +62,7 @@ This narrowing is known to cost no future work on the one place it could have. `
 - [x] **AUTH-10**: Pending polls arriving as HTTP 400 with a JSON body are parsed as protocol responses, not treated as transport failures
 - [x] **AUTH-11**: Refresh tokens are stored as atomically-written JSON under `special://profile/addon_data/`, never in a Kodi setting
 - [x] **AUTH-12**: Every token response is written back in full; when a response omits `refresh_token`, the previous one is retained
-- [ ] **AUTH-13**: An automated test proves the persisted refresh token changes across two consecutive refreshes
+- [x] **AUTH-13**: An automated test proves the persisted refresh token changes across two consecutive refreshes. **Satisfied by 03-07**: `tests/test_refresh.py::test_two_consecutive_refreshes_leave_three_distinct_refresh_tokens` asserts three distinct values read back **from the file on disk**, comparing whole tokens. **Confirmed live by 03-13**: the same property held against the real provider through the shipped store — `sha256:bf92b757a58b`, `sha256:1b8a11103c33`, `sha256:b0dc7a23cd00`. The automated half proves the code keeps what it is given; the live half proves the provider gives something new
 - [x] **AUTH-14**: Concurrent refresh across the plugin and the service is serialised by an `os.open(..., O_CREAT|O_EXCL)` lock with a stale-lock breaker; neither `threading.Lock` nor `fcntl.lockf` is used for this
 - [x] **AUTH-15**: A refresh that loses the race and receives `invalid_grant` re-reads the store and adopts the winner's token rather than signing the user out
 - [x] **AUTH-16**: A proactive refresh runs on Kodi startup well inside the 90-day refresh-token lifetime
@@ -196,7 +196,7 @@ Cross-cutting notes. `CI-06` (per-phase manual acceptance on the TCL Android TV 
 | SETUP-01 | Phase 3 | Complete — satisfied before Phase 1, manifest read back through Graph |
 | SETUP-02 | Phase 3 | Complete — `isFallbackPublicClient: true` in the manifest |
 | SETUP-03 | Phase 3 | Complete — `passwordCredentials`/`keyCredentials` empty, none in repo |
-| SETUP-04 | Phase 3 | Pending — no registration runbook exists in the repo |
+| SETUP-04 | Phase 3 | Complete — `docs/AZURE-REGISTRATION.md`, gated by name; acceptance section recorded by 03-13 |
 | SETUP-05 | Phase 2 | Complete — tokens acquired live from two work/school accounts and one personal |
 | SETUP-06 | Phase 1 | Complete — qualified: emulator stood in for the phone |
 | VND-01 | Phase 1 | Complete |
@@ -216,8 +216,8 @@ Cross-cutting notes. `CI-06` (per-phase manual acceptance on the TCL Android TV 
 | ID-04 | Phase 1 | Complete |
 | ID-05 | Phase 1 | Complete |
 | AUTH-01 | Phase 3 | Pending |
-| AUTH-02 | Phase 3 | Pending |
-| AUTH-03 | Phase 3 | Pending |
+| AUTH-02 | Phase 3 | Complete — built-in `client_id` acquired a live token, no setup and no server |
+| AUTH-03 | Phase 3 | Pending — half done. 03-13 verified a work/school account end-to-end through the project's own registration and the shipped package. The personal-account pass through that package is deferred; the spike already acquired a token on a personal account against this registration, so what is outstanding is a second live run, not a design question. 03-14 also declares this id |
 | AUTH-04 | Phase 3 | Complete |
 | AUTH-05 | Phase 3 | Pending |
 | AUTH-06 | Phase 3 | Pending |
@@ -227,12 +227,12 @@ Cross-cutting notes. `CI-06` (per-phase manual acceptance on the TCL Android TV 
 | AUTH-10 | Phase 3 | Complete |
 | AUTH-11 | Phase 3 | Complete |
 | AUTH-12 | Phase 3 | Complete |
-| AUTH-13 | Phase 3 | Pending |
+| AUTH-13 | Phase 3 | Complete — automated proof in 03-07, confirmed against the live provider in 03-13 |
 | AUTH-14 | Phase 3 | Complete |
 | AUTH-15 | Phase 3 | Complete |
 | AUTH-16 | Phase 3 | Complete |
 | AUTH-17 | Phase 3 | Pending |
-| AUTH-18 | Phase 3 | Pending |
+| AUTH-18 | Phase 3 | Pending — UNVERIFIABLE HERE. The message and the escape hatch exist and the error table is tested, but no tenant available to this project blocks the grant, so the refusal cannot be produced on demand. Recorded as a gap on purpose: a pass claimed here is one nobody would ever go back and check |
 | AUTH-19 | Phase 3 | Complete |
 | AUTH-20 | Phase 3 | Complete |
 | AUTH-21 | Phase 3 | Complete |
