@@ -22,7 +22,10 @@ from resources.lib.vendor.clouddrive_common.ui.utils import KodiUtils
 from resources.lib.vendor.clouddrive_common.utils import Utils
 import os
 from resources.lib.vendor.clouddrive_common.export import ExportManager
-import urllib
+# urllib.parse, not bare urllib: importing the package alone does not bind the
+# submodule, so the urllib.parse.unquote calls further down have only ever
+# resolved because some other module imported it first.
+import urllib.parse
 import uuid
 
 class DialogProgressBG (xbmcgui.DialogProgressBG):
@@ -101,45 +104,118 @@ class QRDialogProgress(xbmcgui.WindowXMLDialog):
     _qr_control = 1001
     _text_control = 1002
     _cancel_btn_control = 1003
+    _new_code_btn_control = 1004
+    _code_control = 1005
+
+    # Catalogue ids for the words this dialog owns. The words themselves live
+    # in resources/language/, so they exist in one place and can be translated.
+    _countdown_string_id = 30038
+    _expired_string_id = 30039
+    _new_code_string_id = 30040
+
     def __init__(self, *args, **kwargs):
         self.heading = kwargs["heading"]
         self.qr_code = kwargs["qr_code"]
         self.line1 = kwargs["line1"]
         self.line2 = kwargs["line2"]
         self.line3 = kwargs["line3"]
+        # Optional, so the existing caller keeps working unchanged. The flow
+        # that fills it in lands separately; between the two commits the
+        # add-on still has to run.
+        self.code = kwargs.get("code", "")
         self.percent = 0
         self._image_path = None
         self.canceled = False
+        self.expired = False
+        self.new_code_requested = False
 
     def __del__(self):
-        xbmcvfs.delete(self._image_path)
-        pass
-    
+        # The image path is unset until onInit has run, and a dialog that is
+        # constructed and then abandoned before that - which is exactly what
+        # an immediate abort produces - used to call delete with None right
+        # here, inside a destructor, where the interpreter discards the error
+        # and prints a note nobody reads. getattr rather than the attribute
+        # itself, because __init__ may not have completed either.
+        image_path = getattr(self, "_image_path", None)
+        if image_path:
+            xbmcvfs.delete(image_path)
+
     @staticmethod
-    def create(heading, qr_code, line1="", line2="", line3=""):
-        return QRDialogProgress("pin-dialog.xml", KodiUtils.get_common_addon_path(), "default", heading=heading, qr_code=qr_code, line1=line1, line2=line2, line3=line3)
-    
+    def create(heading, qr_code, line1="", line2="", line3="", code=""):
+        return QRDialogProgress("pin-dialog.xml", KodiUtils.get_common_addon_path(), "default", heading=heading, qr_code=qr_code, line1=line1, line2=line2, line3=line3, code=code)
+
     def iscanceled(self):
         return self.canceled
-    
+
+    def is_new_code_requested(self):
+        return self.new_code_requested
+
+    @staticmethod
+    def _addon_string(string_id, fallback):
+        # Deliberately not KodiUtils.localize: that sends every id below 32000
+        # to xbmc.getLocalizedString, which reads Kodi's own catalogue. This
+        # add-on's ids sit in the 30000 block Kodi reserves for plugins, so
+        # they have to be read from the add-on itself.
+        try:
+            text = KodiUtils.get_common_addon().getLocalizedString(string_id)
+        except Exception:
+            text = None
+        return text or fallback
+
+    @staticmethod
+    def _is_secure_url(value):
+        try:
+            parsed = urllib.parse.urlparse(Utils.str(value))
+        except Exception:
+            return False
+        return parsed.scheme == "https" and bool(parsed.netloc)
+
     def onInit(self):
-        import resources.lib.vendor.pyqrcode as pyqrcode
-        profile_path = Utils.unicode(KodiUtils.translate_path(KodiUtils.get_addon_info("profile")))
-        # A brand-new add-on id means a brand-new addon_data directory, which
-        # may not exist on first sign-in; without this the write raises before
-        # the dialog renders. Upstream never needed it: its profile always existed.
-        KodiUtils.mkdirs(profile_path)
-        # Kodi's texture cache is keyed by path, so one fixed name lets a second
-        # sign-in within the same session render the previous image against the
-        # new code - a dialog that looks right showing a code that will not
-        # authorise. A per-invocation name makes the question moot.
-        self._image_path = os.path.join(profile_path, "qr-%s.png" % uuid.uuid4().hex)
-        qrcode = pyqrcode.create(self.qr_code)
-        qrcode.png(self._image_path, scale=10)
-        del qrcode
         self.getControl(self._heading_control).setLabel(self.heading)
-        self.getControl(self._qr_control).setImage(self._image_path)
+        self.set_code(self.code)
+        new_code_button = self.getControl(self._new_code_btn_control)
+        new_code_button.setLabel(self._addon_string(self._new_code_string_id, "Get a new code"))
+        # Hidden until the code expires. Hidden from here rather than by a
+        # visible condition in the XML, because a condition in the XML wins
+        # over setVisible the next time it is evaluated.
+        new_code_button.setVisible(False)
+        # A QR is a thing a person is instructed to point a camera at, and the
+        # address inside it is the one the provider returned - never one built
+        # locally. The value arrives over TLS so the real protection is the
+        # transport, but asserting the scheme costs one line, and refusing
+        # leaves the code on screen rather than taking the whole dialog down.
+        if self._is_secure_url(self.qr_code):
+            import resources.lib.vendor.pyqrcode as pyqrcode
+            profile_path = Utils.unicode(KodiUtils.translate_path(KodiUtils.get_addon_info("profile")))
+            # A brand-new add-on id means a brand-new addon_data directory, which
+            # may not exist on first sign-in; without this the write raises before
+            # the dialog renders. Upstream never needed it: its profile always existed.
+            KodiUtils.mkdirs(profile_path)
+            # Kodi's texture cache is keyed by path, so one fixed name lets a second
+            # sign-in within the same session render the previous image against the
+            # new code - a dialog that looks right showing a code that will not
+            # authorise. A per-invocation name makes the question moot.
+            self._image_path = os.path.join(profile_path, "qr-%s.png" % uuid.uuid4().hex)
+            qrcode = pyqrcode.create(Utils.str(self.qr_code))
+            qrcode.png(self._image_path, scale=10)
+            del qrcode
+            self.getControl(self._qr_control).setImage(self._image_path)
+        else:
+            from resources.lib.vendor.clouddrive_common.ui.logger import Logger
+            Logger.error("QRDialogProgress: refusing to encode a sign-in address that is not an https URL")
         self.update(self.percent, self.line1, self.line2, self.line3)
+        # Focus is set once, here. It used to be the last line of update(),
+        # which a countdown calls once a second: that returns focus to Cancel
+        # every tick, so no focus the flow sets anywhere else can survive.
+        self.setFocus(self.getControl(self._cancel_btn_control))
+
+    def _render_text(self):
+        text = self.line1
+        if self.line2:
+            text = text + "[CR]" + self.line2
+        if self.line3:
+            text = text + "[CR]" + self.line3
+        self.getControl(self._text_control).setText(text)
 
     def update(self, percent, line1="", line2="", line3=""):
         self.percent = percent
@@ -151,19 +227,90 @@ class QRDialogProgress(xbmcgui.WindowXMLDialog):
             self.line2 = line2
         if line3:
             self.line3 = line3
-        text = self.line1
-        if self.line2:
-            text = text + "[CR]" + self.line2
-        if self.line3:
-            text = text + "[CR]" + self.line3   
-        self.getControl(self._text_control).setText(text)
+        self._render_text()
+        # No setFocus here, ever. See onInit.
+
+    def set_code(self, code):
+        """Put the code in the code control and nowhere else."""
+        self.code = code
+        self.getControl(self._code_control).setLabel(Utils.str(code or ""))
+
+    @staticmethod
+    def format_remaining(seconds):
+        try:
+            seconds = int(seconds)
+        except (TypeError, ValueError):
+            seconds = 0
+        if seconds < 0:
+            seconds = 0
+        return "%d:%02d" % (seconds // 60, seconds % 60)
+
+    def set_remaining(self, seconds):
+        """Write the countdown line and touch nothing else.
+
+        Driven by the caller once a second. It needs no thread: show() is
+        non-blocking, so the poll loop already ticks at that rate, and a
+        worker mutating controls while onInit may still be running is how the
+        stuck-dialog class of bug is produced.
+        """
+        template = self._addon_string(self._countdown_string_id, "This code expires in %s")
+        formatted = self.format_remaining(seconds)
+        if "%s" in template:
+            self.line3 = template % formatted
+        else:
+            self.line3 = "%s %s" % (template, formatted)
+        self._render_text()
+
+    def set_expired(self, message=None):
+        """Show the second action, focus it exactly once, swap the body text.
+
+        Cancel is left in place rather than hidden, so there are always two
+        ways out of this dialog on a device whose only other escape is force
+        -stopping Kodi. The guard is what makes "exactly once" structural: a
+        caller that discovers expiry on every tick still moves focus once.
+        """
+        if self.expired:
+            return
+        self.expired = True
+        self.line1 = message or self._addon_string(self._expired_string_id, "This code has expired.")
+        self.line2 = ""
+        self.line3 = ""
+        self._render_text()
+        button = self.getControl(self._new_code_btn_control)
+        button.setVisible(True)
+        self.setFocus(button)
+
+    def reset_for_new_code(self, line1="", line2="", line3=""):
+        """Return to the live state once the caller has a fresh code.
+
+        The caller re-reads the expiry from the new response rather than
+        reusing the previous one: the provider randomises it, and three
+        observed runs differed.
+        """
+        self.new_code_requested = False
+        if not self.expired:
+            return
+        self.expired = False
+        self.line1 = line1
+        self.line2 = line2
+        self.line3 = line3
+        self._render_text()
+        button = self.getControl(self._new_code_btn_control)
+        button.setVisible(False)
+        # Focus has to move: it is sitting on a control about to disappear.
+        # This is a transition, not a tick.
         self.setFocus(self.getControl(self._cancel_btn_control))
-    
+
     def onClick(self, control_id):
         if control_id == self._cancel_btn_control:
             self.canceled = True
             self.close()
-    
+        elif control_id == self._new_code_btn_control:
+            # Reported, not acted on. This dialog does not own the protocol,
+            # and a dialog that makes network calls is the thing that later
+            # becomes impossible to test.
+            self.new_code_requested = True
+
     def onAction(self, action):
         if action.getId() == xbmcgui.ACTION_PREVIOUS_MENU or action.getId() == xbmcgui.ACTION_NAV_BACK:
             self.canceled = True
