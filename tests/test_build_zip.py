@@ -190,6 +190,63 @@ def test_the_planning_record_the_suite_and_the_tools_are_absent(members):
                   for top, paths in sorted(offenders.items())))
 
 
+def test_no_member_is_rewritten_between_the_index_and_the_disk():
+    """git must not be converting line endings under this tree.
+
+    `build` writes each member by reading a path on disk, so what ships is
+    whatever git put in the working tree. With `core.autocrlf` set and no
+    `.gitattributes`, that is a property of the developer's configuration rather
+    than of the commit -- and it was: on the machine where this was written,
+    `resources/lib/auth/lock.py` was committed LF, checked out CRLF and archived
+    CRLF. The same revision built elsewhere produced a different zip, and so a
+    different sha256, while the whole point of publishing that digest is to pin
+    the bytes.
+
+    WHAT IS ASSERTED, and why not the obvious thing. Comparing archive members
+    against `HEAD` would be red during every ordinary edit, and a gate that is
+    red while you work is a gate that gets skipped. What is checked instead is
+    the difference that cannot be legitimate: a file whose disk bytes differ
+    from its index blob **only** by line endings. Normalise both sides; if they
+    then agree, nothing was edited and git rewrote the file. A real edit changes
+    the normalised form too and is ignored here.
+
+    That also makes this independent of whether anything is staged, which is
+    what lets it run in the middle of the work rather than only after it.
+    """
+    assert (REPO / '.gitattributes').is_file(), (
+        '.gitattributes is missing. Without it git converts line endings on '
+        'checkout and the archive stops being a function of the commit.')
+
+    attributes = (REPO / '.gitattributes').read_text(encoding='utf-8')
+    directives = [line.strip() for line in attributes.splitlines()
+                  if line.strip() and not line.strip().startswith('#')]
+    assert '* -text' in directives, (
+        '.gitattributes no longer disables end-of-line conversion for every '
+        'path; found %r' % (directives,))
+
+    converted = []
+    for rel in build_addon_zip.tracked_files(REPO):
+        stored = subprocess.run(['git', 'show', ':%s' % rel], cwd=str(REPO),
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.DEVNULL)
+        if stored.returncode != 0:
+            continue
+        indexed = stored.stdout
+        on_disk = (REPO / rel).read_bytes()
+        if on_disk == indexed:
+            continue
+        if on_disk.replace(b'\r\n', b'\n') == indexed.replace(b'\r\n', b'\n'):
+            converted.append('%s: %d bytes on disk, %d in the index, identical '
+                             'once newlines are normalised'
+                             % (rel, len(on_disk), len(indexed)))
+
+    assert not converted, (
+        'git is rewriting line endings between the index and the working tree. '
+        'The build reads the working tree, so the published archive and its '
+        'checksum become a property of this checkout rather than of the '
+        'commit:\n  %s' % '\n  '.join(converted))
+
+
 def test_the_forbidden_list_names_real_directories():
     """Every name in FORBIDDEN must exist in the index, or it excludes nothing.
 

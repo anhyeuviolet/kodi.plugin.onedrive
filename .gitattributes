@@ -1,0 +1,31 @@
+# No end-of-line conversion, in either direction, for anything in this branch.
+#
+# WHY THIS FILE EXISTS
+#
+# `tools/build_addon_zip.py` writes each member by reading the path on disk. So
+# the archive carries whatever git put in the working tree, and without this
+# file that is decided by the developer's `core.autocrlf` rather than by the
+# commit. Measured on the machine this was written on, with autocrlf=true: two
+# of three sampled members did not carry their committed bytes. The same
+# revision built on a differently-configured machine therefore produces a
+# different zip and a different sha256 -- and the published checksum is supposed
+# to pin the bytes, so that discipline was resting on a local setting.
+#
+# `-text` rather than `text=auto eol=lf`. Normalising the whole tree to LF would
+# be the usual choice and is the wrong one here: the vendored copy is pinned to
+# an upstream commit and VENDORED.md states that verbatim is "a measured
+# property of the bytes rather than a claim about the copy command". Upstream is
+# NOT uniform -- `db.py`, `export.py` and `remote/provider.py` arrived LF while
+# the rest of the package arrived CRLF -- so a tree-wide normalisation would
+# silently rewrite most of it and make a diff against upstream meaningless. The
+# target for each file is whatever upstream holds for that file, and `-text`
+# is what lets each one keep it.
+#
+# The gh-pages branch carries the same rule for the neighbouring reason: the
+# bytes it serves are digested and Kodi refuses the repository on a one-byte
+# disagreement. Here the bytes are digested one step earlier, on the way into
+# the archive.
+#
+# `tests/test_build_zip.py::test_every_member_carries_the_committed_bytes` is
+# what holds this. Deleting this file turns it red.
+* -text
