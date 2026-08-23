@@ -1,15 +1,16 @@
 # Vendored code
 
-This add-on carries a copy of the Cloud Drive Common Module inside its own source tree instead of
-depending on it as a separate Kodi add-on. This file is the record of that copy: where it came
-from, what licence each part is under, what was deliberately left behind, what was changed
-locally, and every way the add-on's behaviour now differs from the original.
+This add-on carries copies of two other projects inside its own source tree instead of depending on
+them as separate Kodi add-ons: the Cloud Drive Common Module, and the QR encoder that draws the
+sign-in code. This file is the record of both copies: where each came from, what licence each part
+is under, what was deliberately left behind, what was changed locally, and every way the add-on's
+behaviour now differs from the original.
 
 It exists so that a future upstream diff, a future licence question and a future "was that already
 broken?" all start from a written fact rather than from a guess. If you change anything under
 `resources/lib/vendor/`, add a row here in the same commit.
 
-## Upstream
+## Upstream: the Cloud Drive Common Module
 
 | Field | Value |
 |---|---|
@@ -50,6 +51,51 @@ record and planning paths**, which is exactly what the `source_scan` helper in
 `tests/`, and the four documents `VENDORED.md`, `CREDITS.md`, `COVERAGE.md` and `README.md`. The
 runnable form of both conditions is `test_no_hardcoded_module_id` and `test_no_eval` in that file.
 Those two tests, not a bare `grep` over the whole checkout, are what "zero hits" means here.
+
+## The QR encoder
+
+The second vendored component draws the QR code shown during sign-in. It was **not** taken from the
+project's own source repository; it was taken from a published Kodi add-on zip, and that zip — not
+the repository — is the fixed point this copy is re-derivable from.
+
+| Field | Value |
+|---|---|
+| Add-on id | `script.module.pyqrcode` |
+| Version | `1.2.1+matrix.4` |
+| Zip | `https://mirrors.kodi.tv/addons/omega/script.module.pyqrcode/script.module.pyqrcode-1.2.1+matrix.4.zip` |
+| Zip sha256 | `3bd98699099b531ba8175a3822536927eeaac111d7cb9d12e1f0ed707b020899` |
+| Zip size | 66,542 bytes |
+| Licence | BSD-3-Clause, © 2013 Michael Nooner; the PNG writer bundled inside it is MIT, © 2006 Johann C. Rocholl and others |
+| Code originates at | `https://github.com/mnooner256/pyqrcode` — the origin of the code, **not** the source of this copy |
+| Vendored to | `resources/lib/vendor/pyqrcode/` |
+
+**That URL answers with a 302, and it is not a dead link.** `mirrors.kodi.tv` redirects the canonical
+address above to
+`https://www.mirrorservice.org/sites/mirrors.xbmc.org/addons/omega/script.module.pyqrcode/script.module.pyqrcode-1.2.1+matrix.4.zip`.
+A `curl` without `-L` therefore reports `302` and writes a zero-byte body, which looks exactly like a
+URL that has rotted. Follow the redirect and check the sha256 above before concluding anything.
+
+**Mapping.** `script.module.pyqrcode/lib/pyqrcode/*` → `resources/lib/vendor/pyqrcode/*`, and
+`script.module.pyqrcode/LICENSE.md` → `resources/lib/vendor/pyqrcode/LICENSE.md`. The zip's own
+`addon.xml` and `icon.png` were **not** copied: they are Kodi add-on wrapper metadata and mean
+nothing inside this add-on.
+
+**Why the zip rather than PyPI or a source archive.** That zip is the exact build this add-on was
+tested against, and it is the only distribution that bundles the PNG writer, which exists as no
+separate Kodi module in any repository branch. Re-deriving from the GitHub project instead will
+produce different bytes.
+
+| Vendored file | Bytes | sha256 | Byte-identical to the zip? |
+|---|---:|---|---|
+| `__init__.py` | 32,727 | `781d7ba4aef8a83ca3932a52ea07b4c83f145f8b6f33ca9605fd1c161897bc2a` | no — 3 edits |
+| `builder.py` | 57,948 | `bc4f6d4ccffc2d59b40babf7ba6ff3ed8aeb33a92197b72086a872b1479cc4ca` | no — 2 edits |
+| `tables.py` | 31,446 | `20983a11ec5dc81fd74629d9ba6f3a9a737d8a410cce390b4e10bf5c2dbef588` | **yes** |
+| `png.py` | 81,765 | `9f70a9033f0f7f4412719c7a51cad9043c0187dfe09698b3c1b04ebb859d17df` | **yes** |
+| `LICENSE.md` | 1,503 | `0d2437a10d8ef93c488d49b0a09068c56bc1543e8ee9393bcbba15d172a031f9` | **yes** |
+
+All five ship LF-only, exactly as the zip does, and were staged with `git -c core.autocrlf=false add`
+so the blobs match the zip's bytes — the same procedure used for the module above. The five edits are
+itemised in **Local modifications** below.
 
 ## Licences
 
@@ -98,7 +144,8 @@ Upstream files that were deliberately not copied, and why.
 | `README.md`, `.project`, `.pydevproject`, `.settings/`, `.gitignore` | Upstream repository and IDE metadata |
 
 From the QR encoder add-on zip, `addon.xml` and `icon.png` were likewise not copied: they are Kodi
-add-on wrapper metadata and mean nothing inside this add-on.
+add-on wrapper metadata and mean nothing inside this add-on. The zip is identified in full under
+**The QR encoder** above.
 
 ## Local modifications
 
@@ -117,9 +164,9 @@ why it is a table and not prose.
 | `clouddrive_common/remote/errorreport.py` | Version lookup is `get_addon_info('version')` instead of naming the old module | Reports this add-on's version, not a version it no longer carries |
 | `clouddrive_common/remote/signin.py` | The User-Agent's third field is this add-on's own version | Same reason |
 | `clouddrive_common/ui/dialog.py` | The QR encoder import became `import resources.lib.vendor.pyqrcode as pyqrcode`, still function-local inside `onInit` | The encoder is bundled now. Keeping the import function-local means the dialog constructs and its skin loads even if the encoder is unavailable; it is deliberately **not** wrapped in a handler, so a failure surfaces rather than degrading silently |
-| `pyqrcode/__init__.py`, `pyqrcode/builder.py` | Five internal self-imports rewritten to `from . import …`, and two Python-2 compatibility `try`/`except ImportError` blocks reduced to their Python 3 branch | Absolute self-imports such as `import pyqrcode.tables` resolve to nothing once the package has a parent; and `try: import png` could only ever bind a *top-level* `png` — absent here, or somebody else's module if present. `tables.py`, `png.py` and `LICENSE.md` were not touched at all |
+| `pyqrcode/__init__.py`, `pyqrcode/builder.py` | Three internal self-imports rewritten to `from . import …` — `__init__.py` lines 46 and 47, `builder.py` line 33 — and two Python-2 compatibility `try`/`except ImportError` blocks reduced to their Python 3 branch: **five edits in total, across two files** | Absolute self-imports such as `import pyqrcode.tables` resolve to nothing once the package has a parent; and `try: import png` could only ever bind a *top-level* `png` — absent here, or somebody else's module if present. `tables.py`, `png.py` and `LICENSE.md` were not touched at all |
 | `clouddrive_common/ui/utils.py` | `KodiUtils.to_datetime` parses with `datetime.datetime.fromisoformat` after `re.sub(r'(\.\d{6})\d+', r'\1', s)`, replacing `dateutil.parser.parse`; `import datetime` and `import re` replace `import dateutil.parser` in the same function-local position | Removes the last dependency this add-on did not carry. The substitution truncates a seven-or-more-digit fractional-seconds field, which SharePoint emits, and is a literal no-op for six digits or fewer. It is kept even though CPython 3.11.9 already tolerates those inputs, because Kodi Nexus ships 3.11.2 and that build was not available to check. The surrounding bare handler that returns `None` on failure is unchanged |
-| `clouddrive_common/db.py` | Three reads: `eval(row[…])` → `json.loads(row[…])`. Two writes: `repr(value)` → `json.dumps(value)`. `import json` added | The key-value store backs the account store that holds OAuth refresh tokens. Reading it with `eval` turns a file on disk into running code. There is deliberately **no** compatibility read path and no fallback evaluator: a new add-on id means no database in the old format can exist, and a fallback would restore the exact hole being closed |
+| `clouddrive_common/db.py` | Two reads: `eval(row[…])` → `json.loads(row[…])`. Two writes: `repr(value)` → `json.dumps(value)`. `import json` added. (The tree's third converted read is in `cache/cache.py`, the row below; it is not in this file) | The key-value store backs the account store that holds OAuth refresh tokens. Reading it with `eval` turns a file on disk into running code. There is deliberately **no** compatibility read path and no fallback evaluator: a new add-on id means no database in the old format can exist, and a fallback would restore the exact hole being closed |
 | `clouddrive_common/cache/cache.py` | One read and two writes converted the same way; `import json` added | Same reasoning, for the item, children and page caches |
 | `clouddrive_common/service/source.py` | `content_value = Utils.str(cached_page['content'].getvalue())` — the cached response body is decoded at the write site | The page cache stored `bytes`, a shape JSON cannot carry. It is coerced where it is produced rather than special-cased in the serializer, which is the exact inverse of what the read path already does with `Utils.encode`. Every body written is HTML or a JSON string, so the decode is total |
 | `clouddrive_common/remote/request.py` | `Request.HTTP_TIMEOUT_SECONDS = 30`, passed as `urllib.request.urlopen(req, timeout=self.HTTP_TIMEOUT_SECONDS)` | The one outbound HTTP call in the tree could previously block forever. **The value is unmeasured** — 15 to 30 seconds is a recommended range, not a measurement of this add-on on a real network, and nothing in this repository can tell a correct 30 from a wrong one. One value serves both the metadata path and the chunked download path because the timeout applies per socket operation, not to a whole transfer: it bounds how long a single `read` may block, so a large download never trips it as long as bytes keep arriving |

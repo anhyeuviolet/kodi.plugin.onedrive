@@ -37,7 +37,14 @@ unresolved**, and this record does not resolve it by guessing — see `VENDORED.
 Carried at `resources/lib/vendor/pyqrcode/`, with the notice in
 `resources/lib/vendor/pyqrcode/LICENSE.md`. It renders the QR code shown during sign-in.
 
-Original project: `https://github.com/mnooner256/pyqrcode`
+Original project: `https://github.com/mnooner256/pyqrcode` — where the code comes from.
+
+**Where this copy comes from is a different place**, and the distinction matters to anyone trying to
+re-derive it: the files here were taken from the Kodi add-on zip `script.module.pyqrcode` version
+`1.2.1+matrix.4`, published on `mirrors.kodi.tv`, not from the GitHub project above. That zip is the
+build this add-on was tested against and the only distribution that bundles the PNG writer. Copying
+from GitHub instead yields different bytes. The zip's URL, its sha256 and the per-file hashes are in
+`VENDORED.md`.
 
 ## Bundled inside the QR encoder: the PNG writer
 
