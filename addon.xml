@@ -39,21 +39,22 @@ Play all your media from OneDrive including Videos, Music and Pictures.
 		<news>
 v1.0.0:
 - First release under a new add-on id, maintained independently of the original.
+- Signing in now goes straight to Microsoft: a code appears on screen and you enter it on your phone. It no longer passes through a third-party sign-in server.
 - Self-contained: the Cloud Drive common module is bundled, so no separate module add-on is needed.
 - Requires Kodi 20 or newer.
 		</news>
 		<disclaimer lang="en_GB">
-This cloud drive addon uses a third-party authentication mechanism commonly known as OAuth 2.0.
-If you want to know more about OAuth 2.0 you can visit the following pages:
-- https://oauth.net/2/
-- https://developers.google.com/identity/protocols/OAuth2
-- https://docs.microsoft.com/en-us/onedrive/developer/rest-api/getting-started/msa-oauth
+This add-on signs in with the OAuth 2.0 device authorization grant, directly to Microsoft. It shows
+you a code; you enter that code on your own phone or computer, at the Microsoft address shown beside
+it, and Microsoft hands the token back to the add-on.
 
-Kodi and myself take no responsibility or liability.
+No server run by this project, or by anyone else, sits in that exchange, and the add-on never sees
+your password. The application identifier it ships with is public by design: that is what this kind
+of sign-in uses instead of a secret, it only says which program is asking, and on its own it
+authorises nothing. The permission asked for is read-only access to your own files.
 
-The authentication server URL is specified in Settings / Advanced / Sign-in Server. The Sign-in Server implements the OAuth 2.0 protocol.
-The complete source code of the Sign-in Server can be download here: https://github.com/cguZZman/drive-login
-You can clone the project and host it in your own server. 
+This program is not affiliated with or sponsored by Microsoft. Kodi and myself take no
+responsibility or liability.
 		</disclaimer>
 	</extension>
 </addon>
