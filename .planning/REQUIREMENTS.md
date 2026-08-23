@@ -53,15 +53,15 @@ This narrowing is known to cost no future work on the one place it could have. `
 - [ ] **AUTH-01**: A user signs in by reading a code off the TV and entering it on a phone, without typing a URL, username, or password on the remote
 - [ ] **AUTH-02**: The add-on ships a public `client_id` and requires no Azure setup, no server, and no token copy-paste from the user
 - [ ] **AUTH-03**: Sign-in works for both a personal Microsoft account and a work/school account against the chosen authority — verified end-to-end with the project's own registration, not a first-party client
-- [ ] **AUTH-04**: The requested scope set is `https://graph.microsoft.com/Files.Read offline_access openid profile`, fully qualified, with no `Files.Read.All`, no write scope, and no `.default`
+- [x] **AUTH-04**: The requested scope set is `https://graph.microsoft.com/Files.Read offline_access openid profile`, fully qualified, with no `Files.Read.All`, no write scope, and no `.default`
 - [ ] **AUTH-05**: The device-code dialog renders the code at the largest font the skin offers, legible from a sofa
 - [ ] **AUTH-06**: The dialog shows a live expiry countdown and, on expiry, offers a focused "Get a new code" action
 - [ ] **AUTH-07**: Cancelling sign-in with Back or Esc leaves no partially-created account behind
 - [ ] **AUTH-08**: Any QR code shown encodes only the server-supplied `verification_uri`; the verification URI is never hardcoded, because it differs per authority
-- [ ] **AUTH-09**: The token-polling loop is an allow-list — it continues only on `authorization_pending` and `slow_down`, and stops on anything else
-- [ ] **AUTH-10**: Pending polls arriving as HTTP 400 with a JSON body are parsed as protocol responses, not treated as transport failures
-- [ ] **AUTH-11**: Refresh tokens are stored as atomically-written JSON under `special://profile/addon_data/`, never in a Kodi setting
-- [ ] **AUTH-12**: Every token response is written back in full; when a response omits `refresh_token`, the previous one is retained
+- [x] **AUTH-09**: The token-polling loop is an allow-list — it continues only on `authorization_pending` and `slow_down`, and stops on anything else
+- [x] **AUTH-10**: Pending polls arriving as HTTP 400 with a JSON body are parsed as protocol responses, not treated as transport failures
+- [x] **AUTH-11**: Refresh tokens are stored as atomically-written JSON under `special://profile/addon_data/`, never in a Kodi setting
+- [x] **AUTH-12**: Every token response is written back in full; when a response omits `refresh_token`, the previous one is retained
 - [ ] **AUTH-13**: An automated test proves the persisted refresh token changes across two consecutive refreshes
 - [ ] **AUTH-14**: Concurrent refresh across the plugin and the service is serialised by an `os.open(..., O_CREAT|O_EXCL)` lock with a stale-lock breaker; neither `threading.Lock` nor `fcntl.lockf` is used for this
 - [ ] **AUTH-15**: A refresh that loses the race and receives `invalid_grant` re-reads the store and adopts the winner's token rather than signing the user out
@@ -70,7 +70,7 @@ This narrowing is known to cost no future work on the one place it could have. `
 - [ ] **AUTH-18**: A tenant that blocks the app produces a specific message naming the cause and pointing at the custom `client_id` setting — not a generic failure
 - [ ] **AUTH-19**: A custom `client_id` setting exists at Expert level, empty by default
 - [ ] **AUTH-20**: Multiple accounts are supported, with tokens, delta tokens, and cache keys isolated per account
-- [ ] **AUTH-21**: Account labels come from Graph; no account name is ever typed on a remote
+- [x] **AUTH-21**: Account labels come from Graph; no account name is ever typed on a remote
 - [ ] **AUTH-22**: The add-on root is the account list, with an "Add an account…" row and a per-row context menu offering re-authorise and remove
 - [ ] **AUTH-23**: The `sign-in-server` setting and every code path referencing an external OAuth broker are gone
 
@@ -217,15 +217,15 @@ Cross-cutting notes. `CI-06` (per-phase manual acceptance on the TCL Android TV 
 | AUTH-01 | Phase 3 | Pending |
 | AUTH-02 | Phase 3 | Pending |
 | AUTH-03 | Phase 3 | Pending |
-| AUTH-04 | Phase 3 | Pending |
+| AUTH-04 | Phase 3 | Complete |
 | AUTH-05 | Phase 3 | Pending |
 | AUTH-06 | Phase 3 | Pending |
 | AUTH-07 | Phase 3 | Pending |
 | AUTH-08 | Phase 3 | Pending |
-| AUTH-09 | Phase 3 | Pending |
-| AUTH-10 | Phase 3 | Pending |
-| AUTH-11 | Phase 3 | Pending |
-| AUTH-12 | Phase 3 | Pending |
+| AUTH-09 | Phase 3 | Complete |
+| AUTH-10 | Phase 3 | Complete |
+| AUTH-11 | Phase 3 | Complete |
+| AUTH-12 | Phase 3 | Complete |
 | AUTH-13 | Phase 3 | Pending |
 | AUTH-14 | Phase 3 | Pending |
 | AUTH-15 | Phase 3 | Pending |
@@ -234,7 +234,7 @@ Cross-cutting notes. `CI-06` (per-phase manual acceptance on the TCL Android TV 
 | AUTH-18 | Phase 3 | Pending |
 | AUTH-19 | Phase 3 | Pending |
 | AUTH-20 | Phase 3 | Pending |
-| AUTH-21 | Phase 3 | Pending |
+| AUTH-21 | Phase 3 | Complete |
 | AUTH-22 | Phase 3 | Pending |
 | AUTH-23 | Phase 3 | Pending |
 | BROWSE-01 | Phase 4 | Pending |

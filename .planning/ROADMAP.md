@@ -158,6 +158,7 @@ Plans:
   1. On the TCL Android TV 12, sign-in completes end to end against the project's own registration with a **work/school (Business) account**, by reading a code off the screen and entering it on a phone, with no URL, username or password typed on the remote. A blocking or consent-requiring tenant produces a message naming the cause and pointing at the Expert-level custom `client_id` setting, and the exact `AADSTS` code it returns is recorded. **Narrowed 2026-08-23 to Business; the personal-account pass is deferred, not deleted** — the spike already acquired a token on a personal account, so what is deferred is the on-television pass, not the protocol question. **CI-06 exception resolved 2026-08-23:** the note existed because a phone cannot answer a television question — "read a code off the screen and enter it on a phone" is degenerate when the screen *is* the phone. Under the rewritten CI-06 the television is the acceptance device, so this criterion is checked directly on it and needs no proxy and no deferral to release.
 
   1a. **AUTH-18 is verifiable only in part, and must be recorded that way.** The E5 Developer tenant hosting this registration *permits* device code flow, so no blocking response can be produced from it on demand. Implement the error map defensively over the four known candidates — `AADSTS7000218` (public client flows still off), `AADSTS65001` (user or admin has not consented), `AADSTS50105`/`AADSTS53003` (Conditional Access blocking device code), `AADSTS7000014` (device_code rejected) — and mark AUTH-18 unverified against a genuinely blocking tenant rather than claiming it passes. Also make the terminal-error branch of `verify_device_code.py` persist the failing response to a file: it currently prints and discards, which is how an earlier observed failure was lost.
+
   2. The authorization request carries exactly `https://graph.microsoft.com/Files.Read offline_access openid profile`; a grep finds no `Files.Read.All`, no write scope, no `.default`, no `client_secret`, no `client_assertion`, and no reference to `sign-in-server` or any external broker anywhere in the tree. *(Qualified when planned, 2026-08-23: SETUP-04 requires the runbook to carry `AADSTS7000218` verbatim, and that error text names both forbidden parameters — so as written this criterion and SETUP-04 cannot both hold. Resolved the way the repository already resolves it: `docs/AZURE-REGISTRATION.md` joins `EXCLUDED_DOCS`, and pays for the exclusion with a positive assertion that reads it by name and requires the verbatim text. Same for the broker sweep and `README.md`/`VENDORED.md`, which are required to describe the old flow. The sweep's pattern is not softened anywhere.)*
   3. An automated test proves the persisted refresh token changed across two consecutive refreshes, and that a token response omitting `refresh_token` retains the previous one. A two-interpreter test shows the `O_EXCL` lock serialises refreshes and that a loser receiving `invalid_grant` re-reads the store and adopts the winner's token instead of signing the user out; no `threading.Lock` or `fcntl.lockf` appears in the auth package.
   4. The add-on root is the account list, with an "Add an account…" row and per-row re-authorise and remove. Labels come from Graph, Back or Esc during sign-in leaves no partially-created account, tokens and delta tokens and cache keys are isolated per account, and the background service never opens a sign-in dialog.
@@ -171,10 +172,11 @@ Plans:
   - **KODI-08** — third-party error reporting. Not a choice: AUTH-23 removes the accessor supplying the reporter's only URL, so the reporter either goes or is left with a broken reference.
   - **BROWSE-08, sign-in path only** — `get_account()` and `get_drives()`. Sign-in calls both, `GET /me` cannot answer under AUTH-04's locked scope set, and `/drives` is measured 403 on both account classes. The rest of the drive work stays in Phase 4.
 
-**Plans**: 14 plans, in 8 waves
+**Plans**: 1/14 plans executed
 
 Plans:
-- [ ] 03-01-PLAN.md — Tracer: device code requested, token merged, stored atomically and read back, with no Kodi in the path
+
+- [x] 03-01-PLAN.md — Tracer: device code requested, token merged, stored atomically and read back, with no Kodi in the path
 - [ ] 03-02-PLAN.md — The installable zip, built from the git index (DIST-01)
 - [ ] 03-03-PLAN.md — One gate harness, the auth gate file red by construction, and the registration runbook (SETUP-04)
 - [ ] 03-04-PLAN.md — The `O_EXCL` refresh lock, its two-signal stale breaker, and per-account isolation on disk
@@ -291,7 +293,7 @@ Phases execute in numeric order, with two concurrent pairs: {1, 2} runs alongsid
 |-------|----------------|--------|-----------|
 | 1. Vendor Lift | 7/7 | Complete    | 2026-08-23 |
 | 2. Pure Core and CI Harness | 0/4 | Not started | - |
-| 3. Authentication | 0/5 | Not started | - |
+| 3. Authentication | 1/14 | In Progress|  |
 | 4. Browse | 0/4 | Not started | - |
 | 5. Distribution | 0/3 | Not started | - |
 | 6. Play | 0/4 | Not started | - |
