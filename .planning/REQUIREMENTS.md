@@ -5,16 +5,26 @@
 
 Scope note: this is a brownfield refactor. Requirements below describe the target state, not new product surface. Where the existing add-on already does something, the requirement is that it keeps working after the rewrite. Every requirement is checkable against either an automated test or a named manual acceptance step on real hardware.
 
+### Standing scope notes (set 2026-08-23)
+
+These two narrow several requirements at once. They are written here so the narrowing is stated in one place rather than re-argued in each.
+
+**S1 — The goal is that this add-on runs on the owner's TCL Android TV 12.** That device is the primary acceptance device and the primary consumer. Sharing the add-on with anyone else is secondary. Anything that blocks the TCL path is deferred to a later phase or milestone rather than solved in place, and anything that does not serve it is not a per-phase obligation. Windows is not a target. See CI-06.
+
+**S2 — OneDrive Business is the current drive type.** The owner uses a work/school account. Personal remains in scope as a requirement and is **deferred, not deleted**: it is tested later, not now. Where a requirement demands both drive types, the immediate obligation is Business; the Personal half stays written down and unchecked until it is exercised.
+
+This narrowing is known to cost no future work on the one place it could have. `.planning/research/SPIKE-DEVICE-CODE.md` measured the drive endpoints against live accounts: `GET /me/drives` returns 200 on business and **403 `accessDenied`** on personal, `GET /drives` returns 403 on both, and **`GET /me/drive` returns 200 on both**. BROWSE-08 already fixes `/me/drive` as the endpoint, so the endpoint the add-on uses already serves both account classes. Deferring Personal testing therefore defers a test, not a design decision, and nobody should "optimise" the Personal half away on the grounds that only Business is being exercised.
+
 ## v1 Requirements
 
 ### Setup (maintainer prerequisites — not code)
 
-- [ ] **SETUP-01**: An Azure application is registered with `signInAudience: AzureADandPersonalMicrosoftAccount` and `requestedAccessTokenVersion: 2`, verified by reading the manifest back rather than trusting the portal UI
-- [ ] **SETUP-02**: `allowPublicClient: true` is set on that registration; leaving the `false` default makes the token endpoint demand a client secret
-- [ ] **SETUP-03**: No client secret or certificate exists on the registration, and none appears anywhere in the repository
-- [ ] **SETUP-04**: A written registration runbook lives in the repo, including the `AADSTS7000218` symptom of skipping SETUP-02
-- [ ] **SETUP-05**: Two test accounts are available — one personal Microsoft account and one work/school account
-- [x] **SETUP-06**: A clean test environment exists — a Kodi profile with no sibling cloud-drive add-ons installed, plus an Android phone running Kodi and reachable over `adb`, which is the Android test device. The Android TV box is the deployment target and the design authority for the 10-foot interface, but it is not a test device: it is exercised by use, and only at release (see CI-06)
+- [x] **SETUP-01**: An Azure application is registered with `signInAudience: AzureADandPersonalMicrosoftAccount` and `requestedAccessTokenVersion: 2`, verified by reading the manifest back rather than trusting the portal UI. **Satisfied before Phase 1**: registration `efe197b3-5c14-4d67-810f-e10406742a06`, both values read back through Graph — not from the portal UI, which is exactly what this requirement asks for. Evidence: `.planning/research/SPIKE-DEVICE-CODE.md`
+- [x] **SETUP-02**: `allowPublicClient: true` is set on that registration; leaving the `false` default makes the token endpoint demand a client secret. **Satisfied before Phase 1**: the manifest read back shows `isFallbackPublicClient: true`, which is the Graph API name for the same setting the portal labels "Allow public client flows". Device code flow completed against it in three live runs, which it could not have done at the `false` default. Evidence: `.planning/research/SPIKE-DEVICE-CODE.md`
+- [x] **SETUP-03**: No client secret or certificate exists on the registration, and none appears anywhere in the repository. **Satisfied before Phase 1**: `passwordCredentials` and `keyCredentials` both empty in the manifest read back through Graph, and no secret has ever been committed. Evidence: `.planning/research/SPIKE-DEVICE-CODE.md`
+- [ ] **SETUP-04**: A written registration runbook lives in the repo, including the `AADSTS7000218` symptom of skipping SETUP-02. **Still open** — `git ls-files` finds no such runbook. The registration exists and works, but nothing in the repo tells anyone how to recreate it, which is the whole point of this requirement
+- [x] **SETUP-05**: Two test accounts are available — one personal Microsoft account and one work/school account. **Satisfied before Phase 1**: tokens were acquired live from two distinct work/school accounts in the E5 tenant and from one personal Microsoft account, the last confirmed genuine by the well-known MSA tenant id `9188040d-6c67-4c5b-b112-36a304b66dad`. Evidence: `.planning/research/SPIKE-DEVICE-CODE.md`. **Narrowed by S2**: both accounts exist and both work, but the drive being exercised from here on is the Business one; Personal-drive fixtures and passes are deferred, not dropped
+- [x] **SETUP-06**: A clean test environment exists — a Kodi profile with no sibling cloud-drive add-ons installed, plus an Android instrument running Kodi and reachable over `adb`. The **TCL Android TV 12 is the primary acceptance device** — it is what this add-on is written for; a phone or emulator stands in for it only on API-level questions (see CI-06). **Qualified**: no Android phone was ever connected. An emulator stood in — AVD `kodi_api30`, system image `android-30;google_apis;x86_64`, Android 11 / API 30, software-rendered through SwiftShader — recorded as an approved substitution in `.planning/phases/01-vendor-lift/01-01-SUMMARY.md` deviation 1. Its storage-regime, file-mode and `adb` claims hold; D-pad focus, ten-foot readability, real GPU and codec behaviour and low-end performance are untested, and its API level is one below the TCL's
 
 ### Vendoring
 
@@ -66,11 +76,11 @@ Scope note: this is a brownfield refactor. Requirements below describe the targe
 
 ### Browsing
 
-- [ ] **BROWSE-01**: Folders list correctly for personal and business drives, one page at a time, without buffering the whole folder
+- [ ] **BROWSE-01**: Folders list correctly for personal and business drives, one page at a time, without buffering the whole folder. **S2**: the immediate obligation is the Business drive; the Personal half is deferred, not dropped
 - [ ] **BROWSE-02**: Pagination is iterative, so a very large folder cannot hit a recursion limit
 - [ ] **BROWSE-03**: Cancelling mid-listing returns an empty list, never `None`, and never crashes
 - [ ] **BROWSE-04**: A search does not corrupt subsequent folder listings — no request-scoped state persists on the provider between calls
-- [ ] **BROWSE-05**: Names containing `#`, spaces, and literal `%` resolve correctly, verified on both a Personal and a Business drive because the reserved-character sets differ
+- [ ] **BROWSE-05**: Names containing `#`, spaces, and literal `%` resolve correctly, verified on both a Personal and a Business drive because the reserved-character sets differ. **S2**: verify on Business now; the Personal verification is deferred and must not be deleted — the differing reserved-character sets are the entire reason this requirement names both
 - [ ] **BROWSE-06**: Search queries containing a single quote succeed
 - [ ] **BROWSE-07**: Graph responses are read defensively; a missing or reshaped field produces a handled error, not a `KeyError` traceback
 - [ ] **BROWSE-08**: Drive access uses `GET /me/drive`, the only endpoint verified to work for both account classes — `/me/drives` returns 403 on personal accounts and `/drives` returns 403 on both. See `.planning/research/SPIKE-DEVICE-CODE.md`
@@ -84,20 +94,20 @@ Scope note: this is a brownfield refactor. Requirements below describe the targe
 
 ### Playback
 
-- [ ] **PLAY-01**: Video, audio, and image files play from both personal and business drives
+- [ ] **PLAY-01**: Video, audio, and image files play from both personal and business drives. **S2**: Business now, Personal deferred
 - [ ] **PLAY-02**: A loopback HTTP endpoint answers each request by resolving a fresh download URL and returning a 302; Kodi is never handed a Graph URL directly
 - [ ] **PLAY-03**: The redirector binds to a dynamically allocated port and requires a per-session random path token, so a guessed item id is not sufficient
 - [ ] **PLAY-04**: The download URL is resolved at play time on every request and is never cached, never placed in a directory item URL, and never written into an exported `.strm`
 - [ ] **PLAY-05**: `setResolvedUrl` is called exactly once per playback invocation
 - [ ] **PLAY-06**: Seeking works, including after a 20–30 minute pause on real Android TV hardware
-- [ ] **PLAY-07**: The real download-URL lifetime is measured separately for Personal and Business drives and the numbers are recorded
+- [ ] **PLAY-07**: The real download-URL lifetime is measured separately for Personal and Business drives and the numbers are recorded. **S2**: the Business measurement is the one that gates Phase 6; the Personal measurement is deferred. Keep them separate rather than generalising one number to both — the two drive classes are served by different back ends
 - [ ] **PLAY-08**: Same-name subtitles are discovered across Kodi's full extension set, including language suffixes and VOBsub `.idx`/`.sub` pairs, and failure is silent
 - [ ] **PLAY-09**: Subtitles are served through the same redirector as media, for the same expiry reason
 - [ ] **PLAY-10**: Durations reach Kodi as integers
 
 ### Kodi modernization
 
-- [x] **KODI-01**: `addon.xml` declares `<import addon="xbmc.python" version="3.0.1"/>`, installing on Kodi 20, 21, and 22 and being rejected by Kodi 19
+- [x] **KODI-01**: `addon.xml` declares `<import addon="xbmc.python" version="3.0.1"/>`, installing on Kodi 20, 21, and 22 and being rejected by Kodi 19. **Qualified**: the declaration itself is verified in the file. The Kodi-19-refusal half is evidenced **only** by a harvested `kodi.log` from an uncontrolled, unobserved Kodi 19.5 run on an unverified profile — the log really does carry `The dependency on xbmc.python version 3.0.1 could not be satisfied`, and that content was re-read, but no controlled observed run was ever performed and re-reading a file cannot fix that. The install half has controlled evidence for Kodi 21.3 on Android only; 20 and 22 rest on the same class of uncontrolled log. `.planning/phases/01-vendor-lift/01-07-SUMMARY.md` escalates this for a decision. The checkbox stands on acceptance of that evidence, not on a controlled run
 - [ ] **KODI-02**: The add-on installs and runs on Kodi 20 Nexus, 21 Omega, and 22 Piers. **Narrowed by decision on 2026-08-23 and deliberately left unchecked**: the multi-version install matrix was dropped along with the Windows leg, because this add-on targets one device — a TCL television running Android TV 12 — and backwards compatibility across Kodi versions is not being pursued. Uncontrolled logs from an interrupted run show Kodi 20.5 and 22.0-BETA1 installing the zip and starting both entry points, but that is not an acceptance pass and is not treated as one. If the requirement is still wanted, it is verified at the release stage; see `.planning/phases/01-vendor-lift/01-07-SUMMARY.md`
 - [ ] **KODI-03**: List items use typed InfoTag setters, and this lands in the same commit as the integer-duration fix
 - [ ] **KODI-04**: A full browse-and-play `kodi.log` contains zero `is deprecated` warnings from this add-on
@@ -114,10 +124,10 @@ Scope note: this is a brownfield refactor. Requirements below describe the targe
 
 - [ ] **CI-01**: Only `resources/lib/kodi/` imports `xbmc*`; an automated test enforces this
 - [ ] **CI-02**: Unit tests cover item extraction, pagination, path encoding, and OData literal quoting against recorded Graph JSON
-- [ ] **CI-03**: Graph fixtures are recorded from both a Personal and a Business drive and are labelled by source
+- [ ] **CI-03**: Graph fixtures are recorded from both a Personal and a Business drive and are labelled by source. **S2**: record the Business set now; the Personal set is deferred. The labelling requirement is what makes the deferral safe — an unlabelled fixture set silently becomes "both"
 - [ ] **CI-04**: CI runs the test suite plus `kodi-addon-checker` against the nexus, omega, and piers branches
 - [ ] **CI-05**: CI fails on any occurrence of `client_secret`, `client_assertion`, `eval(`, or `script.module.clouddrive.common`
-- [ ] **CI-06**: Every phase carries a manual acceptance pass on Windows and on Android, where Android means an Android phone running Kodi and reachable over `adb`. The phone is a valid proxy for every OS-level question — storage paths, file mode bits, `O_EXCL`, loopback binding — because those are API-level behaviours, not form-factor ones, and the phone matches the target box's Android 11/12 storage regime. It is **not** a proxy for the two things only the TV can answer: D-pad focus and 10-foot readability, and low-end box performance. Those are checked on the TV before release (CI-07), and by using it
+- [ ] **CI-06**: Every phase carries a manual acceptance pass on the **TCL Android TV 12**, which is the primary acceptance device — it is the machine this add-on is written for and the only one whose failures matter to the goal. It is exercised from Phase 3 onward, the first point at which a run on it proves something an emulator could not; Phase 1 and Phase 2 predate that. There is **no standing obligation to pass on Windows or on a phone**: Windows is not a target. A stand-in — an Android phone or emulator at a comparable API level — is acceptable **only** for OS-level questions: storage paths, file mode bits, `O_EXCL`, loopback binding. Those follow the API level rather than the form factor, so an API-matched instrument answers them soundly. It answers nothing about D-pad focus order, ten-foot readability, real GPU and codec behaviour, or performance on a low-end SoC. Where the TCL genuinely cannot be driven for a phase, the pass is recorded as run on a stand-in, with the stand-in named and its limits stated — never written up as a TV pass
 - [ ] **CI-07**: The release gate requires at least one full acceptance pass on a clean profile using a Business account
 
 ### Error handling
@@ -178,16 +188,16 @@ Mapped during roadmap creation. Every v1 requirement belongs to exactly one phas
 
 Phase names: 1 Vendor Lift · 2 Pure Core and CI Harness · 3 Authentication · 4 Browse · 5 Distribution · 6 Play · 7 Kodi Modernization · 8 Existing-User Migration and Release.
 
-Cross-cutting notes. `CI-06` (per-phase manual acceptance on Windows and on an Android phone; the TV is release-only) is established in Phase 1 and inherited as a standard by every later phase; `CI-07` is the release gate and sits in the final phase. `ERR-01` to `ERR-03` land in Phase 4, the first point at which the central HTTP layer, the auth error map, and the listing error paths all exist, so the failure states can be shown to be distinguishable from one another rather than asserted piecemeal. `SETUP-01` to `SETUP-04` are the Azure registration and appear as a maintainer prerequisite block on Phase 3, not as implementation work. `PLAY-10` sits in Phase 7 rather than Phase 6 because `KODI-03` requires the float-to-int duration fix to land in the same commit as the typed InfoTag setters.
+Cross-cutting notes. `CI-06` (per-phase manual acceptance on the TCL Android TV 12, the primary acceptance device, from Phase 3 onward; a stand-in only for API-level questions; no Windows obligation) is established in Phase 1 and inherited as a standard by every later phase; `CI-07` is the release gate and sits in the final phase. `ERR-01` to `ERR-03` land in Phase 4, the first point at which the central HTTP layer, the auth error map, and the listing error paths all exist, so the failure states can be shown to be distinguishable from one another rather than asserted piecemeal. `SETUP-01` to `SETUP-04` are the Azure registration and appear as a maintainer prerequisite block on Phase 3, not as implementation work; `SETUP-01`, `-02` and `-03` were satisfied by the owner before Phase 1 and are already checked, so only the `SETUP-04` runbook is outstanding there. `PLAY-10` sits in Phase 7 rather than Phase 6 because `KODI-03` requires the float-to-int duration fix to land in the same commit as the typed InfoTag setters.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SETUP-01 | Phase 3 | Pending |
-| SETUP-02 | Phase 3 | Pending |
-| SETUP-03 | Phase 3 | Pending |
-| SETUP-04 | Phase 3 | Pending |
-| SETUP-05 | Phase 2 | Pending |
-| SETUP-06 | Phase 1 | Complete |
+| SETUP-01 | Phase 3 | Complete — satisfied before Phase 1, manifest read back through Graph |
+| SETUP-02 | Phase 3 | Complete — `isFallbackPublicClient: true` in the manifest |
+| SETUP-03 | Phase 3 | Complete — `passwordCredentials`/`keyCredentials` empty, none in repo |
+| SETUP-04 | Phase 3 | Pending — no registration runbook exists in the repo |
+| SETUP-05 | Phase 2 | Complete — tokens acquired live from two work/school accounts and one personal |
+| SETUP-06 | Phase 1 | Complete — qualified: emulator stood in for the phone |
 | VND-01 | Phase 1 | Complete |
 | VND-02 | Phase 1 | Complete |
 | VND-03 | Phase 1 | Complete |
@@ -252,7 +262,7 @@ Cross-cutting notes. `CI-06` (per-phase manual acceptance on Windows and on an A
 | PLAY-08 | Phase 6 | Pending |
 | PLAY-09 | Phase 6 | Pending |
 | PLAY-10 | Phase 7 | Pending |
-| KODI-01 | Phase 1 | Complete |
+| KODI-01 | Phase 1 | Complete — qualified: the Kodi 19 refusal has uncontrolled evidence only |
 | KODI-02 | Phase 1 | Narrowed — not met, moved out of Phase 1 |
 | KODI-03 | Phase 7 | Pending |
 | KODI-04 | Phase 7 | Pending |
