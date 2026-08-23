@@ -290,3 +290,39 @@ DIST-01, which is about the archive the build writes — that archive installed 
 Kodi's own file manager. It is a distribution problem, and Phase 5 is where the hosted
 repository that would solve it already sits. Recorded rather than worked around: a
 workaround invented inside an acceptance run changes the thing being accepted.
+
+## Found during the phase-3 verification
+
+**17. Phase 3 added a CI-01 violation, and until now it was recorded nowhere.**
+
+CI-01 (Phase 2) requires that only `resources/lib/kodi/` import `xbmc*`. That
+directory does not exist in the tree. Phase 3 added
+`resources/lib/auth_context.py`, which imports `xbmc` at module level and sits
+directly under `resources/lib/` — one level above the only location CI-01
+permits.
+
+The module itself is exactly the thin adapter CI-01's architecture asks for: a
+closed list of four things the pure auth package needs from Kodi, documented as
+such, and it is precisely what keeps `resources/lib/auth/` free of any `xbmc`
+import — independently confirmed, there is no `xbmc` import anywhere in that
+package. Nothing about the module is wrong except where it is.
+
+**Not fixed here, and the reason is not scope but ownership.** CI-01 belongs to
+Phase 2, Phase 2 has not been planned, and the fix is not a file move in
+isolation: it is a decision about where the Kodi adapter layer lives and what
+the enforcing test reads, taken together with the four other CI requirements in
+the same phase. Phase 3 ran ahead of Phase 2 by the priority order, and a phase
+running ahead does not get to settle the layout of the phase it overtook. Moving
+the file now would pre-empt that design and would arrive without the test that
+is supposed to hold it.
+
+**Belongs to Phase 2**, which either moves `resources/lib/auth_context.py` under
+the directory CI-01 names, or restates CI-01 against the layout actually wanted
+— and in either case lands the enforcing test in the same commit, because a
+boundary with no test is what let this go unrecorded for fourteen plans. The
+fact and its location are stated here; no fix is proposed, because proposing one
+is the part that is Phase 2's.
+
+Also recorded against `CI-01` in `.planning/REQUIREMENTS.md` and as an inherited
+constraint on Phase 2 in `.planning/ROADMAP.md`, so it is visible from the
+requirement and from the phase as well as from this file.

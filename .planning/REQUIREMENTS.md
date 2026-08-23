@@ -122,7 +122,7 @@ This narrowing is known to cost no future work on the one place it could have. `
 
 ### Quality and CI
 
-- [ ] **CI-01**: Only `resources/lib/kodi/` imports `xbmc*`; an automated test enforces this
+- [ ] **CI-01**: Only `resources/lib/kodi/` imports `xbmc*`; an automated test enforces this. **Phase 3 moved this requirement's target, and the move is recorded rather than acted on.** `resources/lib/kodi/` does not exist in the tree. Phase 3 added `resources/lib/auth_context.py`, which imports `xbmc` at module level and sits directly under `resources/lib/` — one directory above the only place CI-01 permits it. The module is the thin adapter this requirement's architecture calls for: a closed list of four things, documented as such, and it is precisely what keeps `resources/lib/auth/` free of any `xbmc` import at all. Only its location is wrong. **Phase 3 did not restructure it**: where the adapter directory lives and what the enforcing test reads are Phase 2's design, Phase 2 has not been planned, and a phase running ahead of another does not get to settle that other phase's layout. Recorded as deferred item 17 in `.planning/phases/03-authentication/deferred-items.md`, with **Phase 2 named as owner**
 - [ ] **CI-02**: Unit tests cover item extraction, pagination, path encoding, and OData literal quoting against recorded Graph JSON
 - [ ] **CI-03**: Graph fixtures are recorded from both a Personal and a Business drive and are labelled by source. **S2**: record the Business set now; the Personal set is deferred. The labelling requirement is what makes the deferral safe — an unlabelled fixture set silently becomes "both"
 - [ ] **CI-04**: CI runs the test suite plus `kodi-addon-checker` against the nexus, omega, and piers branches
@@ -271,7 +271,7 @@ Cross-cutting notes. `CI-06` (per-phase manual acceptance on the TCL Android TV 
 | KODI-06 | Phase 3 | Complete |
 | KODI-07 | Phase 7 | Pending |
 | KODI-08 | Phase 3 | Complete |
-| CI-01 | Phase 2 | Pending |
+| CI-01 | Phase 2 | Pending — and its target moved while it waited. `resources/lib/kodi/` does not exist, and Phase 3 added `resources/lib/auth_context.py`, which imports `xbmc` outside it. Stated, not fixed: the layout is Phase 2's call. See deferred item 17 |
 | CI-02 | Phase 2 | Pending |
 | CI-03 | Phase 2 | Pending |
 | CI-04 | Phase 2 | Pending |
