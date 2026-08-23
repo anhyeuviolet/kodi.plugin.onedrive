@@ -57,6 +57,16 @@ eight seconds; the predicate has held on each occasion it has been available to
 check, which is what turns it from a description into something worth acting on.
 Suite otherwise green at 256 passed, 1 skipped.
 
+*Three more, during the post-verification gap closure, and the predicate held on
+every one.* Failures on runs of 8.38s, 8.66s and 8.47s; passes on six runs of
+3.30-3.68s interleaved with them, with no file touched between a failure and the
+passes that followed it. That is seven failures now and seven runs over eight
+seconds, with no failure ever seen on a run under it. The predicate has never
+once been wrong when it could be checked, which is as much evidence as this is
+going to accumulate by accident: **the knob is the five-second `acquire` timeout
+in the test, not `ACQUIRE_TIMEOUT_SECONDS` in the lock**, and nothing about the
+shipped code is implicated. Suite otherwise green at 260 passed, 1 skipped.
+
 **3. `AccountManager.remove_drive` has no caller.**
 
 03-09 deleted the per-drive removal option and its handler as unreachable — one
