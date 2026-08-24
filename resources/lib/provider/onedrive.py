@@ -20,6 +20,7 @@
 from resources.lib.auth import device_code
 from resources.lib.graph import items as graph_items
 from resources.lib.graph import pager as graph_pager
+from resources.lib.graph import params as graph_params
 from resources.lib.graph import paths as graph_paths
 from resources.lib.vendor.clouddrive_common.remote.provider import Provider
 from resources.lib.vendor.clouddrive_common.utils import Utils
@@ -28,8 +29,16 @@ from resources.lib.vendor.clouddrive_common.exception import ExceptionUtils
 from urllib.error import HTTPError
 
 class OneDrive(Provider):
-    _extra_parameters = {'expand': 'thumbnails'}
-    
+    # No shared request-parameter dictionary. There used to be one here, as a
+    # class attribute passed to every request, and search() wrote a filter into
+    # it -- after which the next folder listing carried that filter and Graph
+    # answered 400. Each call site now builds its own mapping through
+    # graph.params. An instance attribute would not have been enough:
+    # resources/lib/addon.py holds one provider as a class attribute of its own,
+    # so every action in an invocation shares the instance, and service.py hands
+    # this class to five services that share one interpreter for a whole Kodi
+    # session (BROWSE-04).
+
     def __init__(self, source_mode = False):
         super(OneDrive, self).__init__('onedrive', source_mode)
         
@@ -145,7 +154,7 @@ class OneDrive(Provider):
     def get_folder_items(self, item_driveid=None, item_id=None, path=None, on_items_page_completed=None, include_download_info=False, on_before_add_item=None):
         item_driveid = Utils.default(item_driveid, self._driveid)
         if item_id:
-            files = self.get('/drives/'+item_driveid+'/items/' + item_id + '/children', parameters = self._extra_parameters)
+            files = self.get('/drives/'+item_driveid+'/items/' + item_id + '/children', parameters = graph_params.listing_parameters())
         elif path == 'sharedWithMe' or path == 'recent':
             files = self.get('/drives/'+self._driveid+'/' + path)
         else:
@@ -166,7 +175,7 @@ class OneDrive(Provider):
                     # encoding them would address a folder literally called
                     # "root".
                     path = 'root:'+graph_paths.encode_path(path)+':'
-            files = self.get('/drives/'+self._driveid+'/' + path + '/children', parameters = self._extra_parameters)
+            files = self.get('/drives/'+self._driveid+'/' + path + '/children', parameters = graph_params.listing_parameters())
         if self.cancel_operation():
             # An empty list, never None: a caller that iterates the result would
             # raise TypeError on None, and a cancelled listing is an empty
@@ -214,8 +223,7 @@ class OneDrive(Provider):
         # quote that closed the literal -- everything typed after it was then
         # read as expression rather than as text (T-02-02).
         url += '/search(q=\''+graph_paths.odata_quoted(Utils.str(query))+'\')'
-        self._extra_parameters['filter'] = 'file ne null'
-        files = self.get(url, parameters = self._extra_parameters)
+        files = self.get(url, parameters = graph_params.search_parameters())
         if self.cancel_operation():
             # BROWSE-03's third site, for the same reason as get_folder_items.
             return []
@@ -245,7 +253,7 @@ class OneDrive(Provider):
     def get_item(self, item_driveid=None, item_id=None, path=None, find_subtitles=False, include_download_info=False):
         item_driveid = Utils.default(item_driveid, self._driveid)
         if item_id:
-            f = self.get('/drives/'+item_driveid+'/items/' + item_id, parameters = self._extra_parameters)
+            f = self.get('/drives/'+item_driveid+'/items/' + item_id, parameters = graph_params.listing_parameters())
         elif path == 'sharedWithMe' or path == 'recent':
             return
         else:
@@ -255,7 +263,7 @@ class OneDrive(Provider):
                 parts = path.split('/')
                 if len(parts) > 1 and not parts[0]:
                     path = 'root:'+path+':'
-            f = self.get('/drives/'+self._driveid+'/' + path, parameters = self._extra_parameters)
+            f = self.get('/drives/'+self._driveid+'/' + path, parameters = graph_params.listing_parameters())
         
         item = self._extract_item(f, include_download_info)
         if find_subtitles:
