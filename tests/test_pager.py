@@ -315,3 +315,101 @@ def test_a_non_dict_extra_info_is_ignored():
     body = {'value': [], '@odata.deltaLink': 'https://delta/link'}
     collect_pages(body, ScriptedFetch(), _identity, extra_info=None)
     collect_pages(body, ScriptedFetch(), _identity, extra_info='not-a-dict')
+
+
+# ---------------------------------------------------------------------------
+# The depth stress (BROWSE-02, ROADMAP phase 2 criterion 3)
+# ---------------------------------------------------------------------------
+#
+# WHERE 1,500 COMES FROM, so the number is not read as round. The shipped
+# recursive shape was measured on CPython 3.11 with sys.getrecursionlimit() == 1000:
+#
+#     pages  result
+#     -----  ---------------------------------------------
+#       500  500 items
+#       900  900 items
+#      1000  RecursionError after 998 pages fetched
+#      1500  RecursionError after 998 pages fetched
+#
+# Under Kodi the ceiling is LOWER, because the invoker, entrypoint.py, route(),
+# _list_folder and get_folder_items are all already on the stack beneath the
+# pager. So 1,500 is comfortably past the real limit rather than a safety margin.
+#
+# Re-measured while writing this, against a transcription of the shipped
+# recursive shape and the same generated pages: 500 and 900 returned every item,
+# 1,000 and 1,500 both raised RecursionError, and collect_pages returned every
+# item at all four sizes. The fetch tally came out at 999 rather than 998 -- a
+# counting-convention difference (the link is recorded before the call, so the
+# fetch that raised is on the record), not a disagreement about where it dies.
+# Noted so nobody later reads the two numbers as a regression.
+#
+# ONE ENTRY PER PAGE, deliberately. This isolates stack depth from list size,
+# which is the property BROWSE-02 is actually about. Termination is a different
+# property and is proven separately, against the three recorded pages above.
+#
+# NOTHING IS COMMITTED. Building these takes about 0.05 s; the same pages with
+# fifty entries each would be 1.5 MB serialised, and a committed fixture that
+# large would be paying storage to assert a property about the interpreter.
+#
+# WHAT THIS DOES NOT PROVE: memory behaviour on a 1-2 GB Android box. Both the
+# recursive and the iterative shapes buffer every item, because the return value
+# is a list, so this stress passes either way once the recursion is gone.
+# BROWSE-02 is not evidence of streaming. The per-page escape hatch is on_page,
+# and using it to render without buffering the folder is a later phase's work.
+
+DEPTH_PAGES = 1500
+
+
+def _generated_pages(count):
+    """`count` page bodies of one entry each, chained by next link.
+
+    Returned as (first_body, fetch) where fetch serves the rest from a dict.
+    """
+    bodies = {}
+    first = None
+    for index in range(count):
+        link = 'https://graph.invalid/page/%d' % index
+        body = {'value': [{'id': 'entry-%d' % index}]}
+        if index + 1 < count:
+            body['@odata.nextLink'] = 'https://graph.invalid/page/%d' % (index + 1)
+        if index == 0:
+            first = body
+        else:
+            bodies[link] = body
+
+    calls = []
+
+    def fetch(link):
+        calls.append(link)
+        return bodies[link]
+
+    return first, fetch, calls
+
+
+def test_fifteen_hundred_pages_yield_every_item_without_a_recursion_error():
+    first, fetch, calls = _generated_pages(DEPTH_PAGES)
+    items = collect_pages(first, fetch, _identity)
+
+    assert len(items) == DEPTH_PAGES, (
+        'the ROADMAP names 1,500 pages, and the shipped recursive shape raised '
+        'RecursionError after fetching 998 of them')
+    assert len(calls) == DEPTH_PAGES - 1, (
+        'one fetch per page after the first, each exactly once: 1,499 for 1,500 '
+        'pages')
+    assert items[0]['id'] == 'entry-0'
+    assert items[-1]['id'] == 'entry-%d' % (DEPTH_PAGES - 1), (
+        'order must hold at depth as well as at three pages')
+
+
+def test_cancelling_at_page_750_returns_an_empty_list():
+    """The boundary check must still run at depth, not only near the start."""
+    first, fetch, calls = _generated_pages(DEPTH_PAGES)
+    items = collect_pages(first, fetch, _identity,
+                          cancelled=CancelAfter(750))
+
+    assert items == [], (
+        'a cancel deep into a large folder is the case this matters most for: '
+        'it is the folder slow enough that the user reached for the remote')
+    assert len(calls) == 750, (
+        'the run must stop fetching at the boundary it was cancelled on, not '
+        'carry on to the end of the folder')
