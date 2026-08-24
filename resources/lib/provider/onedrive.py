@@ -19,6 +19,7 @@
 
 from resources.lib.auth import device_code
 from resources.lib.graph import items as graph_items
+from resources.lib.graph import pager as graph_pager
 from resources.lib.graph import paths as graph_paths
 from resources.lib.vendor.clouddrive_common.remote.provider import Provider
 from resources.lib.vendor.clouddrive_common.utils import Utils
@@ -167,32 +168,31 @@ class OneDrive(Provider):
                     path = 'root:'+graph_paths.encode_path(path)+':'
             files = self.get('/drives/'+self._driveid+'/' + path + '/children', parameters = self._extra_parameters)
         if self.cancel_operation():
-            return
+            # An empty list, never None: a caller that iterates the result would
+            # raise TypeError on None, and a cancelled listing is an empty
+            # listing rather than a failed one (BROWSE-03).
+            return []
         return self.process_files(files, on_items_page_completed, include_download_info, on_before_add_item=on_before_add_item)
     
     def process_files(self, files, on_items_page_completed=None, include_download_info=False, extra_info=None, on_before_add_item=None):
-        items = []
-        for f in files['value']:
-            # The entry reaches the extractor intact. A shared entry used to be
-            # replaced wholesale by its remote half here, which was right about
-            # addressing and wrong about labelling; the merge is now field by
-            # field inside graph.items.
-            item = self._extract_item(f, include_download_info)
-            if on_before_add_item:
-                on_before_add_item(item)
-            items.append(item)
-        if on_items_page_completed:
-            on_items_page_completed(items)
-        if type(extra_info) is dict:
-            if '@odata.deltaLink' in files:
-                extra_info['change_token'] = files['@odata.deltaLink']
-                
-        if '@odata.nextLink' in files:
-            next_files = self.get(files['@odata.nextLink'])
-            if self.cancel_operation():
-                return
-            items.extend(self.process_files(next_files, on_items_page_completed, include_download_info, extra_info, on_before_add_item))
-        return items
+        # The loop, the cancellation contract and the defensive envelope read all
+        # live in resources/lib/graph/pager.py. It called itself once per page
+        # here, which was measured to raise RecursionError after 998 pages, and
+        # its cancel path returned None into an items.extend(None) one frame up.
+        #
+        # The entry reaches the extractor intact. A shared entry used to be
+        # replaced wholesale by its remote half before extraction, which was
+        # right about addressing and wrong about labelling; the merge is now
+        # field by field inside graph.items.
+        return graph_pager.collect_pages(
+            files,
+            fetch=self.get,
+            extract=lambda entry: self._extract_item(entry, include_download_info),
+            cancelled=self.cancel_operation,
+            on_page=on_items_page_completed,
+            on_before_add_item=on_before_add_item,
+            extra_info=extra_info,
+        )
     
     def _extract_item(self, f, include_download_info=False):
         # The mapping itself lives in resources/lib/graph/items.py, which imports
@@ -217,7 +217,8 @@ class OneDrive(Provider):
         self._extra_parameters['filter'] = 'file ne null'
         files = self.get(url, parameters = self._extra_parameters)
         if self.cancel_operation():
-            return
+            # BROWSE-03's third site, for the same reason as get_folder_items.
+            return []
         return self.process_files(files, on_items_page_completed)
     
     def get_subtitles(self, parent, name, item_driveid=None, include_download_info=False):
