@@ -173,7 +173,10 @@ class OneDrive(Provider):
     def process_files(self, files, on_items_page_completed=None, include_download_info=False, extra_info=None, on_before_add_item=None):
         items = []
         for f in files['value']:
-            f = Utils.get_safe_value(f, 'remoteItem', f)
+            # The entry reaches the extractor intact. A shared entry used to be
+            # replaced wholesale by its remote half here, which was right about
+            # addressing and wrong about labelling; the merge is now field by
+            # field inside graph.items.
             item = self._extract_item(f, include_download_info)
             if on_before_add_item:
                 on_before_add_item(item)

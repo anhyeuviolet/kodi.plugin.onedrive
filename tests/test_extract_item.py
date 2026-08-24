@@ -49,7 +49,7 @@ import json
 
 import pytest
 
-from resources.lib.graph.items import extract_item
+from resources.lib.graph.items import extract_item, merge_remote_item
 
 FIXTURES = 'tests/fixtures/graph'
 
@@ -202,3 +202,127 @@ def test_the_srt_carries_no_media_facet(business_folder):
     item = extract_item(business_folder['value'][1])
     for key in ('video', 'audio', 'image', 'folder'):
         assert key not in item
+
+
+# ---------------------------------------------------------------------------
+# The remoteItem merge (BROWSE-16)
+# ---------------------------------------------------------------------------
+#
+# The shared entry in personal/root_children.json is the Vault. It is the one
+# entry of sixteen carrying a remoteItem, and the shape is what makes the merge
+# non-obvious: `name` is on the OUTER half only, the folder facet is INSIDE
+# remoteItem only, the two parentReferences name two different drives, and
+# remoteItem.parentReference carries no `id` at all.
+#
+# So neither wholesale answer works. Substituting remoteItem for the entry -- what
+# shipped -- gives the right address and an empty label. Not substituting gives
+# the right label and misclassifies the Vault as a file.
+#
+# WHAT THESE ASSERTIONS ARE ABOUT, AND WHY THEY ARE NOT ABOUT CLASSIFICATION:
+# a test asking "is the Vault classified as a file?" PASSES against the shipped
+# code, because the wholesale swap did carry the folder facet across. That is
+# recorded in 02-FINDINGS.md. The defect is the name and the addressing pair, so
+# that is what is asserted here.
+#
+# The negative control below is not optional. A merge that always read remoteItem
+# and always fell back would satisfy every assertion about the shared entry by
+# accident; only the fifteen ordinary entries can tell that apart.
+
+
+@pytest.fixture(scope='module')
+def personal_root():
+    return _body('personal', 'root_children.json')
+
+
+@pytest.fixture(scope='module')
+def shared_entry(personal_root):
+    shared = [e for e in personal_root['value'] if 'remoteItem' in e]
+    assert len(shared) == 1, (
+        'this fixture is supposed to carry exactly one shared entry; the merge '
+        'tests below are written against it by identity, not by search')
+    return shared[0]
+
+
+def test_the_shared_entry_keeps_the_name_the_user_chose(shared_entry):
+    item = extract_item(shared_entry)
+    assert item['name'] == shared_entry['name']
+    assert item['name'], (
+        'the wholesale substitution that shipped read remoteItem.name, which is '
+        'documented optional and is absent here, so the Vault rendered as a '
+        'blank row in the listing')
+
+
+def test_the_shared_entry_addresses_the_remote_drive(shared_entry):
+    item = extract_item(shared_entry)
+    remote = shared_entry['remoteItem']
+    assert item['id'] == remote['id'], (
+        'the outer id does not resolve in the drive that holds the item; Graph '
+        'warns the id may change when an item moves into a remote item')
+    assert item['id'] != shared_entry['id']
+    assert item['drive_id'] == remote['parentReference']['driveId'], (
+        'the outer parentReference.driveId names the LOCAL drive; pairing it '
+        'with the remote id addresses the wrong place')
+    assert item['drive_id'] != shared_entry['parentReference']['driveId']
+
+
+def test_the_shared_entry_is_a_folder(shared_entry):
+    assert 'folder' in extract_item(shared_entry), (
+        'the folder facet exists only inside remoteItem, so a merge that simply '
+        'stopped substituting would classify the Vault as a file')
+
+
+def test_the_shared_entry_has_no_parent(shared_entry):
+    """remoteItem.parentReference carries no id, and there is no fallback."""
+    assert 'id' not in shared_entry['remoteItem']['parentReference'], (
+        'this fixture is supposed to carry no remote parent id')
+    item = extract_item(shared_entry)
+    assert not item['parent'], (
+        'parent must not fall back to the outer parentReference.id: that names '
+        'a folder in the LOCAL drive, and pairing it with a remote drive_id '
+        'produces an address that resolves to nothing')
+
+
+def test_the_shared_entry_falls_back_for_last_modified(shared_entry):
+    """The fallback is load-bearing here, not defensive."""
+    assert 'lastModifiedDateTime' not in shared_entry['remoteItem']
+    item = extract_item(shared_entry)
+    assert item['last_modified_date'] == shared_entry['lastModifiedDateTime']
+
+
+def test_the_ordinary_entries_keep_their_own_address(personal_root):
+    """The negative control. Without it the merge could always read remoteItem."""
+    ordinary = [e for e in personal_root['value'] if 'remoteItem' not in e]
+    assert len(ordinary) == 15, (
+        'expected fifteen ordinary entries beside the one shared entry; if the '
+        'fixture changed, this control is no longer covering what it was '
+        'written for')
+    for entry in ordinary:
+        item = extract_item(entry)
+        assert item['id'] == entry['id']
+        assert item['drive_id'] == entry['parentReference']['driveId']
+
+
+def test_the_remote_name_is_used_only_when_the_outer_name_is_absent():
+    """CONSTRUCTED. The recorded shared entry carries no remoteItem.name at all."""
+    both = {'id': 'outer', 'name': 'outer name',
+            'remoteItem': {'id': 'remote', 'name': 'remote name',
+                           'parentReference': {'driveId': 'd'}}}
+    assert extract_item(both)['name'] == 'outer name'
+
+    outer_missing = copy.deepcopy(both)
+    del outer_missing['name']
+    assert extract_item(outer_missing)['name'] == 'remote name'
+
+
+def test_merge_returns_an_unshared_entry_unchanged(business_folder):
+    entry = business_folder['value'][0]
+    assert merge_remote_item(entry) is entry
+
+
+def test_merge_does_not_mutate_its_input(shared_entry):
+    before = copy.deepcopy(shared_entry)
+    merge_remote_item(shared_entry)
+    assert shared_entry == before, (
+        'the entries come from a module-scoped fixture and from a response body '
+        'the caller may read again; mutating one would make extraction depend on '
+        'call order')

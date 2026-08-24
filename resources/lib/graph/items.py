@@ -46,9 +46,20 @@ and a grep cannot tell a live key read from a docstring explaining why there is
 no live key read. The stricter check is that `photo` appears among this module's
 executable string literals zero times, which it does.)
 
+The other half of this module's job is `merge_remote_item`, which flattens a
+shared entry -- one Graph returned with a `remoteItem` facet, meaning the item
+lives in another drive. `extract_item` calls it first, so the merge is part of
+the extraction contract rather than something each call site has to remember.
+It is worth knowing before reading it that **neither wholesale answer is
+correct**: the entry is simultaneously the item as it appears in this drive and
+the object it points at, the label belongs to the first and the address to the
+second, and `merge_remote_item`'s docstring carries the mapping field by field.
+
 Extraction is per-entry and order-preserving. No function here holds state
 between calls or reads a module-level mutable object, so entry N of a response
-produces item N of a listing and no entry's result depends on any other.
+produces item N of a listing and no entry's result depends on any other. Nothing
+here mutates the entry it is given, either -- `merge_remote_item` copies -- so a
+caller may read a response body again afterwards.
 """
 
 from resources.lib.vendor.clouddrive_common.utils import Utils
@@ -61,6 +72,101 @@ from resources.lib.vendor.clouddrive_common.utils import Utils
 # in every ordering rather than only in the one that was observed.
 MEDIA_FACET_PRECEDENCE = ('video', 'audio', 'image')
 
+# The facets that describe the object itself, so they come from the remote half
+# of a shared entry when there is one. This is the one thing the wholesale
+# substitution the shipped code performed already got right.
+REMOTE_FIRST_FACETS = ('folder', 'file', 'video', 'image', 'audio', 'package')
+
+
+def merge_remote_item(entry):
+    """Flatten a shared entry's `remoteItem` into it, field by field.
+
+    An entry with no `remoteItem` is returned unchanged, and the entry passed in
+    is never mutated.
+
+    Graph says a `driveItem` carrying a non-null `remoteItem` references an item
+    that lives in another drive: shared with the user, added to their OneDrive,
+    or returned from a heterogeneous collection such as search results. So the
+    entry is genuinely two things at once -- the item as it appears in *this*
+    drive, and the object it points at -- and **neither wholesale answer is
+    correct**. That is the trap here.
+
+    The shipped code substituted `remoteItem` for the whole entry. It was right
+    about addressing and wrong about labelling: `remoteItem.name` is documented
+    optional and is absent from the recorded entry, so the Vault rendered as a
+    blank row. But simply not substituting would invert the error, because the
+    folder facet exists only inside `remoteItem`, and the Vault would go back to
+    being classified as a file.
+
+    Field by field:
+
+    ================  ==========================  ==============================
+    Extracted field   Source                       Why
+    ================  ==========================  ==============================
+    name              outer, then remote           The label the user chose, on
+                                                   the item as it appears in
+                                                   their own drive. The remote
+                                                   name is optional and absent
+                                                   in the recorded entry.
+    id                remote                       The unique id of the remote
+                                                   item in its own drive. The
+                                                   outer id does not resolve
+                                                   there -- Graph warns the id
+                                                   may change across the move.
+    parentReference   remote                       Carries the driveId half of
+      .driveId                                     the addressing pair. The
+                                                   outer one names the LOCAL
+                                                   drive.
+    parentReference   remote only, else absent      Must NOT fall back to the
+      .id                                          outer id: that names a folder
+                                                   in the local drive, and
+                                                   pairing it with a remote
+                                                   driveId produces an address
+                                                   that resolves to nothing.
+    folder, file,     remote, then outer            The facets describe the
+    video, image,                                   remote object.
+    audio, package
+    size,             remote, then outer            The fallback is load-bearing,
+    lastModified                                    not defensive: the recorded
+      DateTime                                      entry carries
+                                                    lastModifiedDateTime on the
+                                                    outer half only.
+    ================  ==========================  ==============================
+
+    This is on the search path as well as the root listing: Graph documents
+    drive-scoped search as possibly returning items from other drives carrying
+    this facet.
+    """
+    remote = Utils.get_safe_value(entry, 'remoteItem')
+    if not remote:
+        return entry
+
+    merged = dict(entry)
+    merged.pop('remoteItem', None)
+
+    # The label stays the outer one when there is one; the address becomes the
+    # remote one unconditionally.
+    merged['name'] = Utils.get_safe_value(
+        entry, 'name', Utils.get_safe_value(remote, 'name', ''))
+    merged['id'] = Utils.get_safe_value(remote, 'id')
+
+    remote_parent = Utils.get_safe_value(remote, 'parentReference', {})
+    parent_reference = {
+        'driveId': Utils.get_safe_value(remote_parent, 'driveId'),
+    }
+    # Only when the remote half names one. No fallback, by design -- see the
+    # parentReference.id row of the table above.
+    remote_parent_id = Utils.get_safe_value(remote_parent, 'id')
+    if remote_parent_id:
+        parent_reference['id'] = remote_parent_id
+    merged['parentReference'] = parent_reference
+
+    for key in REMOTE_FIRST_FACETS + ('size', 'lastModifiedDateTime'):
+        value = Utils.get_safe_value(remote, key)
+        if value:
+            merged[key] = value
+    return merged
+
 
 def extract_item(entry, include_download_info=False):
     """One `driveItem` mapping into the item shape the browse layer reads.
@@ -69,7 +175,12 @@ def extract_item(entry, include_download_info=False):
     be well formed: a reshaped or truncated body produces an item, not a
     traceback. `extract_item({})` returns an item with a null id and an empty
     name.
+
+    A shared entry's `remoteItem` is flattened in here rather than by the caller,
+    so the merge is part of the extraction contract and not something every call
+    site has to remember to do first.
     """
+    entry = merge_remote_item(entry)
     name = Utils.get_safe_value(entry, 'name', '')
     parent_reference = Utils.get_safe_value(entry, 'parentReference', {})
     item = {
