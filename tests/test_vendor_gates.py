@@ -616,9 +616,30 @@ def test_addon_xml_identity():
     assert root.get('id') == ADDON_ID, (
         'the manifest still declares %r; the add-on ships under a new id so '
         'there is no prior profile to collide with' % (root.get('id'),))
-    assert root.get('version') == '1.0.0', (
-        'version is %r; the lifted add-on starts its own version line at 1.0.0'
-        % (root.get('version'),))
+    # The property is that this add-on numbers itself from its OWN line, begun
+    # at 1.0.0, rather than continuing the upstream add-on's numbering. That is
+    # a statement about where the line starts and which line it is -- not about
+    # which release is current.
+    #
+    # This used to pin the literal '1.0.0', which turned a one-time property
+    # into a gate the maintainer had to edit on every release, and a gate edited
+    # as a matter of routine stops being read. The assertion beside it avoids
+    # exactly that for `name`, and says so. Releases must be able to happen
+    # without touching this file: shipping a fix to the television requires a
+    # version the repository index can see as new, because the index carries
+    # nothing but ids and versions.
+    version = (root.get('version') or '').strip()
+    parts = version.split('.')
+    assert len(parts) == 3 and all(p.isdigit() for p in parts), (
+        'version is %r; Kodi compares versions field by field, so the manifest '
+        'must carry a plain numeric MAJOR.MINOR.PATCH' % (version,))
+    numeric = tuple(int(p) for p in parts)
+    assert numeric[0] == 1, (
+        'version is %r; the lifted add-on has its own major version line, '
+        'begun at 1.0.0, and a different major would either continue the '
+        'upstream numbering or start a third line' % (version,))
+    assert numeric >= (1, 0, 0), (
+        'version is %r, which is below the 1.0.0 this line starts at' % (version,))
 
     # Non-equality rather than a pinned display string, so the maintainer can
     # adjust the presented name without editing this gate.

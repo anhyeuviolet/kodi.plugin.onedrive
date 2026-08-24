@@ -90,7 +90,7 @@ So: one USB trip, then the network.
 Build both archives from a checkout:
 
 ```
-python tools/build_addon_zip.py    # dist/plugin.onedrive.kn-1.0.0.zip
+python tools/build_addon_zip.py    # dist/plugin.onedrive.kn-1.0.1.zip
 python tools/build_repo.py         # dist/pages/ — the whole publishable tree
 ```
 
