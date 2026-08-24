@@ -695,7 +695,15 @@ class CloudDriveAddon:
         if self._child_count_supported:
             item = self.get_provider().get_item(item_driveid, item_id, path)
             if item:
-                self._load_target = item['folder']['child_count']
+                # LOCAL MODIFICATION: both levels read through the truth test
+                # with a numeric default. _child_count_supported is True, so
+                # every folder listing reaches this line, and the original
+                # chained subscript raised KeyError inside the vendored tree --
+                # a failed listing with a traceback from a file this project did
+                # not write -- for any item that came back without a folder
+                # facet.
+                self._load_target = Utils.get_safe_value(
+                    Utils.get_safe_value(item, 'folder', {}), 'child_count', 0)
                 self._progress_dialog_bg.create(self._addon_name, self._common_addon.getLocalizedString(32049) % Utils.str(self._load_target))
         
         items = self.get_provider().get_folder_items(item_driveid, item_id, path, on_items_page_completed = self.on_items_page_completed)

@@ -18,6 +18,7 @@
 #-------------------------------------------------------------------------------
 
 from resources.lib.auth import device_code
+from resources.lib.graph import items as graph_items
 from resources.lib.graph import paths as graph_paths
 from resources.lib.vendor.clouddrive_common.remote.provider import Provider
 from resources.lib.vendor.clouddrive_common.utils import Utils
@@ -191,55 +192,11 @@ class OneDrive(Provider):
         return items
     
     def _extract_item(self, f, include_download_info=False):
-        name = Utils.get_safe_value(f, 'name', '')
-        parent_reference = Utils.get_safe_value(f, 'parentReference', {})
-        item = {
-            'id': f['id'],
-            'name': name,
-            'name_extension' : Utils.get_extension(name),
-            'drive_id' : Utils.get_safe_value(parent_reference, 'driveId'),
-            'parent' : Utils.get_safe_value(parent_reference, 'id'),
-            'mimetype' : Utils.get_safe_value(Utils.get_safe_value(f, 'file', {}), 'mimeType'),
-            'last_modified_date' : Utils.get_safe_value(f,'lastModifiedDateTime'),
-            'size': Utils.get_safe_value(f, 'size', 0),
-            'description': Utils.get_safe_value(f, 'description', ''),
-            'deleted': 'deleted' in f
-        }
-        if 'folder' in f:
-            item['folder'] = {
-                'child_count' : Utils.get_safe_value(f['folder'],'childCount',0)
-            }
-        if 'video' in f:
-            video = f['video']
-            item['video'] = {
-                'width' : Utils.get_safe_value(video,'width', 0),
-                'height' : Utils.get_safe_value(video, 'height', 0),
-                'duration' : Utils.get_safe_value(video, 'duration', 0) /1000
-            }
-        if 'audio' in f:
-            audio = f['audio']
-            item['audio'] = {
-                'tracknumber' : Utils.get_safe_value(audio, 'track'),
-                'discnumber' : Utils.get_safe_value(audio, 'disc'),
-                'duration' : int(Utils.get_safe_value(audio, 'duration') or '0') / 1000,
-                'year' : Utils.get_safe_value(audio, 'year'),
-                'genre' : Utils.get_safe_value(audio, 'genre'),
-                'album': Utils.get_safe_value(audio, 'album'),
-                'artist': Utils.get_safe_value(audio, 'artist'),
-                'title': Utils.get_safe_value(audio, 'title')
-            }
-        if 'image' in f or 'photo' in f:
-            item['image'] = {
-                'size' : Utils.get_safe_value(f, 'size', 0)
-            }
-        if 'thumbnails' in f and type(f['thumbnails']) == list and len(f['thumbnails']) > 0:
-            thumbnails = f['thumbnails'][0]
-            item['thumbnail'] = Utils.get_safe_value(Utils.get_safe_value(thumbnails, 'large', {}), 'url', '')
-        if include_download_info:
-            item['download_info'] =  {
-                'url' : Utils.get_safe_value(f,'@microsoft.graph.downloadUrl')
-            }
-        return item
+        # The mapping itself lives in resources/lib/graph/items.py, which imports
+        # no Kodi module and is therefore testable against recorded JSON without
+        # a stub library. The method stays because the vendored callers reach it
+        # by name.
+        return graph_items.extract_item(f, include_download_info)
     
     def search(self, query, item_driveid=None, item_id=None, on_items_page_completed=None):
         item_driveid = Utils.default(item_driveid, self._driveid)
