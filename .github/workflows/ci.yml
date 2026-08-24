@@ -1,0 +1,170 @@
+# The first CI in this repository. Nothing here was carried over from another
+# project; the checker half is written from a session in which 0.0.36 was
+# installed from PyPI and run against this add-on's built archive on all three
+# branches, and the numbers below are that session's measurements.
+#
+# Two jobs on two independent axes, which is the mistake worth naming: the
+# Python matrix and the Kodi-branch matrix have nothing to do with each other.
+# kodi-addon-checker runs on the *host* Python and --branch only selects a
+# dependency index and some version comparisons; it does not require the runner
+# to be running the Python that the Kodi branch bundles. Conflating them would
+# produce six legs that test two things.
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  # CI-04, first half: the suite on both target Pythons.
+  #
+  # 3.11 and 3.14 come from PYTHON3-VERSION per Kodi release tag: Kodi 20 Nexus
+  # ships 3.11.0, 21 Omega 3.11.7, 22 Piers 3.13.5, with master at 3.14.6. The
+  # add-on's floor is Kodi 20, so 3.8 is not a target. 3.14 is the forward edge
+  # rather than a shipped Kodi Python, and it is here so a deprecation lands as
+  # a red leg on the day it appears instead of on the day Kodi adopts it.
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      # One version's failure must not hide the other's. With fail-fast the
+      # second leg is cancelled mid-run and its result is unknown, which reads
+      # in the UI as though it had not been tried.
+      fail-fast: false
+      matrix:
+        python-version: ['3.11', '3.14']
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install the runner
+        run: python -m pip install --upgrade pip pytest
+
+      # The repository gates read the git index through gatelib.tracked_files(),
+      # not a filesystem walk, so this needs a checkout that produces a working
+      # index. The default actions/checkout does; a source archive would not.
+      - name: pytest
+        run: python -m pytest -q
+
+  # CI-04, second half: the checker on all three branches CI-04 names.
+  #
+  # Three legs rather than one, so the wall clock is one leg rather than three.
+  # Every run of this tool calls get_all_repo_addons(), which fetches all ten
+  # branch indexes from mirrors.kodi.tv before any check executes -- about 16 MB
+  # per run, regardless of which --branch was asked for, and --skip-dependency-
+  # checks does not skip it. The piers leg was measured at roughly seven minutes
+  # wall clock, essentially all of it in those downloads.
+  addon-check:
+    runs-on: ubuntu-latest
+    # Above ten because of those downloads. A leg that is merely slow must not
+    # read as a leg that is stuck.
+    timeout-minutes: 20
+    strategy:
+      # So one branch's network flake does not hide the other two. These legs
+      # talk to a third-party mirror over plain HTTP, which is the flakiest
+      # thing in this workflow.
+      fail-fast: false
+      matrix:
+        branch: [nexus, omega, piers]
+    steps:
+      - uses: actions/checkout@v4
+
+      # One Python for all three legs: the checker's own requires_python is
+      # >=3.5 and the branch is data, not a runtime.
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # Pinned to the build that was installed and executed during research, so
+      # a leg that goes red is a change in this repository rather than a change
+      # in the tool on somebody else's release day.
+      - name: Install the checker
+        run: python -m pip install --upgrade pip 'kodi-addon-checker==0.0.36'
+
+      - name: Build the shipping archive
+        run: python tools/build_addon_zip.py --out-dir dist
+
+      # The build writes exactly one archive and prints its path. Resolved into a
+      # variable rather than globbed into unzip, so a second stale zip in dist/
+      # is an error here instead of an arbitrary choice made by shell expansion.
+      - name: Extract the archive
+        run: |
+          archive=$(ls dist/*.zip)
+          if [ "$(printf '%s\n' "${archive}" | wc -l)" -ne 1 ]; then
+            echo "::error::expected exactly one archive in dist/, found:"
+            printf '%s\n' "${archive}"
+            exit 1
+          fi
+          mkdir -p extracted
+          unzip -q "${archive}" -d extracted
+          test -d extracted/plugin.onedrive.kn
+
+      # Against the extracted plugin.onedrive.kn/ directory, NOT the repository
+      # root, for two reasons and both matter:
+      #
+      #   1. The checker's folder-name check compares the directory name to the
+      #      add-on id. This repository's root directory is 'OneDrive.Addon', so
+      #      at the root the check is a PROBLEM and the only way past it is
+      #      --allow-folder-id-mismatch -- which is switching off a real check to
+      #      accommodate a checkout path. The archive's single top-level
+      #      directory is 'plugin.onedrive.kn', so against the extracted tree the
+      #      check passes on its own terms.
+      #   2. It checks the artefact that actually ships rather than the working
+      #      tree. Those two differ by everything in EXCLUDED_TOP_LEVEL, and the
+      #      thing users install is the archive.
+      #
+      # The WARN grep is the point of this step. The tool exits 1 only when
+      # problem_count > 0; a warning falls off the end of its main() and exits 0,
+      # and there is no flag that makes warnings fail. So a fifth warning would
+      # be a green leg and a line nobody reads. Asserting it here is what makes
+      # the report clean rather than merely passing -- and a leg that is green
+      # over warnings teaches its reader that warnings do not matter, after which
+      # a real one is invisible.
+      #
+      # pipefail so the checker's own exit code survives the tee, and
+      # `|| status=$?` so this step's default `bash -e` does not abort at the
+      # pipeline before the WARN assertion below has run. Without that, a PROBLEM
+      # would end the step early and the warning report would never be printed --
+      # correct in its verdict, but silent about the rest of what the tool found.
+      #
+      # The ANSI strip is not cosmetic and it is not optional. This tool colours
+      # its output unconditionally -- it does not test for a tty -- so every line
+      # it writes arrives prefixed with an escape sequence and a warning reads as
+      # ESC[35mWARN: rather than WARN:. An anchored grep for '^WARN:' therefore
+      # matches nothing, on every run, and the assertion below would certify a
+      # clean report while the tool was printing warnings. That was measured
+      # here, not reasoned about: with a non-whitelisted file planted in the
+      # extracted tree, the tool printed two WARN lines and '^WARN:' counted
+      # zero. Stripping first is a no-op if a future version stops colouring, so
+      # this is correct either way.
+      - name: kodi-addon-checker (${{ matrix.branch }})
+        run: |
+          set -o pipefail
+          status=0
+          kodi-addon-checker --branch ${{ matrix.branch }} \
+            extracted/plugin.onedrive.kn 2>&1 | tee checker.log || status=$?
+          echo "checker exited ${status}"
+
+          sed 's/\x1b\[[0-9;]*m//g' checker.log > checker.plain
+
+          if grep -q '^WARN:' checker.plain; then
+            echo "::error::kodi-addon-checker reported warnings on branch ${{ matrix.branch }}. The tool exits 0 on warnings, so this step asserts their absence. Offending lines:"
+            grep '^WARN:' checker.plain
+            exit 1
+          fi
+
+          # The zero-warning summary is a positive assertion, not an inference
+          # from the absence of WARN lines: a run that produced no output at all
+          # would otherwise pass this step.
+          if ! grep -q 'We found no problems and no warnings' checker.plain; then
+            echo "::error::kodi-addon-checker did not print its zero-problem, zero-warning summary on branch ${{ matrix.branch }}. Either the run did not complete or the tool's summary wording changed; this step asserts the clean result rather than inferring it. Output was:"
+            cat checker.plain
+            exit 1
+          fi
+
+          exit ${status}

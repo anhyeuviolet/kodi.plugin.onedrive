@@ -77,7 +77,34 @@ MANIFEST = 'addon.xml'
 #               tests/test_build_zip.py, not this repository.
 #   tests     - the suite, including the repository gates.
 #   tools     - this build itself.
-EXCLUDED_TOP_LEVEL = frozenset({'.planning', 'tests', 'tools'})
+#
+# The next four are what kodi-addon-checker's file-ending whitelist reports as
+# non-whitelisted, one warning each. They are development and checkout metadata,
+# not shipped source, and none of them is read by Kodi:
+#
+#   .gitattributes - the line-ending rule for this checkout. It governs how git
+#                    writes the working tree the build then reads; it has no
+#                    meaning inside an installed add-on.
+#   .gitignore     - what this checkout does not track. Same class.
+#   .project       - Eclipse/PyDev project metadata.
+#   .pydevproject  - Eclipse/PyDev interpreter configuration.
+#
+# And the fifth is a directory rather than a file:
+#
+#   .github   - CI configuration. It shipped until now and drew no warning only
+#               because it held nothing but .md, which is whitelisted. The moment
+#               .github/workflows/ci.yml exists a .yml file ships inside the
+#               archive, and .yml is not on the checker's whitelist, so leaving
+#               .github in would trade one clean report for a fifth warning
+#               created by the very commit that added the check.
+#
+# pytest.ini is deliberately NOT excluded. It ships today and draws no warning,
+# because .ini is whitelisted, so removing it is distribution hygiene rather
+# than a measured defect and this list acts only on what was measured. It is
+# recorded as Phase 5's to decide.
+EXCLUDED_TOP_LEVEL = frozenset({'.planning', 'tests', 'tools',
+                                '.gitattributes', '.gitignore',
+                                '.project', '.pydevproject', '.github'})
 
 # Anything shipping at all puts the member list above this. The floor exists so
 # a build from an empty or broken index fails here instead of writing an archive

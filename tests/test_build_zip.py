@@ -74,7 +74,20 @@ MEMBER_FLOOR = 30
 # for something that cannot be there proves nothing either. The build still
 # carries the exclusion as a guard against a forced add; what proves that guard
 # works is the synthetic tree in this file, not this list.
-FORBIDDEN = ('tests', 'tools', 'repository.onedrive.kn')
+# The five names after the first three are checkout and CI metadata, excluded
+# because kodi-addon-checker's file-ending whitelist reports each of the first
+# four as a warning, and because '.github' starts carrying a non-whitelisted
+# .yml the moment the workflow exists. All five are top-level entries in the
+# index, so test_the_forbidden_list_names_real_directories holds every one of
+# them against the tree - which is what stops a name that excludes nothing
+# sitting beside names that do.
+#
+# 'pytest.ini' is absent from this list on purpose, matching the build: .ini is
+# whitelisted, so it draws no warning, and dropping it would be hygiene rather
+# than a measured fix.
+FORBIDDEN = ('tests', 'tools', 'repository.onedrive.kn',
+             '.gitattributes', '.gitignore', '.project', '.pydevproject',
+             '.github')
 
 
 def _manifest_text():

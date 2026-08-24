@@ -80,7 +80,22 @@ EXCLUDED_TOP_LEVEL = frozenset({'tests'})
 EXCLUDED_DOCS = frozenset({'VENDORED.md', 'CREDITS.md', 'README.md',
                            'docs/AZURE-REGISTRATION.md'})
 
-TEXT_SUFFIXES = frozenset({'.py', '.xml', '.po', '.md', '.ini', '.txt'})
+# Which tracked files a sweep is allowed to open. A suffix absent from this set
+# is a file every forbidden-string sweep is green over without having read it,
+# so the set is widened in the same commit as the first file of a new kind.
+#
+#   .yml, .yaml - the CI workflow. A workflow file is the file in this tree most
+#                 likely to grow a credential reference, because that is where a
+#                 secret is wired into a build, and it is the one kind of file
+#                 whose author is often not the person who wrote the gates. Until
+#                 these two suffixes were present, text_files() never opened one:
+#                 the repository held no YAML at all, so every sweep was green
+#                 over a category it could not see. They are added in the commit
+#                 that creates .github/workflows/ci.yml rather than after it,
+#                 because the window between the two is a window in which the
+#                 sweep certifies a file it never read.
+TEXT_SUFFIXES = frozenset({'.py', '.xml', '.po', '.md', '.ini', '.txt',
+                           '.yml', '.yaml'})
 
 
 @functools.lru_cache(maxsize=1)
