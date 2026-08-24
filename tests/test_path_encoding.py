@@ -192,3 +192,29 @@ def test_a_folder_name_with_a_space_reaches_a_request(tmp_path):
         'the request path %r still contains a raw space. http.client refuses '
         'the request line outright, so the user gets an empty folder and there '
         'is no HTTP status anywhere to explain it' % (asked,))
+
+
+def test_the_recorded_capture_shows_no_request_was_ever_sent(graph_envelope):
+    """The evidence BROWSE-05 rests on, read out of the capture rather than
+    described.
+
+    `children_by_path_unencoded` is what the recorder got when it asked for a
+    folder whose name contains a space, with the path concatenated in raw: no
+    status and no body, because `http.client` raised `InvalidURL` before
+    anything left the machine. Every other fixture in the set carries a status,
+    so this one is the whole reason the loader returns the envelope rather than
+    the body.
+    """
+    envelope = graph_envelope('business', 'children_by_path_unencoded')
+
+    assert envelope['status'] is None, (
+        'the capture records status %r. If a status was received then a request '
+        'was sent, and the failure this test describes is a different one'
+        % (envelope['status'],))
+    assert 'body' not in envelope, (
+        'the capture carries a body: %r. A request that was never sent has no '
+        'response to have parsed' % (envelope,))
+    assert envelope['transport_error'] == 'InvalidURL', (
+        'the capture records %r rather than the InvalidURL http.client raises '
+        'on a request line carrying a disallowed character'
+        % (envelope['transport_error'],))
