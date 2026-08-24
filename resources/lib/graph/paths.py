@@ -82,3 +82,38 @@ def encode_path(path):
     if not path:
         return ''
     return '/'.join(encode_segment(part) for part in path.split('/'))
+
+
+def odata_literal(text):
+    """The body of an OData single-quoted string literal.
+
+    OData v4.01 section 2.2: a single quote inside such a literal is written
+    twice. An undoubled one closes the literal, and everything the user typed
+    after it is read by the service as expression rather than as text -- which
+    is a query that fails, and, given a query somebody else chose, a query that
+    was rewritten (T-02-02).
+
+    Text only. Nothing here knows it is going into a URL; that is the next
+    function's job, and keeping the two apart is what stops the order being
+    swapped by accident.
+    """
+    if not text:
+        return ''
+    return text.replace("'", "''")
+
+
+def odata_quoted(text):
+    """A search term, ready to sit between the quotes of `search(q='...')`.
+
+    Doubling first, percent-encoding second, and the order is the rule rather
+    than a detail. Reversed, the encoder would turn the user's quote into `%27`,
+    the doubling step would then find no quote to double, and the service would
+    decode `%27` back into the single quote that closes the literal -- the
+    original defect, arriving one step later.
+
+    With the safe set this module uses the two orders happen to agree, because
+    an apostrophe is a sub-delim and `encode_segment` leaves it alone. That
+    agreement is a property of the safe set, not of the rule, so it is not
+    something to depend on.
+    """
+    return encode_segment(odata_literal(text))

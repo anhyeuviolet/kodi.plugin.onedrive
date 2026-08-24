@@ -23,7 +23,6 @@ from resources.lib.vendor.clouddrive_common.remote.provider import Provider
 from resources.lib.vendor.clouddrive_common.utils import Utils
 from resources.lib.vendor.clouddrive_common.exception import ExceptionUtils
 
-import urllib.parse
 from urllib.error import HTTPError
 
 class OneDrive(Provider):
@@ -249,7 +248,12 @@ class OneDrive(Provider):
             url += item_driveid+'/items/' + item_id
         else:
             url += self._driveid
-        url += '/search(q=\''+urllib.parse.quote(Utils.str(query))+'\')'
+        # The user's query is a string literal to the service, so the quote
+        # rule applies before the URL rule. Going straight to the percent
+        # encoder emitted a single %27, which the service decoded back into a
+        # quote that closed the literal -- everything typed after it was then
+        # read as expression rather than as text (T-02-02).
+        url += '/search(q=\''+graph_paths.odata_quoted(Utils.str(query))+'\')'
         self._extra_parameters['filter'] = 'file ne null'
         files = self.get(url, parameters = self._extra_parameters)
         if self.cancel_operation():
@@ -259,7 +263,11 @@ class OneDrive(Provider):
     def get_subtitles(self, parent, name, item_driveid=None, include_download_info=False):
         item_driveid = Utils.default(item_driveid, self._driveid)
         subtitles = []
-        search_url = '/drives/'+item_driveid+'/items/' + parent + '/search(q=\''+urllib.parse.quote(Utils.str(Utils.remove_extension(name)).replace("'","''"))+'\')'
+        # Reached through the same rule as `search` above. This call site
+        # already doubled by hand; what changes is that the rule now lives in
+        # one place instead of two, so the next fix to it cannot land on only
+        # one of them.
+        search_url = '/drives/'+item_driveid+'/items/' + parent + '/search(q=\''+graph_paths.odata_quoted(Utils.str(Utils.remove_extension(name)))+'\')'
         files = self.get(search_url)
         for f in files['value']:
             subtitle = self._extract_item(f, include_download_info)
