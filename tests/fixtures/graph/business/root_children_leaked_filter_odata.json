@@ -1,0 +1,9 @@
+{
+  "body": {
+    "error": {
+      "code": "notSupported",
+      "message": "Operation not supported"
+    }
+  },
+  "status": 400
+}

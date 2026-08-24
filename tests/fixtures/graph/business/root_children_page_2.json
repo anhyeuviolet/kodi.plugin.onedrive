@@ -1,6 +1,6 @@
 {
   "body": {
-    "@odata.nextLink": "https://graph.microsoft.com/v1.0/me/drive/root/children?$expand=thumbnails&$top=50&$skiptoken=SYNTHETIC-PAGE-9",
+    "@odata.nextLink": "https://graph.microsoft.com/v1.0/me/drive/root/children?$expand=thumbnails&$top=50&$skiptoken=SYNTHETIC-PAGE-12",
     "value": [
       {
         "folder": {

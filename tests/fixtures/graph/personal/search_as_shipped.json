@@ -28,7 +28,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -48,7 +60,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -80,7 +104,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -100,7 +136,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -132,7 +180,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -152,7 +212,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -172,7 +244,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -192,7 +276,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -212,7 +308,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -232,7 +340,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -257,7 +377,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -277,7 +409,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -297,7 +441,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -317,7 +473,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -337,7 +505,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -359,7 +539,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -379,7 +571,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -399,7 +603,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -419,7 +635,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -439,7 +667,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -459,7 +699,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -479,7 +731,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -499,7 +763,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -519,7 +795,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -539,7 +827,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -564,7 +864,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -584,7 +896,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -604,7 +928,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -624,7 +960,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -644,7 +992,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -664,7 +1024,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -684,7 +1056,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -704,7 +1088,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -724,7 +1120,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -744,7 +1152,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -764,7 +1184,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -784,7 +1216,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -804,7 +1248,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -824,7 +1280,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -844,7 +1312,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -864,7 +1344,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -884,7 +1376,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -904,7 +1408,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -924,7 +1440,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -944,7 +1472,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -964,7 +1504,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -984,7 +1536,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1004,7 +1568,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1024,7 +1600,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1044,7 +1632,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1069,7 +1669,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1094,7 +1706,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1114,7 +1738,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1134,7 +1770,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1154,7 +1802,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1179,7 +1839,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1204,7 +1876,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1224,7 +1908,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1244,7 +1940,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1264,7 +1972,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1284,7 +2004,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1304,7 +2036,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1324,7 +2068,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1344,7 +2100,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1364,7 +2132,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1384,7 +2164,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1404,7 +2196,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1424,7 +2228,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1444,7 +2260,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1464,7 +2292,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1484,7 +2324,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1504,7 +2356,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1529,7 +2393,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1549,7 +2425,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1569,7 +2457,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1589,7 +2489,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1609,7 +2521,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1629,7 +2553,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1649,7 +2585,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1669,7 +2617,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1689,7 +2649,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1709,7 +2681,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1729,7 +2713,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1749,7 +2745,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1769,7 +2777,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1789,7 +2809,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1809,7 +2841,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1829,7 +2873,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1849,7 +2905,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1869,7 +2937,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1889,7 +2969,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1914,7 +3006,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1934,7 +3038,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1954,7 +3070,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1974,7 +3102,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -1994,7 +3134,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2014,7 +3166,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2034,7 +3198,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2054,7 +3230,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2074,7 +3262,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2094,7 +3294,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2114,7 +3326,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2134,7 +3358,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2154,7 +3390,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2174,7 +3422,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2194,7 +3454,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2214,7 +3486,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2234,7 +3518,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2254,7 +3550,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2274,7 +3582,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2294,7 +3614,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2314,7 +3646,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2334,7 +3678,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2354,7 +3710,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2374,7 +3742,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2394,7 +3774,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2414,7 +3806,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2434,7 +3838,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2454,7 +3870,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2474,7 +3902,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2494,7 +3934,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2514,7 +3966,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2534,7 +3998,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2554,7 +4030,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2574,7 +4062,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2594,7 +4094,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2614,7 +4126,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2634,7 +4158,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2654,7 +4190,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2674,7 +4222,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2694,7 +4254,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2714,7 +4286,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2734,7 +4318,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2754,7 +4350,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2774,7 +4382,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2794,7 +4414,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2814,7 +4446,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2834,7 +4478,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2854,7 +4510,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2874,7 +4542,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2894,7 +4574,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2914,7 +4606,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2934,7 +4638,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2954,7 +4670,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2974,7 +4702,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -2994,7 +4734,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3014,7 +4766,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3034,7 +4798,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3054,7 +4830,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3074,7 +4862,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3094,7 +4894,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3114,7 +4926,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3134,7 +4958,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3154,7 +4990,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3174,7 +5022,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3194,7 +5054,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3214,7 +5086,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3234,7 +5118,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3254,7 +5150,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3274,7 +5182,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3294,7 +5214,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3314,7 +5246,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3334,7 +5278,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3354,7 +5310,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3374,7 +5342,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3394,7 +5374,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3414,7 +5406,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3434,7 +5438,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3454,7 +5470,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3474,7 +5502,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3494,7 +5534,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3514,7 +5566,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3534,7 +5598,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3554,7 +5630,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3574,7 +5662,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3594,7 +5694,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3614,7 +5726,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3634,7 +5758,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3654,7 +5790,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3674,7 +5822,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3694,7 +5854,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3714,7 +5886,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3734,7 +5918,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3754,7 +5950,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3774,7 +5982,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3794,7 +6014,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3814,7 +6046,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3834,7 +6078,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3854,7 +6110,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3874,7 +6142,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3894,7 +6174,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3914,7 +6206,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3934,7 +6238,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3954,7 +6270,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]
@@ -3974,7 +6302,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 300,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 300
+            },
+            "small": {
+              "height": 100,
+              "url": "https://example.invalid/thumb/small",
+              "width": 100
             }
           }
         ]

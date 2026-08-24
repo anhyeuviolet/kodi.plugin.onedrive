@@ -759,7 +759,19 @@
         "thumbnails": [
           {
             "large": {
-              "url": "https://example.invalid/thumb"
+              "height": 800,
+              "url": "https://example.invalid/thumb/large",
+              "width": 800
+            },
+            "medium": {
+              "height": 176,
+              "url": "https://example.invalid/thumb/medium",
+              "width": 176
+            },
+            "small": {
+              "height": 96,
+              "url": "https://example.invalid/thumb/small",
+              "width": 96
             }
           }
         ]

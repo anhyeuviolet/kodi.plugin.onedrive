@@ -1,6 +1,6 @@
 {
   "body": {
-    "@odata.nextLink": "https://graph.microsoft.com/v1.0/me/drive/root/children?$expand=thumbnails&$top=50&$skiptoken=SYNTHETIC-PAGE-8",
+    "@odata.nextLink": "https://graph.microsoft.com/v1.0/me/drive/root/children?$expand=thumbnails&$top=50&$skiptoken=SYNTHETIC-PAGE-11",
     "value": [
       {
         "folder": {
@@ -214,7 +214,7 @@
       },
       {
         "folder": {
-          "childCount": 22
+          "childCount": 24
         },
         "id": "01JNPJLJDPKKJKMJGEDODBIDPNMAKMMJOB",
         "lastModifiedDateTime": "2020-01-16T15:15:00Z",
@@ -223,7 +223,7 @@
           "driveId": "b!ALAKBBJBIABAKFIIEKPPLHCAEDENILFAEMLKLLLHFAIKHEEPMCIFLDGLNPKLMCCJ",
           "id": "01PNOJDKHENKELPNIDHNKFMAKPOKGLIDNG"
         },
-        "size": 177504401084,
+        "size": 213982817981,
         "thumbnails": []
       },
       {
@@ -396,7 +396,7 @@
       },
       {
         "folder": {
-          "childCount": 13
+          "childCount": 14
         },
         "id": "01FGOKELHOIKLGMBDOLDJCEFDLKAIJKAAC",
         "lastModifiedDateTime": "2020-01-01T04:28:00Z",
@@ -648,7 +648,7 @@
       },
       {
         "folder": {
-          "childCount": 32
+          "childCount": 35
         },
         "id": "01EMHLFEFCLDIKLDPMEIMAKFMBFJIHOFPI",
         "lastModifiedDateTime": "2020-01-19T22:46:00Z",
@@ -657,7 +657,7 @@
           "driveId": "b!ALAKBBJBIABAKFIIEKPPLHCAEDENILFAEMLKLLLHFAIKHEEPMCIFLDGLNPKLMCCJ",
           "id": "01PNOJDKHENKELPNIDHNKFMAKPOKGLIDNG"
         },
-        "size": 25713195901,
+        "size": 30056537220,
         "thumbnails": []
       },
       {

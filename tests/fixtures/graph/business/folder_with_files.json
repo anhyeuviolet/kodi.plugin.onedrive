@@ -2,23 +2,23 @@
   "body": {
     "value": [
       {
-        "@microsoft.graph.downloadUrl": "https://example.invalid/download/01FJEMGLONPMIDHKBCLDLPNIPIOIMNJMBJ",
+        "@microsoft.graph.downloadUrl": "https://example.invalid/download/01BFLLOIINGCGAPNKKIFICJMNGDAADJDCB",
         "file": {
           "mimeType": "application/octet-stream"
         },
-        "id": "01FJEMGLONPMIDHKBCLDLPNIPIOIMNJMBJ",
+        "id": "01BFLLOIINGCGAPNKKIFICJMNGDAADJDCB",
         "lastModifiedDateTime": "2020-01-01T00:00:00Z",
-        "name": "Round (2019) Việt 00.mkv",
+        "name": "Trailing dot. 00.mkv",
         "parentReference": {
           "driveId": "b!ALAKBBJBIABAKFIIEKPPLHCAEDENILFAEMLKLLLHFAIKHEEPMCIFLDGLNPKLMCCJ",
-          "id": "01IJNKFMHFEGCMPJIFNGHOJPMJKOCLKNHE"
+          "id": "01ALGACDAKNBKDMINOCHAJOOMCCEFOKEHK"
         },
         "photo": {},
-        "size": 1867800729,
+        "size": 627897039,
         "thumbnails": [
           {
             "large": {
-              "height": 333,
+              "height": 334,
               "url": "https://example.invalid/thumb/large",
               "width": 800
             },
@@ -35,24 +35,24 @@
           }
         ],
         "video": {
-          "duration": 5841000,
-          "height": 800,
-          "width": 1920
+          "duration": 5704607,
+          "height": 534,
+          "width": 1280
         }
       },
       {
-        "@microsoft.graph.downloadUrl": "https://example.invalid/download/01MEMNDKHBJFLDDANBJMLMCMMCKHPGCBGN",
+        "@microsoft.graph.downloadUrl": "https://example.invalid/download/01GMHIBAAKAPPOIJIHEEDOLHEGAJBOAPOD",
         "file": {
           "mimeType": "application/octet-stream"
         },
-        "id": "01MEMNDKHBJFLDDANBJMLMCMMCKHPGCBGN",
+        "id": "01GMHIBAAKAPPOIJIHEEDOLHEGAJBOAPOD",
         "lastModifiedDateTime": "2020-01-02T01:01:00Z",
-        "name": "Echo Foxtrot Golf Việt 01.srt",
+        "name": "Trailing dot. 01.srt",
         "parentReference": {
           "driveId": "b!ALAKBBJBIABAKFIIEKPPLHCAEDENILFAEMLKLLLHFAIKHEEPMCIFLDGLNPKLMCCJ",
-          "id": "01IJNKFMHFEGCMPJIFNGHOJPMJKOCLKNHE"
+          "id": "01ALGACDAKNBKDMINOCHAJOOMCCEFOKEHK"
         },
-        "size": 113287,
+        "size": 142485,
         "thumbnails": []
       }
     ]
