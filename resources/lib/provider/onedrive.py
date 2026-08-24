@@ -183,7 +183,7 @@ class OneDrive(Provider):
             return []
         return self.process_files(files, on_items_page_completed, include_download_info, on_before_add_item=on_before_add_item)
     
-    def process_files(self, files, on_items_page_completed=None, include_download_info=False, extra_info=None, on_before_add_item=None):
+    def process_files(self, files, on_items_page_completed=None, include_download_info=False, extra_info=None, on_before_add_item=None, keep=None):
         # The loop, the cancellation contract and the defensive envelope read all
         # live in resources/lib/graph/pager.py. It called itself once per page
         # here, which was measured to raise RecursionError after 998 pages, and
@@ -201,6 +201,7 @@ class OneDrive(Provider):
             on_page=on_items_page_completed,
             on_before_add_item=on_before_add_item,
             extra_info=extra_info,
+            keep=keep,
         )
     
     def _extract_item(self, f, include_download_info=False):
@@ -222,12 +223,38 @@ class OneDrive(Provider):
         # encoder emitted a single %27, which the service decoded back into a
         # quote that closed the literal -- everything typed after it was then
         # read as expression rather than as text (T-02-02).
+        #
+        # The endpoint form is search() on the DRIVE resource, and that is a
+        # choice rather than an inheritance. Graph documents two: this one, which
+        # may include items shared from other drives, and the same call placed
+        # under `/root/`, scoped to this drive alone. This one is kept for three
+        # reasons. Both recorded
+        # search fixtures were captured against it, and re-recording is not
+        # available -- the recorder is untracked and imports an untracked live
+        # sign-in harness -- so switching would make the recorded 200 evidence
+        # about a request the code no longer makes. An item arriving with a
+        # remoteItem facet is now addressed correctly by the field-wise merge in
+        # graph.items, so the broader scope is a gain rather than the hazard it
+        # was while that merge lost the item's name. And narrowing it would
+        # silently drop shared items from search results, which is a product
+        # decision nobody has taken. If shared hits turn out to be confusing,
+        # the change is one line and one fresh capture.
         url += '/search(q=\''+graph_paths.odata_quoted(Utils.str(query))+'\')'
         files = self.get(url, parameters = graph_params.search_parameters())
         if self.cancel_operation():
             # BROWSE-03's third site, for the same reason as get_folder_items.
             return []
-        return self.process_files(files, on_items_page_completed)
+        # Files only, decided on the client. `$filter` is not among the
+        # parameters Graph documents for this endpoint -- the documented set is
+        # $expand, $select, $skipToken, $top and $orderby -- so `file ne null`
+        # cannot be asked for, and asking anyway is what produced the recorded
+        # 501 on a business drive and then the 400 on the following listing.
+        #
+        # Passed to the pager rather than applied to the result, because
+        # on_items_page_completed is what the browse layer renders from: it must
+        # see the rows that will be shown, not the rows that arrived.
+        return self.process_files(files, on_items_page_completed,
+                                  keep=graph_items.is_file)
     
     def get_subtitles(self, parent, name, item_driveid=None, include_download_info=False):
         item_driveid = Utils.default(item_driveid, self._driveid)

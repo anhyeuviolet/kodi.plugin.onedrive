@@ -64,7 +64,7 @@ def entries_of(body):
 
 
 def collect_pages(body, fetch, extract, cancelled=None, on_page=None,
-                  on_before_add_item=None, extra_info=None):
+                  on_before_add_item=None, extra_info=None, keep=None):
     """Every item across a paged response, in page order then entry order.
 
     `body` is the first page, already fetched. `fetch(link)` returns the next
@@ -73,6 +73,19 @@ def collect_pages(body, fetch, extract, cancelled=None, on_page=None,
     given, is called with each page's items as that page completes -- it is the
     hook a caller uses to render progressively instead of waiting for the whole
     folder. `on_before_add_item(item)` is called per item before it is kept.
+
+    `keep(entry)`, when given, decides which RAW entries survive, before
+    extraction. Default `None` means keep everything, so a caller that does not
+    pass one is unaffected.
+
+    It belongs here rather than in a comprehension over the return value, and the
+    reason is `on_page`: the per-page callback is what the browse layer renders
+    from, so it must see the items that will be shown and not the items that
+    arrived. Filtering afterwards would leave the callback reporting rows the
+    caller then discards -- a progress count that disagrees with the screen. It is
+    applied to the raw entry rather than the extracted item because the question
+    a caller asks here is about the response ("is this a file?"), and extracting
+    something only to drop it is work paid for twice.
 
     CANCELLATION RETURNS AN EMPTY LIST, and discards whatever was accumulated.
     Not a partial listing: the user cancelled because the listing was taking too
@@ -106,6 +119,8 @@ def collect_pages(body, fetch, extract, cancelled=None, on_page=None,
 
         page_items = []
         for entry in entries_of(body):
+            if keep and not keep(entry):
+                continue
             item = extract(entry)
             if on_before_add_item:
                 on_before_add_item(item)

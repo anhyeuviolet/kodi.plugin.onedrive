@@ -46,6 +46,14 @@ and a grep cannot tell a live key read from a docstring explaining why there is
 no live key read. The stricter check is that `photo` appears among this module's
 executable string literals zero times, which it does.)
 
+`is_file` is the same truth test exposed as a predicate, for a caller that needs
+to classify an entry without extracting it. It exists because `$filter` is not
+among the parameters Graph documents for the search endpoint, so `file ne null`
+cannot be asked for server-side and the search path selects files here instead.
+Sharing the truth test rather than reimplementing it is the point: a predicate
+that disagreed with `extract_item` about the same entry would put the empty-facet
+defect back one layer up.
+
 The other half of this module's job is `merge_remote_item`, which flattens a
 shared entry -- one Graph returned with a `remoteItem` facet, meaning the item
 lives in another drive. `extract_item` calls it first, so the merge is part of
@@ -133,6 +141,23 @@ def pick_thumbnail_url(entry):
         if url:
             return url
     return None
+
+
+def is_file(entry):
+    """True when the entry carries a truthy `file` facet.
+
+    A truth test through the same vendored helper every facet branch in this
+    module uses, so `file: {}` reads as absent here exactly as it does in
+    `extract_item`. That consistency is the point: an empty facet meaning
+    "present" is the defect this module was written to remove, and a predicate
+    that disagreed with the extractor about the same entry would reintroduce it
+    one layer up.
+
+    This exists because `$filter` is not among the parameters Graph documents for
+    the search endpoint, so `file ne null` cannot be asked for server-side. The
+    classification happens here instead.
+    """
+    return bool(Utils.get_safe_value(entry, 'file'))
 
 
 def merge_remote_item(entry):
