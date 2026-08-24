@@ -230,7 +230,13 @@ class OneDrive(Provider):
         # one of them.
         search_url = '/drives/'+item_driveid+'/items/' + parent + '/search(q=\''+graph_paths.odata_quoted(Utils.str(Utils.remove_extension(name)))+'\')'
         files = self.get(search_url)
-        for f in files['value']:
+        # Through the same defensive read as every other listing. This is the one
+        # call site where an error body is not hypothetical: it is the search
+        # endpoint, and the recorded 501 notSupported in the fixture set came
+        # back from exactly this endpoint carrying an `error` key and no entry
+        # list. Reading the key unconditionally turned a subtitle lookup that
+        # found nothing into a KeyError traceback during playback (BROWSE-07).
+        for f in graph_pager.entries_of(files):
             subtitle = self._extract_item(f, include_download_info)
             if subtitle['name_extension'].lower() in ('srt','idx','sub','sbv','ass','ssa','smi'):
                 subtitles.append(subtitle)
