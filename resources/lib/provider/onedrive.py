@@ -18,6 +18,7 @@
 #-------------------------------------------------------------------------------
 
 from resources.lib.auth import device_code
+from resources.lib.graph import paths as graph_paths
 from resources.lib.vendor.clouddrive_common.remote.provider import Provider
 from resources.lib.vendor.clouddrive_common.utils import Utils
 from resources.lib.vendor.clouddrive_common.exception import ExceptionUtils
@@ -152,7 +153,18 @@ class OneDrive(Provider):
             else:
                 parts = path.split('/')
                 if len(parts) > 1 and not parts[0]:
-                    path = 'root:'+path+':'
+                    # The user's own path is the only part of this URL that is
+                    # not ours, and it is percent-encoded one segment at a time
+                    # on the way in. Concatenating it raw is what stopped a
+                    # folder whose name contains a space from producing any
+                    # request at all: http.client refuses the request line
+                    # before the socket is opened (BROWSE-05).
+                    #
+                    # 'root', 'sharedWithMe' and 'recent' stay untouched. They
+                    # are endpoint names this file chose, not user data, and
+                    # encoding them would address a folder literally called
+                    # "root".
+                    path = 'root:'+graph_paths.encode_path(path)+':'
             files = self.get('/drives/'+self._driveid+'/' + path + '/children', parameters = self._extra_parameters)
         if self.cancel_operation():
             return
