@@ -406,6 +406,97 @@ def test_no_eval():
         _report(hits))
 
 
+# ---------------------------------------------------------------------------
+# The credential parameter names (CI-05)
+# ---------------------------------------------------------------------------
+
+# Written out in full, once, so the sweep below has something to check itself
+# against. This file lives under tests/, which EXCLUDED_TOP_LEVEL excludes from
+# every shipped-source sweep, so naming the forbidden strings here costs nothing
+# -- and the gates in this file are *required* to name what they forbid, which is
+# the reason that exclusion exists at all. The module docstring of
+# tests/test_error_map.py is the precedent for saying so at the point it matters.
+CREDENTIAL_PARAMETER_NAMES = ('client_secret', 'client_assertion')
+
+# The floor is a floor, not the count. Seventy non-excluded text files were swept
+# when this was written; sixty is low enough not to go stale on the next file
+# added and high enough that a tree which has stopped being read fails here.
+CREDENTIAL_SWEEP_FILE_FLOOR = 60
+
+
+def test_no_credential_parameter_names():
+    """Neither credential parameter name appears in shipped source.
+
+    This closes the last of the four strings CI-05 names; the other three are
+    held from phase 1 by test_no_eval and test_no_hardcoded_module_id and are not
+    re-implemented here.
+
+    The non-vacuity guard is the part worth reading, because a forbidden-string
+    sweep cannot use the usual one. Every other sweep in this file proves it did
+    something by counting what it found -- a call site, an import, a manifest
+    attribute -- and asserting the count is non-zero. Here a hit *is* the failure,
+    so there is nothing to count on the way to green, and the ordinary guard would
+    have to assert the very thing the test forbids. test_no_eval has no guard at
+    all today, and that is a gap rather than a precedent to copy.
+
+    So the guard is in two parts, both asserted separately from the absence of
+    hits, and each closing a different way this test could pass while checking
+    nothing:
+
+      1. The number of non-excluded text files the sweep read, against a floor.
+         A sweep that has stopped reading the tree -- an exclusion widened, a
+         suffix dropped from TEXT_SUFFIXES, an index that came back empty --
+         passes trivially otherwise.
+      2. The sweep's own pattern, against a control string built here from the
+         two names. A pattern that stopped matching, through an edit or a stray
+         escape, would otherwise pass silently and forever.
+
+    No new exclusion is added and none is needed. EXCLUDED_TOP_LEVEL already
+    excludes tests/ by construction, and EXCLUDED_DOCS already carries
+    docs/AZURE-REGISTRATION.md, whose exclusion is already paid for by
+    test_runbook_contains_aadsts7000218 -- the runbook is required to quote the
+    AADSTS7000218 response verbatim, and that response names both of these
+    strings. Softening the pattern to let that quote through would weaken the
+    sweep everywhere; naming one document weakens it in one auditable place.
+    """
+    pattern = re.compile('|'.join(CREDENTIAL_PARAMETER_NAMES))
+
+    # Guard part 2, before the sweep rather than after it: if the pattern has
+    # stopped matching, the empty hit list below means nothing and should not be
+    # reported as a pass.
+    control = 'grant_type=client_credentials&%s=REDACTED&%s=REDACTED' % (
+        CREDENTIAL_PARAMETER_NAMES)
+    for name in CREDENTIAL_PARAMETER_NAMES:
+        assert pattern.search(name), (
+            "this sweep's own pattern no longer matches %r. Until that is "
+            'fixed the sweep cannot fail, and a credential parameter name in '
+            'shipped source would pass it silently and forever' % (name,))
+    assert pattern.search(control), (
+        "this sweep's own pattern does not match a control string containing "
+        'both forbidden names, so it cannot be relied on to match a real one: '
+        '%r' % (control,))
+
+    # Guard part 1. The same file list source_scan itself walks, under the same
+    # one exclusion set, so this counts what was actually read rather than an
+    # approximation of it.
+    swept = [rel for rel, _ in text_files() if not _excluded(rel)]
+    assert len(swept) >= CREDENTIAL_SWEEP_FILE_FLOOR, (
+        'this sweep read only %d non-excluded text file(s), below the floor of '
+        '%d. It is not passing because the tree is clean, it is passing because '
+        'it has stopped reading the tree -- check TEXT_SUFFIXES, EXCLUDED_DOCS, '
+        'EXCLUDED_TOP_LEVEL and the git index before trusting any other '
+        'forbidden-string gate in this file'
+        % (len(swept), CREDENTIAL_SWEEP_FILE_FLOOR))
+
+    hits = source_scan(pattern)
+    assert not hits, (
+        'a credential parameter name appears in shipped source. This project '
+        'has no client secret and no client assertion by design: the entire '
+        'sign-in story is that no third party is ever in the exchange, and a '
+        'parameter name here is a credential one edit away from a public '
+        'repository:\n' + _report(hits))
+
+
 def test_store_json_roundtrip():
     # An account dict as account.py stores it, with a non-ASCII display name.
     account = {
