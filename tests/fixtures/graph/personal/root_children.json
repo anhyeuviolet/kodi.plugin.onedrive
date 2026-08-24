@@ -1,0 +1,239 @@
+{
+  "body": {
+    "value": [
+      {
+        "folder": {
+          "childCount": 18
+        },
+        "id": "01HFBDJPBGGCOEOBDMEFL",
+        "lastModifiedDateTime": "2020-01-01T00:00:00Z",
+        "name": "Brackets-[2]-00",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01CKHKCBBHNGNHIHNNBBMPKILFCMEBABENOFKDAOGOLHOOBIHG"
+        },
+        "size": 258472106,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 0
+        },
+        "id": "01HDNENHBBPBKAIJOFBLI",
+        "lastModifiedDateTime": "2020-01-02T01:01:00Z",
+        "name": "Plus+Sign-01",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01CKHKCBBHNGNHIHNNBBMPKILFCMEBABENOFKDAOGOLHOOBIHG"
+        },
+        "size": 0,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 0
+        },
+        "id": "01IIIBAHBGEKBPDIHJPPBLDOCFAPNOJDLIAKIJNALPBHLGBNLN",
+        "lastModifiedDateTime": "2020-01-03T02:02:00Z",
+        "name": "Alpha Two Việt 02",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01CKHKCBBHNGNHIHNNBBMPKILFCMEBABENOFKDAOGOLHOOBIHG"
+        },
+        "size": 0,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 0
+        },
+        "id": "01LIFMONCCGGKMKLOLLHKJ",
+        "lastModifiedDateTime": "2020-01-04T03:03:00Z",
+        "name": "Alpha Two 03",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01CKHKCBBHNGNHIHNNBBMPKILFCMEBABENOFKDAOGOLHOOBIHG"
+        },
+        "size": 0,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 0
+        },
+        "id": "01BAMCFKIFIBICOJJPFP",
+        "lastModifiedDateTime": "2020-01-05T04:04:00Z",
+        "name": "Delta-04",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01CKHKCBBHNGNHIHNNBBMPKILFCMEBABENOFKDAOGOLHOOBIHG"
+        },
+        "size": 0,
+        "thumbnails": []
+      },
+      {
+        "id": "01PDHFFHBFLPDNPINGBEPADIMHJPJJLMMKHMJNNHDHNJLEGJIO",
+        "lastModifiedDateTime": "2020-01-06T05:05:00Z",
+        "name": "Break#Out Two Việt 05",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01CKHKCBBHNGNHIHNNBBMPKILFCMEBABENOFKDAOGOLHOOBIHG"
+        },
+        "remoteItem": {
+          "folder": {
+            "childCount": 0
+          },
+          "id": "01GKPFKMGGPOHMDIJJHPJJKLEDJPGIFILF",
+          "parentReference": {
+            "driveId": "b!HNAMKABJDGKHCBPLBLNPOLINCECLHHJMAGNCAIFOCKNBPMNHCACDGAPKEIAJEKCP"
+          },
+          "size": 0
+        },
+        "size": 0,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 38
+        },
+        "id": "01FIJOGPFNCJLCAECGIMJ",
+        "lastModifiedDateTime": "2020-01-07T06:06:00Z",
+        "name": "Round (2019) 06",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01CKHKCBBHNGNHIHNNBBMPKILFCMEBABENOFKDAOGOLHOOBIHG"
+        },
+        "size": 2502947700,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 12
+        },
+        "id": "01EGPBBPEOJCGGELJPJMLD",
+        "lastModifiedDateTime": "2020-01-08T07:07:00Z",
+        "name": "Delta Two 07",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01CKHKCBBHNGNHIHNNBBMPKILFCMEBABENOFKDAOGOLHOOBIHG"
+        },
+        "size": 22273093,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 0
+        },
+        "id": "01ADPCJNBLFOJLFCLILME",
+        "lastModifiedDateTime": "2020-01-09T08:08:00Z",
+        "name": "Estimate%s-08",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01CKHKCBBHNGNHIHNNBBMPKILFCMEBABENOFKDAOGOLHOOBIHG"
+        },
+        "size": 0,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 8
+        },
+        "id": "01GPHPOJEDMAGOEKEKLIC",
+        "lastModifiedDateTime": "2020-01-10T09:09:00Z",
+        "name": "Estimate%s-09",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01CKHKCBBHNGNHIHNNBBMPKILFCMEBABENOFKDAOGOLHOOBIHG"
+        },
+        "size": 1556848,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 2
+        },
+        "id": "01PIPOKDDJJGHAOAPGKJ",
+        "lastModifiedDateTime": "2020-01-11T10:10:00Z",
+        "name": "Estimate%s Two 10",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01CKHKCBBHNGNHIHNNBBMPKILFCMEBABENOFKDAOGOLHOOBIHG"
+        },
+        "size": 6829917,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 16
+        },
+        "id": "01NBFENLJMFHFECOPHOD",
+        "lastModifiedDateTime": "2020-01-12T11:11:00Z",
+        "name": "Fifty Percent 50% 11",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01CKHKCBBHNGNHIHNNBBMPKILFCMEBABENOFKDAOGOLHOOBIHG"
+        },
+        "size": 52339391,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 54
+        },
+        "id": "01LNELODFEPIEEDHLDADAB",
+        "lastModifiedDateTime": "2020-01-13T12:12:00Z",
+        "name": "Bravo Charlie Việt 12",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01CKHKCBBHNGNHIHNNBBMPKILFCMEBABENOFKDAOGOLHOOBIHG"
+        },
+        "size": 4828222525,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 6
+        },
+        "id": "01CHMBJKPGMFLFBNMMPEL",
+        "lastModifiedDateTime": "2020-01-14T13:13:00Z",
+        "name": "Brackets [2] 13",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01CKHKCBBHNGNHIHNNBBMPKILFCMEBABENOFKDAOGOLHOOBIHG"
+        },
+        "size": 858137,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 2
+        },
+        "id": "01BHGBLLKPOLOMGDJJLCC",
+        "lastModifiedDateTime": "2020-01-15T14:14:00Z",
+        "name": "Trailing dot. 14",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01CKHKCBBHNGNHIHNNBBMPKILFCMEBABENOFKDAOGOLHOOBIHG"
+        },
+        "size": 18154,
+        "thumbnails": []
+      },
+      {
+        "@microsoft.graph.downloadUrl": "https://example.invalid/download/01NBKKCNDHPPFOPIBIMGB",
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01NBKKCNDHPPFOPIBIMGB",
+        "lastModifiedDateTime": "2020-01-16T15:15:00Z",
+        "name": "Question?Mark-15.msi",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01CKHKCBBHNGNHIHNNBBMPKILFCMEBABENOFKDAOGOLHOOBIHG"
+        },
+        "size": 730112,
+        "thumbnails": []
+      }
+    ]
+  },
+  "status": 200
+}

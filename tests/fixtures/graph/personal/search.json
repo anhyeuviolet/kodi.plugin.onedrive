@@ -1,0 +1,3985 @@
+{
+  "body": {
+    "value": [
+      {
+        "file": {
+          "mimeType": "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+        },
+        "id": "01FAMLIDMPPIEMGDCNHP",
+        "lastModifiedDateTime": "2020-01-01T00:00:00Z",
+        "name": "Delta Two Việt 00.pptx",
+        "parentReference": {
+          "driveId": "b!PEOAFBJHPIHGDN",
+          "id": "01CIAFNFBDJJPFAGPDMFEKHNPHGEDKDGHPFAFABGJKCNPJMHHE"
+        },
+        "remoteItem": {
+          "file": {
+            "mimeType": "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+          },
+          "id": "01FAMLIDMPPIEMGDCNHP",
+          "lastModifiedDateTime": "2020-01-01T00:00:00Z",
+          "name": "Delta Two Việt 00.pptx",
+          "parentReference": {
+            "driveId": "b!PEOAFBJHPIHGDN",
+            "id": "01CIAFNFBDJJPFAGPDMFEKHNPHGEDKDGHPFAFABGJKCNPJMHHE"
+          },
+          "size": 104111706
+        },
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+        },
+        "id": "01JNDHPEPOJGINLAKJHGI",
+        "lastModifiedDateTime": "2020-01-02T01:01:00Z",
+        "name": "Delta Two Việt 01.pptx",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01HFBDJPBGGCOEOBDMEFL"
+        },
+        "size": 104133471,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/pdf"
+        },
+        "id": "01LBJKBMMNFOHAICOKBDMJCDJFMCMBODFAHDBBFHCKMHJHHIOE",
+        "lastModifiedDateTime": "2020-01-03T02:02:00Z",
+        "name": "Anh nghi he 02.pdf",
+        "parentReference": {
+          "driveId": "b!MDDDCKHNKCCFDJ",
+          "id": "01BGAJDPKFPCMNEEMIIB"
+        },
+        "remoteItem": {
+          "file": {
+            "mimeType": "application/pdf"
+          },
+          "id": "01LBJKBMMNFOHAICOKBDMJCDJFMCMBODFAHDBBFHCKMHJHHIOE",
+          "lastModifiedDateTime": "2020-01-03T02:02:00Z",
+          "name": "Anh nghi he 02.pdf",
+          "parentReference": {
+            "driveId": "b!MDDDCKHNKCCFDJ",
+            "id": "01BGAJDPKFPCMNEEMIIB"
+          },
+          "size": 83390
+        },
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+        },
+        "id": "01CONPHJEIHAAMIMKBMJM",
+        "lastModifiedDateTime": "2020-01-04T03:03:00Z",
+        "name": "Question?Mark Two 03.pptx",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01HFBDJPBGGCOEOBDMEFL"
+        },
+        "size": 48989,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/pdf"
+        },
+        "id": "01DACDCDBKIECHFKJCJIOMJJAOHKPNGBDEFLPMKJIOHIKIKLKL",
+        "lastModifiedDateTime": "2020-01-05T04:04:00Z",
+        "name": "Tai lieu chung 04.pdf",
+        "parentReference": {
+          "driveId": "b!EJILDOAIJMCAIL",
+          "id": "01BDCCMFBFLBKKFHPMEKIDGKEMDMMOPNIAEHDAPNJFEPPDDOOE"
+        },
+        "remoteItem": {
+          "file": {
+            "mimeType": "application/pdf"
+          },
+          "id": "01DACDCDBKIECHFKJCJIOMJJAOHKPNGBDEFLPMKJIOHIKIKLKL",
+          "lastModifiedDateTime": "2020-01-05T04:04:00Z",
+          "name": "Tai lieu chung 04.pdf",
+          "parentReference": {
+            "driveId": "b!EJILDOAIJMCAIL",
+            "id": "01BDCCMFBFLBKKFHPMEKIDGKEMDMMOPNIAEHDAPNJFEPPDDOOE"
+          },
+          "size": 880933
+        },
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/msonenote"
+        },
+        "id": "01GENILGBGHGLNOEOMBAL",
+        "lastModifiedDateTime": "2020-01-06T05:05:00Z",
+        "name": "Echo Foxtrot Golf 05.one",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01JGBLMEHPLHHJDMGCIJCB"
+        },
+        "size": 323939,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+        },
+        "id": "01GELOAOBFBFBIMPBNAOHM",
+        "lastModifiedDateTime": "2020-01-07T06:06:00Z",
+        "name": "Question?Mark Two 06.pptx",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01GLNPJGCKPPAFBHEIDFFN"
+        },
+        "size": 48989,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01KLFMKMCKFMGKOPAAJGNB",
+        "lastModifiedDateTime": "2020-01-08T07:07:00Z",
+        "name": "Anh nghi he 07.mobi",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01GABEHHFJJLBLEMOJBOHI"
+        },
+        "size": 1371451,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01EEGBFFPAKLBIICIKLLHK",
+        "lastModifiedDateTime": "2020-01-09T08:08:00Z",
+        "name": "Echo-Foxtrot-Golf-08.log",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01KACGLANOOEGCGLPIEKHB"
+        },
+        "size": 1120,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01HPMECDMCKEJNEPFHOABA",
+        "lastModifiedDateTime": "2020-01-10T09:09:00Z",
+        "name": "Brackets [2] Việt 09.mbp",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01PPPFJDLMFCJGFIKCEAEJ"
+        },
+        "size": 444,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "image/jpeg"
+        },
+        "id": "01GPDMEBHEPFKOFNHEJMAB",
+        "image": {
+          "height": 240,
+          "width": 180
+        },
+        "lastModifiedDateTime": "2020-01-11T10:10:00Z",
+        "name": "Delta Two Việt 10.jpeg",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01FNIFNKGIPDKHKAPJANJC"
+        },
+        "photo": {},
+        "size": 2748,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01DHPFKLGJGBJALDANNMNO",
+        "lastModifiedDateTime": "2020-01-12T11:11:00Z",
+        "name": "Echo-Foxtrot-Golf-11.log",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01MJHGEOINGIEPAIHFCDIG"
+        },
+        "size": 337,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "text/html"
+        },
+        "id": "01NOOJMFHIFHJBPOGNKMJK",
+        "lastModifiedDateTime": "2020-01-13T12:12:00Z",
+        "name": "Delta Two 12.html",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01ANJGEAGAHLPBCGIPFGDA"
+        },
+        "size": 9717,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "text/html"
+        },
+        "id": "01PCBBHJEEJLEBDGJMDHIH",
+        "lastModifiedDateTime": "2020-01-14T13:13:00Z",
+        "name": "Semi;colon-13.html",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01ANJGEAGAHLPBCGIPFGDA"
+        },
+        "size": 9717,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "text/css"
+        },
+        "id": "01JEANHDKCJFCOAGMJJGFF",
+        "lastModifiedDateTime": "2020-01-15T14:14:00Z",
+        "name": "Echo-Foxtrot-Golf-14.css",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01FCOGHNGNCBPKIBOAAFCM"
+        },
+        "size": 5597,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "image/vnd.microsoft.icon"
+        },
+        "id": "01KABJAEPCHMALFCBFGDOJ",
+        "image": {},
+        "lastModifiedDateTime": "2020-01-16T15:15:00Z",
+        "name": "Round (2019) Việt 15.ico",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01JLFIPDEJMOGPCEFPIHKN"
+        },
+        "photo": {},
+        "size": 59582,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/msword"
+        },
+        "id": "01FOHIPJPHOFKDBGPBNN",
+        "lastModifiedDateTime": "2020-01-17T16:16:00Z",
+        "name": "Delta Two 16.doc",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01NBFENLJMFHFECOPHOD"
+        },
+        "size": 186880,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01IENFIJCGPPDMDNBLNDIO",
+        "lastModifiedDateTime": "2020-01-18T17:17:00Z",
+        "name": "Alpha Two Việt 17.mobi",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01PPPFJDLMFCJGFIKCEAEJ"
+        },
+        "size": 408126,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "text/plain"
+        },
+        "id": "01OFFJAMKNNPHBANKLEEBL",
+        "lastModifiedDateTime": "2020-01-19T18:18:00Z",
+        "name": "Echo-Foxtrot-Golf-18.txt",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01IOFDCEHACLEFOMOCJIKE"
+        },
+        "size": 6431,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "text/plain"
+        },
+        "id": "01ANKFKEOGKGNPEDHEAIPE",
+        "lastModifiedDateTime": "2020-01-20T19:19:00Z",
+        "name": "Echo-Foxtrot-Golf-19.txt",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01KACGLANOOEGCGLPIEKHB"
+        },
+        "size": 6129,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/pdf"
+        },
+        "id": "01FJHHABDKCKBGNLFFHNK",
+        "lastModifiedDateTime": "2020-01-21T20:20:00Z",
+        "name": "Trailing dot. 20.pdf",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01HLIIDGJGJAHIFMAFPLC"
+        },
+        "size": 1702941,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/pdf"
+        },
+        "id": "01PAKDJHLANECKHHAPJAD",
+        "lastModifiedDateTime": "2020-01-22T21:21:00Z",
+        "name": "Tai lieu chung 21.pdf",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01HLIIDGJGJAHIFMAFPLC"
+        },
+        "size": 154111,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/pdf"
+        },
+        "id": "01ELOLEKBGBOFAKHPIKEI",
+        "lastModifiedDateTime": "2020-01-23T22:22:00Z",
+        "name": "Tai lieu chung 22.pdf",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01HLIIDGJGJAHIFMAFPLC"
+        },
+        "size": 130054,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/msword"
+        },
+        "id": "01OGNIMNEHHCEKKEPAAAB",
+        "lastModifiedDateTime": "2020-01-24T23:23:00Z",
+        "name": "Alpha Two 23.doc",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01HLIIDGJGJAHIFMAFPLC"
+        },
+        "size": 220160,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/msword"
+        },
+        "id": "01OBKKDCCNCJIMPPIDEEJ",
+        "lastModifiedDateTime": "2020-01-25T00:24:00Z",
+        "name": "Delta Two 24.doc",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01HLIIDGJGJAHIFMAFPLC"
+        },
+        "size": 153600,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "image/png"
+        },
+        "id": "01DCGJBFDLIGAIGKEAOPNC",
+        "image": {
+          "height": 120,
+          "width": 90
+        },
+        "lastModifiedDateTime": "2020-01-26T01:25:00Z",
+        "name": "Brackets [2] Việt 25.png",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01JLFIPDEJMOGPCEFPIHKN"
+        },
+        "photo": {},
+        "size": 4022,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/pdf"
+        },
+        "id": "01NJEDOPNCILLGLLPJDIC",
+        "lastModifiedDateTime": "2020-01-27T02:26:00Z",
+        "name": "Ampersand&Co Two 26.pdf",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01HLIIDGJGJAHIFMAFPLC"
+        },
+        "size": 194435,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/msword"
+        },
+        "id": "01PFDLIAFNGJEMPJCMBOE",
+        "lastModifiedDateTime": "2020-01-28T03:27:00Z",
+        "name": "Semi;colon Two 27.doc",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01HLIIDGJGJAHIFMAFPLC"
+        },
+        "size": 324608,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01ABBMABJLFEEHOKLIFBDI",
+        "lastModifiedDateTime": "2020-01-01T04:28:00Z",
+        "name": "Echo-Foxtrot-Golf-28.log",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01MKNLBFCLBFPFLGJCLPJL"
+        },
+        "size": 242,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/x-rar-compressed"
+        },
+        "id": "01GOECEBIMAHCIEPMILM",
+        "lastModifiedDateTime": "2020-01-02T05:29:00Z",
+        "name": "Tai lieu chung 29.rar",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01NBFENLJMFHFECOPHOD"
+        },
+        "size": 4727475,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01BDEBHPIHHOKJNIJGJDFJ",
+        "lastModifiedDateTime": "2020-01-03T06:30:00Z",
+        "name": "Tai-lieu-chung-30.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01FCOFLGAGEAMDJFBGJCBB"
+        },
+        "size": 104479,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/pdf"
+        },
+        "id": "01FAFFNGOKGENBPHHMCLM",
+        "lastModifiedDateTime": "2020-01-04T07:31:00Z",
+        "name": "uong dan dai 31.pdf",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01HLIIDGJGJAHIFMAFPLC"
+        },
+        "size": 2773285,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/pdf"
+        },
+        "id": "01KLCNHNMKGOJHHJJIMMHO",
+        "lastModifiedDateTime": "2020-01-05T08:32:00Z",
+        "name": "Question?Mark-32.pdf",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01FCLEFCODMCPDJMONIKJL"
+        },
+        "size": 60307,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/json"
+        },
+        "id": "01BJBDHNCJMOCNAMECDBGF",
+        "lastModifiedDateTime": "2020-01-06T09:33:00Z",
+        "name": "Bravo-Charlie-33.json",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01IOFDCEHACLEFOMOCJIKE"
+        },
+        "size": 9448,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/msword"
+        },
+        "id": "01ICBNKNKCIKNAIBLICLD",
+        "lastModifiedDateTime": "2020-01-07T10:34:00Z",
+        "name": "Semi;colon Two 34.doc",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01HLIIDGJGJAHIFMAFPLC"
+        },
+        "size": 201216,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/javascript"
+        },
+        "id": "01GABJACAHJDGJEDCCNMOD",
+        "lastModifiedDateTime": "2020-01-08T11:35:00Z",
+        "name": "uong-dan-dai-35.js",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01FCOGHNGNCBPKIBOAAFCM"
+        },
+        "size": 93637,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/x-rar-compressed"
+        },
+        "id": "01GGFBAMINBIFMHHKKJN",
+        "lastModifiedDateTime": "2020-01-09T12:36:00Z",
+        "name": "Echo Foxtrot Golf 36.rar",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01NBFENLJMFHFECOPHOD"
+        },
+        "size": 1301329,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/pdf"
+        },
+        "id": "01DLMMHPFEGGLLKCOKDILL",
+        "lastModifiedDateTime": "2020-01-10T13:37:00Z",
+        "name": "Anh-nghi-he-37.pdf",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01EGPBBPEOJCGGELJPJMLD"
+        },
+        "size": 23514,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01FHHGEKDLOLAHLNIGJGME",
+        "lastModifiedDateTime": "2020-01-11T14:38:00Z",
+        "name": "Alpha-38.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01HGDBOAFGKHEHOEFEDHEG"
+        },
+        "size": 5829,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+        },
+        "id": "01OOCAJADNHMFPAMMFKMA",
+        "lastModifiedDateTime": "2020-01-12T15:39:00Z",
+        "name": "Delta Two Việt 39.pptx",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01PIPOKDDJJGHAOAPGKJ"
+        },
+        "size": 6634649,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "text/plain"
+        },
+        "id": "01HOGPNEEAMBLILAFFBODD",
+        "lastModifiedDateTime": "2020-01-13T16:40:00Z",
+        "name": "Ryan's-Files-40.txt",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01IOFDCEHACLEFOMOCJIKE"
+        },
+        "size": 4497,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/json"
+        },
+        "id": "01CJNAILLIFNCCPKLAELCD",
+        "lastModifiedDateTime": "2020-01-14T17:41:00Z",
+        "name": "Bravo-Charlie-41.json",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01KACGLANOOEGCGLPIEKHB"
+        },
+        "size": 6126,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/msword"
+        },
+        "id": "01GNIGHDDCFKPEGDNHKFL",
+        "lastModifiedDateTime": "2020-01-15T18:42:00Z",
+        "name": "Break#Out Two 42.doc",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01HLIIDGJGJAHIFMAFPLC"
+        },
+        "size": 203776,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01AEEGGBDFPFDKIKCGDPHE",
+        "lastModifiedDateTime": "2020-01-16T19:43:00Z",
+        "name": "Ryan's-Files-43.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01CNMFLJLHJBOCNIGGMKDJ"
+        },
+        "size": 42824,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01FKICFBPPGNIFMEGLFLCB",
+        "lastModifiedDateTime": "2020-01-17T20:44:00Z",
+        "name": "Anh-nghi-he-44.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01FFCIFODCNAFOGKNHDAMM"
+        },
+        "size": 5448,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+        },
+        "id": "01LKDPINJOGKNFEOAFIDM",
+        "lastModifiedDateTime": "2020-01-18T21:45:00Z",
+        "name": "Bravo Charlie Việt 45.pptx",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01HFBDJPBGGCOEOBDMEFL"
+        },
+        "size": 7041635,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01KGHEDBKKJKCKHKHHNDPK",
+        "lastModifiedDateTime": "2020-01-19T22:46:00Z",
+        "name": "Trailing-dot.-46.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01CNMFLJLHJBOCNIGGMKDJ"
+        },
+        "size": 15046,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01HLBPJMBCGPKIOEDKHJMC",
+        "lastModifiedDateTime": "2020-01-20T23:47:00Z",
+        "name": "Bravo-Charlie-47.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01DDHKLAKMJIAJBMGNGLMD"
+        },
+        "size": 6708,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/pdf"
+        },
+        "id": "01MEKNFDGLNPBDMOPBCKFO",
+        "lastModifiedDateTime": "2020-01-21T00:48:00Z",
+        "name": "Fifty-Percent-50%-48.pdf",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01FCLEFCODMCPDJMONIKJL"
+        },
+        "size": 61725,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        },
+        "id": "01OCJPODINNLJAAAELCBGE",
+        "lastModifiedDateTime": "2020-01-22T01:49:00Z",
+        "name": "Estimate%s-49.xlsx",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01FCLEFCODMCPDJMONIKJL"
+        },
+        "size": 1170906,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "image/png"
+        },
+        "id": "01JBJELGAKELGDAONPNHHI",
+        "image": {
+          "height": 1600,
+          "width": 4480
+        },
+        "lastModifiedDateTime": "2020-01-23T02:50:00Z",
+        "name": "Delta-50.png",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01HJGFLBDKNPAEEEFLDEDC"
+        },
+        "photo": {},
+        "size": 778424,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "image/jpeg"
+        },
+        "id": "01AOOFCHJJDCLNLDMAHMJM",
+        "image": {
+          "height": 1939,
+          "width": 1375
+        },
+        "lastModifiedDateTime": "2020-01-24T03:51:00Z",
+        "name": "Delta Two 51.jpeg",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01FNIFNKGIPDKHKAPJANJC"
+        },
+        "photo": {},
+        "size": 854788,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "text/plain"
+        },
+        "id": "01EGHHLCGNFJPOLKLFNCBE",
+        "lastModifiedDateTime": "2020-01-25T04:52:00Z",
+        "name": "Ryan's-Files-52.txt",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01KACGLANOOEGCGLPIEKHB"
+        },
+        "size": 4484,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/pdf"
+        },
+        "id": "01NNEPJKLGJFMFILOHIOBE",
+        "lastModifiedDateTime": "2020-01-26T05:53:00Z",
+        "name": "Tai lieu chung 53.pdf",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01FCLEFCODMCPDJMONIKJL"
+        },
+        "size": 87269,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+        },
+        "id": "01MMECIBEKELHPCODFMCCF",
+        "lastModifiedDateTime": "2020-01-27T06:54:00Z",
+        "name": "Bravo Charlie Việt 54.pptx",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01GLNPJGCKPPAFBHEIDFFN"
+        },
+        "size": 7041635,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "image/png"
+        },
+        "id": "01JAKBKFMFBMLDEEKPCGOC",
+        "image": {
+          "height": 1600,
+          "width": 4480
+        },
+        "lastModifiedDateTime": "2020-01-28T07:55:00Z",
+        "name": "Delta Two 55.png",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01HJGFLBDKNPAEEEFLDEDC"
+        },
+        "photo": {},
+        "size": 778424,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "image/jpeg"
+        },
+        "id": "01NHNONAHCLBGBLMNDLPEE",
+        "image": {
+          "height": 2024,
+          "width": 1381
+        },
+        "lastModifiedDateTime": "2020-01-01T08:56:00Z",
+        "name": "uong-dan-dai-56.jpg",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01MIFJMJMBEPKNNOBJLMHJ"
+        },
+        "photo": {},
+        "size": 458999,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01EKICCMLGEKHPOKAPALEH",
+        "lastModifiedDateTime": "2020-01-02T09:57:00Z",
+        "name": "Echo-Foxtrot-Golf-57.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01DDHKLAKMJIAJBMGNGLMD"
+        },
+        "size": 6846,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/x-rar-compressed"
+        },
+        "id": "01CAHPPDBCHJAGNADELL",
+        "lastModifiedDateTime": "2020-01-03T10:58:00Z",
+        "name": "Echo-Foxtrot-Golf-58.rar",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01NBFENLJMFHFECOPHOD"
+        },
+        "size": 14721,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+        },
+        "id": "01AMMLLIHCELOBIPCJMNO",
+        "lastModifiedDateTime": "2020-01-04T11:59:00Z",
+        "name": "Delta Two Việt 59.pptx",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01HFBDJPBGGCOEOBDMEFL"
+        },
+        "size": 3619359,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01HBNMJAHLOOFJHNHOHGEC",
+        "lastModifiedDateTime": "2020-01-05T12:00:00Z",
+        "name": "Ampersand&Co-60.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01DDHKLAKMJIAJBMGNGLMD"
+        },
+        "size": 6781,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01NFGLJPNMIHJJHLDJGKIH",
+        "lastModifiedDateTime": "2020-01-06T13:01:00Z",
+        "name": "Plus+Sign-61.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01DDHKLAKMJIAJBMGNGLMD"
+        },
+        "size": 6541,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01FCACAIBCFFKKFAADHMIL",
+        "lastModifiedDateTime": "2020-01-07T14:02:00Z",
+        "name": "Ampersand&Co-62.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01FFCIFODCNAFOGKNHDAMM"
+        },
+        "size": 1277,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01EAGLIFFDFABKKHAGDBPO",
+        "lastModifiedDateTime": "2020-01-08T15:03:00Z",
+        "name": "Question?Mark-63.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01FFCIFODCNAFOGKNHDAMM"
+        },
+        "size": 3057,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01KECBPIKHEDPHIIJMKJLG",
+        "lastModifiedDateTime": "2020-01-09T16:04:00Z",
+        "name": "Round-(2019)-64.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01FFCIFODCNAFOGKNHDAMM"
+        },
+        "size": 3057,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01MFOOCLMLOAOCILGOHEPK",
+        "lastModifiedDateTime": "2020-01-10T17:05:00Z",
+        "name": "Anh-nghi-he-65.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01FFCIFODCNAFOGKNHDAMM"
+        },
+        "size": 3057,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.ms-powerpoint"
+        },
+        "id": "01HDNLDCGEFJFAEIBHHO",
+        "lastModifiedDateTime": "2020-01-11T18:06:00Z",
+        "name": "Echo Foxtrot Golf Việt 66.ppt",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01NBFENLJMFHFECOPHOD"
+        },
+        "size": 335360,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01LJPFLLFGPALHILILCALG",
+        "lastModifiedDateTime": "2020-01-12T19:07:00Z",
+        "name": "Brackets-[2]-67.log",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01JCEPKFPKMKMKEKMPHAEG"
+        },
+        "size": 647702,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01LCKJBBLKIDAFELCGNEHP",
+        "lastModifiedDateTime": "2020-01-13T20:08:00Z",
+        "name": "Delta-68.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01DDHKLAKMJIAJBMGNGLMD"
+        },
+        "size": 6415,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+        },
+        "id": "01IMGJFCGJIIBIKCIOGGAL",
+        "lastModifiedDateTime": "2020-01-14T21:09:00Z",
+        "name": "Delta Two Việt 69.pptx",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01GLNPJGCKPPAFBHEIDFFN"
+        },
+        "size": 3619359,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/pdf"
+        },
+        "id": "01MMJEMLHFOPIIOIJKCKF",
+        "lastModifiedDateTime": "2020-01-15T22:10:00Z",
+        "name": "Break#Out Two 70.pdf",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01HLIIDGJGJAHIFMAFPLC"
+        },
+        "size": 113533,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        },
+        "id": "01PFJMHDJNMNIHNIHPBKPF",
+        "lastModifiedDateTime": "2020-01-16T23:11:00Z",
+        "name": "Brackets [2] Việt 71.xlsx",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01FCLEFCODMCPDJMONIKJL"
+        },
+        "size": 962261,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "image/png"
+        },
+        "id": "01FKFBMBLEJHCPNDILGHNM",
+        "image": {
+          "height": 541,
+          "width": 1338
+        },
+        "lastModifiedDateTime": "2020-01-17T00:12:00Z",
+        "name": "Alpha Two 72.png",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01FCOGHNGNCBPKIBOAAFCM"
+        },
+        "photo": {},
+        "size": 56397,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/pdf"
+        },
+        "id": "01BEINPAHFGLOMCAANADF",
+        "lastModifiedDateTime": "2020-01-18T01:13:00Z",
+        "name": "Echo Foxtrot Golf 73.pdf",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01HLIIDGJGJAHIFMAFPLC"
+        },
+        "size": 211526,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        },
+        "id": "01FEFPCFCNELHMCKEFOLJL",
+        "lastModifiedDateTime": "2020-01-19T02:14:00Z",
+        "name": "Alpha Two 74.docx",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01GJDMGMOLAMIDLNOJLLPD"
+        },
+        "size": 6988815,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01AEODPEKKLKFKLBJFHLME",
+        "lastModifiedDateTime": "2020-01-20T03:15:00Z",
+        "name": "Round-(2019)-75.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01DDHKLAKMJIAJBMGNGLMD"
+        },
+        "size": 6874,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/msword"
+        },
+        "id": "01FOHHHKGLGHCHBHGIBEE",
+        "lastModifiedDateTime": "2020-01-21T04:16:00Z",
+        "name": "Alpha Two 76.doc",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01HLIIDGJGJAHIFMAFPLC"
+        },
+        "size": 200192,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01BJHEJJMFAOJKOLAKOFPN",
+        "lastModifiedDateTime": "2020-01-22T05:17:00Z",
+        "name": "Ho-so-77.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01OENPLNGDAJNNLNHCKHIB"
+        },
+        "size": 59055,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01FGLOAMDILFGOEMMLMLKM",
+        "lastModifiedDateTime": "2020-01-23T06:18:00Z",
+        "name": "Trailing-dot.-78.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01DDHKLAKMJIAJBMGNGLMD"
+        },
+        "size": 6951,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01BEACBNBHEJLFJCJJLDJN",
+        "lastModifiedDateTime": "2020-01-24T07:19:00Z",
+        "name": "Round-(2019)-79.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01DDHKLAKMJIAJBMGNGLMD"
+        },
+        "size": 6618,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01FEELEIPJKHPGJJHIHFJB",
+        "lastModifiedDateTime": "2020-01-25T08:20:00Z",
+        "name": "Fifty-Percent-50%-80.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01DDHKLAKMJIAJBMGNGLMD"
+        },
+        "size": 8669,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01PFHJNGJJDHEGJBLJNDNN",
+        "lastModifiedDateTime": "2020-01-26T09:21:00Z",
+        "name": "Ryan's-Files-81.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01DDHKLAKMJIAJBMGNGLMD"
+        },
+        "size": 6025,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01MPCHMDGLCIPDKKABODML",
+        "lastModifiedDateTime": "2020-01-27T10:22:00Z",
+        "name": "Echo-Foxtrot-Golf-82.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01DDHKLAKMJIAJBMGNGLMD"
+        },
+        "size": 6552,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01MKBCDKOOILIOPNCMIBNB",
+        "lastModifiedDateTime": "2020-01-28T11:23:00Z",
+        "name": "Ho-so-83.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01DDHKLAKMJIAJBMGNGLMD"
+        },
+        "size": 6598,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+        },
+        "id": "01LAOEAPCLIHOIEHNDFEA",
+        "lastModifiedDateTime": "2020-01-01T12:24:00Z",
+        "name": "Trailing dot. Việt 84.pptx",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01HFBDJPBGGCOEOBDMEFL"
+        },
+        "size": 508291,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01CKDJAKIEDLCIDLBKGHGF",
+        "lastModifiedDateTime": "2020-01-02T13:25:00Z",
+        "name": "Plus+Sign-85.log",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01OGIAFMGLKLHLDBAJLLCC"
+        },
+        "size": 189325,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01NHLPEDLHKEFPLFLHHPGK",
+        "lastModifiedDateTime": "2020-01-03T14:26:00Z",
+        "name": "Alpha-86.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01LJIDBPOAKEEKIJGOONKC"
+        },
+        "size": 39486,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.ms-excel"
+        },
+        "id": "01FCFJHPPHKJHDFAKNOABC",
+        "lastModifiedDateTime": "2020-01-04T15:27:00Z",
+        "name": "Estimate%s Two 87.xls",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01FCLEFCODMCPDJMONIKJL"
+        },
+        "size": 72704,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        },
+        "id": "01BODDLNNFEFEKJMKHEDGK",
+        "lastModifiedDateTime": "2020-01-05T16:28:00Z",
+        "name": "Fifty Percent 50% Việt 88.xlsx",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01FCLEFCODMCPDJMONIKJL"
+        },
+        "size": 14119,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01GLHBBFPOPPNHAAIGDIHJ",
+        "lastModifiedDateTime": "2020-01-06T17:29:00Z",
+        "name": "Semi;colon-89.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01DDHKLAKMJIAJBMGNGLMD"
+        },
+        "size": 8676,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01AIOLOBHIOBKEAAKMGNIJ",
+        "lastModifiedDateTime": "2020-01-07T18:30:00Z",
+        "name": "uong-dan-dai-90.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01CNMFLJLHJBOCNIGGMKDJ"
+        },
+        "size": 9161,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "image/png"
+        },
+        "id": "01FNEDPMPJGEKPKDGNLAAE",
+        "image": {
+          "height": 399,
+          "width": 1364
+        },
+        "lastModifiedDateTime": "2020-01-08T19:31:00Z",
+        "name": "Round (2019) 91.png",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01FCOGHNGNCBPKIBOAAFCM"
+        },
+        "photo": {},
+        "size": 32805,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01EKLDKCGAFPGGIFJBKHAI",
+        "lastModifiedDateTime": "2020-01-09T20:32:00Z",
+        "name": "Semi;colon-92.log",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01MJHGEOINGIEPAIHFCDIG"
+        },
+        "size": 15628,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01FKFIGOHDADHNCGGBECAG",
+        "lastModifiedDateTime": "2020-01-10T21:33:00Z",
+        "name": "Semi;colon-93.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01OENPLNGDAJNNLNHCKHIB"
+        },
+        "size": 8557,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+        },
+        "id": "01KOELDLLMEFONGALCIHFF",
+        "lastModifiedDateTime": "2020-01-11T22:34:00Z",
+        "name": "Trailing dot. Việt 94.pptx",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01GLNPJGCKPPAFBHEIDFFN"
+        },
+        "size": 508291,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01NKHHLJBNNANNENMJJGEH",
+        "lastModifiedDateTime": "2020-01-12T23:35:00Z",
+        "name": "Bravo-Charlie-95.log",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01JGLBMENJHEFPMDCEPGHL"
+        },
+        "size": 13430,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01MCNPJAAOPNIBDLMMCCJE",
+        "lastModifiedDateTime": "2020-01-13T00:36:00Z",
+        "name": "Ho-so-96.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01NOMDKFEELBGLDCLEINGN"
+        },
+        "size": 24639,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01AMDDIANAFHMIJNJNCJML",
+        "lastModifiedDateTime": "2020-01-14T01:37:00Z",
+        "name": "Ampersand&Co-97.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01LJIDBPOAKEEKIJGOONKC"
+        },
+        "size": 30087,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/pdf"
+        },
+        "id": "01OBAGNBMFABIGKABFDEM",
+        "lastModifiedDateTime": "2020-01-15T02:38:00Z",
+        "name": "Echo Foxtrot Golf 98.pdf",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01HLIIDGJGJAHIFMAFPLC"
+        },
+        "size": 162870,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        },
+        "id": "01KBJCIOOMPCMAFPIGMLDN",
+        "lastModifiedDateTime": "2020-01-16T03:39:00Z",
+        "name": "Ryan's Files 99.docx",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01MIFJMJMBEPKNNOBJLMHJ"
+        },
+        "size": 15434787,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        },
+        "id": "01HLJEDIAIPOOJMLNJJGKF",
+        "lastModifiedDateTime": "2020-01-17T04:40:00Z",
+        "name": "Alpha Two 100.docx",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01CIJAFGCLCPHLIMHBPEEH"
+        },
+        "size": 1422531,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/msword"
+        },
+        "id": "01JNFNFBKGELDEHPHMIFD",
+        "lastModifiedDateTime": "2020-01-18T05:41:00Z",
+        "name": "Plus+Sign Two 101.doc",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01HLIIDGJGJAHIFMAFPLC"
+        },
+        "size": 160256,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01KDHPMCIPGACGHPEAJCAP",
+        "lastModifiedDateTime": "2020-01-19T06:42:00Z",
+        "name": "Anh-nghi-he-102.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01OENPLNGDAJNNLNHCKHIB"
+        },
+        "size": 26956,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01OFJHFDLKKDADEAHMONIJ",
+        "lastModifiedDateTime": "2020-01-20T07:43:00Z",
+        "name": "Plus+Sign-103.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01CNMFLJLHJBOCNIGGMKDJ"
+        },
+        "size": 68303,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        },
+        "id": "01IMBOOONGLBACEDJDMFGH",
+        "lastModifiedDateTime": "2020-01-21T08:44:00Z",
+        "name": "Fifty Percent 50% 104.docx",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01MJHHCACJFNCHONJFALKO"
+        },
+        "size": 5279472,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/json"
+        },
+        "id": "01ELACOLBDLGOPDGHJMLLJ",
+        "lastModifiedDateTime": "2020-01-22T09:45:00Z",
+        "name": "Bravo Charlie 105.json",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01OEPFBAEIPDKKAMGLBDDM"
+        },
+        "size": 14713,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01ONLMAKOACMHJBANNBPEO",
+        "lastModifiedDateTime": "2020-01-23T10:46:00Z",
+        "name": "Ampersand&Co-106.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01CNMFLJLHJBOCNIGGMKDJ"
+        },
+        "size": 43085,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        },
+        "id": "01MAPFJDHGBALJCDMMGGBK",
+        "lastModifiedDateTime": "2020-01-24T11:47:00Z",
+        "name": "Ampersand&Co Two 107.docx",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01AMLECLDDKAAEPEEIIMIC"
+        },
+        "size": 4648650,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/json"
+        },
+        "id": "01CGMBJBAENGBLEHFMLDHG",
+        "lastModifiedDateTime": "2020-01-25T12:48:00Z",
+        "name": "Round-(2019)-108.json",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01OEPFBAEIPDKKAMGLBDDM"
+        },
+        "size": 14713,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/pdf"
+        },
+        "id": "01INOADENDOCOKHPLJGDJ",
+        "lastModifiedDateTime": "2020-01-26T13:49:00Z",
+        "name": "Anh nghi he 109.pdf",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01HLIIDGJGJAHIFMAFPLC"
+        },
+        "size": 862984,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01DLKMEPKMFLHAAFGMMIBI",
+        "lastModifiedDateTime": "2020-01-27T14:50:00Z",
+        "name": "Break#Out-110.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01NOMDKFEELBGLDCLEINGN"
+        },
+        "size": 4258,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01JHHGGLFDIGCJFCANNJGF",
+        "lastModifiedDateTime": "2020-01-28T15:51:00Z",
+        "name": "Echo-Foxtrot-Golf-111.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01CNMFLJLHJBOCNIGGMKDJ"
+        },
+        "size": 34247,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01EEDDIGPMBOEPAOPAEOHD",
+        "lastModifiedDateTime": "2020-01-01T16:52:00Z",
+        "name": "Ryan's-Files-112.log",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01MFCOMDEFDGODINPALLJO"
+        },
+        "size": 127490,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "text/plain"
+        },
+        "id": "01OKAGIOJNOKOAGLJDGDAI",
+        "lastModifiedDateTime": "2020-01-02T17:53:00Z",
+        "name": "Question?Mark-113.txt",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01AMALOJAHMICMDEFMAMPC"
+        },
+        "size": 21038,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01HNKABIAODFCCNPAGGCHA",
+        "lastModifiedDateTime": "2020-01-03T18:54:00Z",
+        "name": "Brackets-[2]-114.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01DDHKLAKMJIAJBMGNGLMD"
+        },
+        "size": 5955,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        },
+        "id": "01JCKDJLAJPEPJLMIOLDNK",
+        "lastModifiedDateTime": "2020-01-04T19:55:00Z",
+        "name": "Tai lieu chung 115.docx",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01CLJKPNEJJECFFCBEDKJE"
+        },
+        "size": 3237181,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01DOGAJFKHBNELFHJNNKJA",
+        "lastModifiedDateTime": "2020-01-05T20:56:00Z",
+        "name": "uong-dan-dai-116.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01HAMICMBPCBBLPLMLJCIM"
+        },
+        "size": 30880,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01DMLIJDMKLBIACKPCOAJF",
+        "lastModifiedDateTime": "2020-01-06T21:57:00Z",
+        "name": "Semi;colon-117.log",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01MFCOMDEFDGODINPALLJO"
+        },
+        "size": 127051,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01DFNCLBLHEIFKFOGCLNDL",
+        "lastModifiedDateTime": "2020-01-07T22:58:00Z",
+        "name": "Trailing-dot.-118.log",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01MFCOMDEFDGODINPALLJO"
+        },
+        "size": 127538,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01NAJEAGAFKPNDNFOEJBHI",
+        "lastModifiedDateTime": "2020-01-08T23:59:00Z",
+        "name": "Trailing-dot.-119.log",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01MFCOMDEFDGODINPALLJO"
+        },
+        "size": 127490,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01CLCDPCJOLJBKJMEMNGMM",
+        "lastModifiedDateTime": "2020-01-09T00:00:00Z",
+        "name": "Tai-lieu-chung-120.log",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01MFCOMDEFDGODINPALLJO"
+        },
+        "size": 127490,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01NIHMBJJPEKOGMNCAGICD",
+        "lastModifiedDateTime": "2020-01-10T01:01:00Z",
+        "name": "Break#Out-121.log",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01MFCOMDEFDGODINPALLJO"
+        },
+        "size": 93865,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01ANEGKDIFJGBKDAGJOLLL",
+        "lastModifiedDateTime": "2020-01-11T02:02:00Z",
+        "name": "Ryan's-Files-122.log",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01MFCOMDEFDGODINPALLJO"
+        },
+        "size": 110604,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01KGLKHHGGJNEHHMNCMDAE",
+        "lastModifiedDateTime": "2020-01-12T03:03:00Z",
+        "name": "Fifty-Percent-50%-123.log",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01MFCOMDEFDGODINPALLJO"
+        },
+        "size": 114568,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/msword"
+        },
+        "id": "01CLKLAMOFBNGJGHBPICM",
+        "lastModifiedDateTime": "2020-01-13T04:04:00Z",
+        "name": "Plus+Sign Two 124.doc",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01HLIIDGJGJAHIFMAFPLC"
+        },
+        "size": 2342400,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.ms-powerpoint"
+        },
+        "id": "01OBPBICLGIBJCKIMKKI",
+        "lastModifiedDateTime": "2020-01-14T05:05:00Z",
+        "name": "Alpha Two 125.ppt",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01NBFENLJMFHFECOPHOD"
+        },
+        "size": 180736,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01MKNJDIOOAJPPEGFMOCDI",
+        "lastModifiedDateTime": "2020-01-15T06:06:00Z",
+        "name": "Bravo-Charlie-126.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01LGHPPBMIMEJCOCJLCICL"
+        },
+        "size": 3467,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/xml"
+        },
+        "id": "01AJHCMGNBELDMAFGDCGHL",
+        "lastModifiedDateTime": "2020-01-16T07:07:00Z",
+        "name": "Tai-lieu-chung-127.xml",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01ADEOICEMCOHAMJCBDAOJ"
+        },
+        "size": 3275,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01DDDLLGHPNCFAOLFGNMGM",
+        "lastModifiedDateTime": "2020-01-17T08:08:00Z",
+        "name": "Semi;colon-128.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01HAMICMBPCBBLPLMLJCIM"
+        },
+        "size": 64223,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        },
+        "id": "01FELEIFLMKPJAKAGLPMN",
+        "lastModifiedDateTime": "2020-01-18T09:09:00Z",
+        "name": "Ampersand&Co Two 129.docx",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01CLKHILJBMGHJJDPGPBC"
+        },
+        "size": 98798,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01IOGCMLIOLPFJFBFDIPKA",
+        "lastModifiedDateTime": "2020-01-19T10:10:00Z",
+        "name": "An-so-cuoi-130.log",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01JGLBMENJHEFPMDCEPGHL"
+        },
+        "size": 8546,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01LAEAIOPGMPKFLLBFLEKC",
+        "lastModifiedDateTime": "2020-01-20T11:11:00Z",
+        "name": "Ampersand&Co-131.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01LJIDBPOAKEEKIJGOONKC"
+        },
+        "size": 9360,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/msword"
+        },
+        "id": "01INOIKAFIDOAENLIIBH",
+        "lastModifiedDateTime": "2020-01-21T12:12:00Z",
+        "name": "Break#Out Two Việt 132.doc",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01NBFENLJMFHFECOPHOD"
+        },
+        "size": 1146880,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01EKEFAOAIMJNINDEPOKGM",
+        "lastModifiedDateTime": "2020-01-22T13:13:00Z",
+        "name": "Ryan's-Files-133.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01HAMICMBPCBBLPLMLJCIM"
+        },
+        "size": 19158,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01MOGBACIKMLFLNDNMCCAJ",
+        "lastModifiedDateTime": "2020-01-23T14:14:00Z",
+        "name": "Alpha-134.log",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01BNFBJGPHDDHHKILFNMAI"
+        },
+        "size": 6097,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01FLKAPCKLIFFBHBOKAONE",
+        "lastModifiedDateTime": "2020-01-24T15:15:00Z",
+        "name": "Ho-so-135.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01NOMDKFEELBGLDCLEINGN"
+        },
+        "size": 70931,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01JIKLOKIKGBIDFFDFLCPJ",
+        "lastModifiedDateTime": "2020-01-25T16:16:00Z",
+        "name": "Anh-nghi-he-136.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01HAMICMBPCBBLPLMLJCIM"
+        },
+        "size": 5002,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/zip"
+        },
+        "id": "01APJHIIHKCEEKNHLJHLFC",
+        "lastModifiedDateTime": "2020-01-26T17:17:00Z",
+        "name": "Round-(2019)-137.zip",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01FCLEFCODMCPDJMONIKJL"
+        },
+        "size": 11214507,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.ms-excel.sheet.macroEnabled.12"
+        },
+        "id": "01OBMJBFPOFLJFKKPPLIFO",
+        "lastModifiedDateTime": "2020-01-27T18:18:00Z",
+        "name": "Ryan's-Files-Việt-138.xlsm",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01EGPBBPEOJCGGELJPJMLD"
+        },
+        "size": 3631823,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/pdf"
+        },
+        "id": "01FADLLAODBNNDOEPLFCE",
+        "lastModifiedDateTime": "2020-01-28T19:19:00Z",
+        "name": "Fifty Percent 50% 139.pdf",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01HLIIDGJGJAHIFMAFPLC"
+        },
+        "size": 248557,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "text/html"
+        },
+        "id": "01INCHGDBBHLBHPHNNFAPK",
+        "lastModifiedDateTime": "2020-01-01T20:20:00Z",
+        "name": "Brackets-[2]-140.html",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01CMILLDILIILJGHEADKII"
+        },
+        "size": 2385785,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/pdf"
+        },
+        "id": "01ELHDCPOHGPPDKOANICF",
+        "lastModifiedDateTime": "2020-01-02T21:21:00Z",
+        "name": "Delta Two 141.pdf",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01HLIIDGJGJAHIFMAFPLC"
+        },
+        "size": 1699633,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/x-rar-compressed"
+        },
+        "id": "01FPCJBFCNNCNABHGHKP",
+        "lastModifiedDateTime": "2020-01-03T22:22:00Z",
+        "name": "Ryan's-Files-142.rar",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01NBFENLJMFHFECOPHOD"
+        },
+        "size": 3347188,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        },
+        "id": "01PKAPOMEDGOBGKIAKOACL",
+        "lastModifiedDateTime": "2020-01-04T23:23:00Z",
+        "name": "Tai lieu chung 143.docx",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01MFHLCEPKIBHNCNBHDPDI"
+        },
+        "size": 1058387,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01JOAPOGNOCGHIGAIHNEHC",
+        "lastModifiedDateTime": "2020-01-05T00:24:00Z",
+        "name": "Bravo-Charlie-144.log",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01MKNLBFCLBFPFLGJCLPJL"
+        },
+        "size": 16812,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "text/plain"
+        },
+        "id": "01AEBBCHGKKDACDDDAEDMP",
+        "lastModifiedDateTime": "2020-01-06T01:25:00Z",
+        "name": "Ampersand&Co-145.txt",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01ALCCLKFKGKDLJEFFEAMD"
+        },
+        "size": 19200,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/msword"
+        },
+        "id": "01FAIFGLEPLKOCIJMJHE",
+        "lastModifiedDateTime": "2020-01-07T02:26:00Z",
+        "name": "Ampersand&Co-146.doc",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01NBFENLJMFHFECOPHOD"
+        },
+        "size": 898048,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/msword"
+        },
+        "id": "01ANLIOGFMGKICFIAECBA",
+        "lastModifiedDateTime": "2020-01-08T03:27:00Z",
+        "name": "Alpha Two 147.doc",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01HLIIDGJGJAHIFMAFPLC"
+        },
+        "size": 939008,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01PEOILOHNDMLMDJFPHFMA",
+        "lastModifiedDateTime": "2020-01-09T04:28:00Z",
+        "name": "Bravo-Charlie-148.log",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01MJHGEOINGIEPAIHFCDIG"
+        },
+        "size": 23937,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        },
+        "id": "01KPEJAAIBFIGCOOOAAEFD",
+        "lastModifiedDateTime": "2020-01-10T05:29:00Z",
+        "name": "Brackets [2] 149.xlsx",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01FCLEFCODMCPDJMONIKJL"
+        },
+        "size": 1122046,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "text/plain"
+        },
+        "id": "01FLLFLMKINEMEHLCDAIBC",
+        "lastModifiedDateTime": "2020-01-11T06:30:00Z",
+        "name": "uong dan dai 150.txt",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01ALCCLKFKGKDLJEFFEAMD"
+        },
+        "size": 19200,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01EEMEDPCAIGHJGJEDGLDK",
+        "lastModifiedDateTime": "2020-01-12T07:31:00Z",
+        "name": "Ampersand&Co-151.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01OENPLNGDAJNNLNHCKHIB"
+        },
+        "size": 69952,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01LKALCFIEONDJPACPEGFO",
+        "lastModifiedDateTime": "2020-01-13T08:32:00Z",
+        "name": "Semi;colon-152.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01OENPLNGDAJNNLNHCKHIB"
+        },
+        "size": 205866,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "text/plain"
+        },
+        "id": "01DNJFBHEOKEDBMFDCLILM",
+        "lastModifiedDateTime": "2020-01-14T09:33:00Z",
+        "name": "Plus+Sign-153.txt",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01ALCCLKFKGKDLJEFFEAMD"
+        },
+        "size": 28731,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01MJGECMEGEPJAAOALNOGF",
+        "lastModifiedDateTime": "2020-01-15T10:34:00Z",
+        "name": "Estimate%s-154.log",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01MJHGEOINGIEPAIHFCDIG"
+        },
+        "size": 106459,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "text/plain"
+        },
+        "id": "01JAKLEFCHFFLGGABOPLDK",
+        "lastModifiedDateTime": "2020-01-16T11:35:00Z",
+        "name": "Brackets-[2]-155.txt",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01KACGLANOOEGCGLPIEKHB"
+        },
+        "size": 4348,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "text/plain"
+        },
+        "id": "01ANHFPILOHLCADDGDJDLN",
+        "lastModifiedDateTime": "2020-01-17T12:36:00Z",
+        "name": "Brackets-[2]-156.txt",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01IOFDCEHACLEFOMOCJIKE"
+        },
+        "size": 4594,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "text/plain"
+        },
+        "id": "01ILMBMAJHHDIHBOBFAGAF",
+        "lastModifiedDateTime": "2020-01-18T13:37:00Z",
+        "name": "Tai lieu chung 157.txt",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01ALCCLKFKGKDLJEFFEAMD"
+        },
+        "size": 28731,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01FOJIBPNFGEELBKBLFGLG",
+        "lastModifiedDateTime": "2020-01-19T14:38:00Z",
+        "name": "uong-dan-dai-158.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01OENPLNGDAJNNLNHCKHIB"
+        },
+        "size": 16301,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "text/plain"
+        },
+        "id": "01IOFBDHEADPHPFCBHKALI",
+        "lastModifiedDateTime": "2020-01-20T15:39:00Z",
+        "name": "Fifty-Percent-50%-159.txt",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01CFLHPFCDDMNIEIEBJJAE"
+        },
+        "size": 1768907,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "text/plain"
+        },
+        "id": "01BHHGMKPLCPLGOLJILLMF",
+        "lastModifiedDateTime": "2020-01-21T16:40:00Z",
+        "name": "Anh-nghi-he-160.txt",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01CFLHPFCDDMNIEIEBJJAE"
+        },
+        "size": 1679711,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01EFPIOFCMNKKOCGBJEJNG",
+        "lastModifiedDateTime": "2020-01-22T17:41:00Z",
+        "name": "Tai-lieu-chung-161.log",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01MKNLBFCLBFPFLGJCLPJL"
+        },
+        "size": 9966,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/pdf"
+        },
+        "id": "01OFMJADMNKIANHGPOLIH",
+        "lastModifiedDateTime": "2020-01-23T18:42:00Z",
+        "name": "Ho so 162.pdf",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01HLIIDGJGJAHIFMAFPLC"
+        },
+        "size": 2578881,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01IHBKEKOKGNOIHHCPJCGO",
+        "lastModifiedDateTime": "2020-01-24T19:43:00Z",
+        "name": "Semi;colon-163.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01NOMDKFEELBGLDCLEINGN"
+        },
+        "size": 16273,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01HFHFEEFANJPPELDICFJO",
+        "lastModifiedDateTime": "2020-01-25T20:44:00Z",
+        "name": "Question?Mark-164.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01HAMICMBPCBBLPLMLJCIM"
+        },
+        "size": 70457,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01GHGJEOKGGAGHFPDLFBBC",
+        "lastModifiedDateTime": "2020-01-26T21:45:00Z",
+        "name": "uong-dan-dai-165.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01LJIDBPOAKEEKIJGOONKC"
+        },
+        "size": 24484,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        },
+        "id": "01IBLOHHLPOGBMDFOPNBFN",
+        "lastModifiedDateTime": "2020-01-27T22:46:00Z",
+        "name": "Fifty Percent 50% 166.docx",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01MMIPAGANJCHJMDFJPIDJ"
+        },
+        "size": 5332550,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        },
+        "id": "01IALFLCABMFNBIDCOACBE",
+        "lastModifiedDateTime": "2020-01-28T23:47:00Z",
+        "name": "Ảnh nghỉ hè 167.xlsx",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01EGPBBPEOJCGGELJPJMLD"
+        },
+        "size": 874520,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/xml"
+        },
+        "id": "01ODIJKDMIKHGBDCPGPOHL",
+        "lastModifiedDateTime": "2020-01-01T00:48:00Z",
+        "name": "Delta-168.xml",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01EHIEKFHJLECBAMGANKBE"
+        },
+        "size": 22305,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01MINAHPKAOGOGHEEMJIFP",
+        "lastModifiedDateTime": "2020-01-02T01:49:00Z",
+        "name": "Ryan's-Files-169.ini",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01LJIDBPOAKEEKIJGOONKC"
+        },
+        "size": 38355,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01FELPLENKKIKNMOCAFBPE",
+        "lastModifiedDateTime": "2020-01-03T02:50:00Z",
+        "name": "Tai-lieu-chung-170.log",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01MJHGEOINGIEPAIHFCDIG"
+        },
+        "size": 53726,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/x-rar-compressed"
+        },
+        "id": "01HJLKDIMCLEKDOJCEKC",
+        "lastModifiedDateTime": "2020-01-04T03:51:00Z",
+        "name": "Round (2019) 171.rar",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01NBFENLJMFHFECOPHOD"
+        },
+        "size": 2143614,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        },
+        "id": "01MPKGEIBJCCGMGBIJLJLB",
+        "lastModifiedDateTime": "2020-01-05T04:52:00Z",
+        "name": "Echo Foxtrot Golf 172.docx",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01ILIDDOCFKOAOEBCNFKID"
+        },
+        "size": 1052847,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        },
+        "id": "01GKCDAJPGNEJLOEDCOFM",
+        "lastModifiedDateTime": "2020-01-06T05:53:00Z",
+        "name": "Semi;colon-173.xlsx",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01HFBDJPBGGCOEOBDMEFL"
+        },
+        "size": 120635,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "text/plain"
+        },
+        "id": "01ACGNKPPMNAFEJEADJMIF",
+        "lastModifiedDateTime": "2020-01-07T06:54:00Z",
+        "name": "Plus+Sign-174.txt",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01GMEELDLHJBNGFCBBDJNN"
+        },
+        "size": 4154,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "text/plain"
+        },
+        "id": "01PGIFMHBLBBHCEEIILGKA",
+        "lastModifiedDateTime": "2020-01-08T07:55:00Z",
+        "name": "Plus+Sign-175.txt",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01BKNDOLADLNGKGHNAICDB"
+        },
+        "size": 4154,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        },
+        "id": "01JJCCCHFPJKFBDIPBAKDP",
+        "lastModifiedDateTime": "2020-01-09T08:56:00Z",
+        "name": "Ryan's Files 176.docx",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01FOILNPEOFPEHLPONMJHA"
+        },
+        "size": 9973863,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        },
+        "id": "01FLEKOCNFJDJDPDCCGBJF",
+        "lastModifiedDateTime": "2020-01-10T09:57:00Z",
+        "name": "Break#Out Two 177.docx",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01GJKDKNHDFOIDGMEPADOA"
+        },
+        "size": 7604198,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "text/plain"
+        },
+        "id": "01DGJEIEOOGEIDFIIDCOHH",
+        "lastModifiedDateTime": "2020-01-11T10:58:00Z",
+        "name": "Plus+Sign-178.txt",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01ADEOICEMCOHAMJCBDAOJ"
+        },
+        "size": 197766,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        },
+        "id": "01ECKKONJAPKFNGFIJPAHJ",
+        "lastModifiedDateTime": "2020-01-12T11:59:00Z",
+        "name": "Semi;colon-179.xlsx",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01GLNPJGCKPPAFBHEIDFFN"
+        },
+        "size": 120635,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01JMNHEENLGNOBHNGJOGBA",
+        "lastModifiedDateTime": "2020-01-13T12:00:00Z",
+        "name": "Delta-180.csv",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01MJHGEOINGIEPAIHFCDIG"
+        },
+        "size": 144381,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01FKGLBDPODENLNCEMGCOL",
+        "lastModifiedDateTime": "2020-01-14T13:01:00Z",
+        "name": "Brackets-[2]-181.log",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01KGKKGMKCCNOEODBPDHPL"
+        },
+        "size": 19389,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01KKIKDLBJHCBIIJDLHMGN",
+        "lastModifiedDateTime": "2020-01-15T14:02:00Z",
+        "name": "Echo-Foxtrot-Golf-182.log",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01MJHGEOINGIEPAIHFCDIG"
+        },
+        "size": 51356,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        },
+        "id": "01EOPECIBACGGKLCDKNJM",
+        "lastModifiedDateTime": "2020-01-16T15:03:00Z",
+        "name": "Brackets [2] Việt 183.xlsx",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01HFBDJPBGGCOEOBDMEFL"
+        },
+        "size": 6613526,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01OAGEFKHIPDPKLIHAHGPA",
+        "lastModifiedDateTime": "2020-01-17T16:04:00Z",
+        "name": "Estimate%s-184.log",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01MKNLBFCLBFPFLGJCLPJL"
+        },
+        "size": 60924,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        },
+        "id": "01CPGPDDMBHHGBPJFDLLO",
+        "lastModifiedDateTime": "2020-01-18T17:05:00Z",
+        "name": "Bravo Charlie Việt 185.xlsx",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01HFBDJPBGGCOEOBDMEFL"
+        },
+        "size": 32039374,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        },
+        "id": "01JGKAKPLCONDJGKAJNPDJ",
+        "lastModifiedDateTime": "2020-01-19T18:06:00Z",
+        "name": "Alpha Two 186.docx",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01ECMBIHPJNIPMEADHBPDP"
+        },
+        "size": 2223686,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        },
+        "id": "01KNHHFNNIILOHFBMJGOBM",
+        "lastModifiedDateTime": "2020-01-20T19:07:00Z",
+        "name": "Ho so 187.docx",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01PJMNPEIAHEEJDFBNIDHP"
+        },
+        "size": 307235,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01GKMKGOOBAIBEHHPOOBDO",
+        "lastModifiedDateTime": "2020-01-21T20:08:00Z",
+        "name": "Estimate%s-188.log",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01MJHGEOINGIEPAIHFCDIG"
+        },
+        "size": 80738,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        },
+        "id": "01JGHGMPMKJMOGDPEKLCJK",
+        "lastModifiedDateTime": "2020-01-22T21:09:00Z",
+        "name": "Brackets [2] Việt 189.xlsx",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01GLNPJGCKPPAFBHEIDFFN"
+        },
+        "size": 6613526,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        },
+        "id": "01JKOLMGEIEHCOAAFOMLB",
+        "lastModifiedDateTime": "2020-01-23T22:10:00Z",
+        "name": "Brackets [2] Việt 190.xlsx",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01HFBDJPBGGCOEOBDMEFL"
+        },
+        "size": 4693180,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        },
+        "id": "01OLCGOEKLIJIILJNNMLK",
+        "lastModifiedDateTime": "2020-01-24T23:11:00Z",
+        "name": "Ryan's Files Việt 191.xlsx",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01HFBDJPBGGCOEOBDMEFL"
+        },
+        "size": 4724521,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        },
+        "id": "01ENKKBHHDAMKGJLJFIJAL",
+        "lastModifiedDateTime": "2020-01-25T00:12:00Z",
+        "name": "Brackets [2] Việt 192.xlsx",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01GLNPJGCKPPAFBHEIDFFN"
+        },
+        "size": 4693180,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        },
+        "id": "01NNJJPAGHINIHCBOOKOPP",
+        "lastModifiedDateTime": "2020-01-26T01:13:00Z",
+        "name": "Ryan's Files Việt 193.xlsx",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01GLNPJGCKPPAFBHEIDFFN"
+        },
+        "size": 4724521,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      },
+      {
+        "file": {
+          "mimeType": "application/vnd.ms-excel.sheet.macroEnabled.12"
+        },
+        "id": "01FKEIMECAELNJHIDKDKHE",
+        "lastModifiedDateTime": "2020-01-27T02:14:00Z",
+        "name": "Alpha-Việt-194.xlsm",
+        "parentReference": {
+          "driveId": "b!FCLAJBKFDDHMJJ",
+          "id": "01EGPBBPEOJCGGELJPJMLD"
+        },
+        "size": 7195945,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "status": 200
+}

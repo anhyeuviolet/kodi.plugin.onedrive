@@ -1,0 +1,49 @@
+{
+  "body": {
+    "value": [
+      {
+        "@microsoft.graph.downloadUrl": "https://example.invalid/download/01FJEMGLONPMIDHKBCLDLPNIPIOIMNJMBJ",
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01FJEMGLONPMIDHKBCLDLPNIPIOIMNJMBJ",
+        "lastModifiedDateTime": "2020-01-01T00:00:00Z",
+        "name": "Round (2019) Việt 00.mkv",
+        "parentReference": {
+          "driveId": "b!ALAKBBJBIABAKFIIEKPPLHCAEDENILFAEMLKLLLHFAIKHEEPMCIFLDGLNPKLMCCJ",
+          "id": "01IJNKFMHFEGCMPJIFNGHOJPMJKOCLKNHE"
+        },
+        "photo": {},
+        "size": 1867800729,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ],
+        "video": {
+          "duration": 5841000,
+          "height": 800,
+          "width": 1920
+        }
+      },
+      {
+        "@microsoft.graph.downloadUrl": "https://example.invalid/download/01MEMNDKHBJFLDDANBJMLMCMMCKHPGCBGN",
+        "file": {
+          "mimeType": "application/octet-stream"
+        },
+        "id": "01MEMNDKHBJFLDDANBJMLMCMMCKHPGCBGN",
+        "lastModifiedDateTime": "2020-01-02T01:01:00Z",
+        "name": "Echo Foxtrot Golf Việt 01.srt",
+        "parentReference": {
+          "driveId": "b!ALAKBBJBIABAKFIIEKPPLHCAEDENILFAEMLKLLLHFAIKHEEPMCIFLDGLNPKLMCCJ",
+          "id": "01IJNKFMHFEGCMPJIFNGHOJPMJKOCLKNHE"
+        },
+        "size": 113287,
+        "thumbnails": []
+      }
+    ]
+  },
+  "status": 200
+}

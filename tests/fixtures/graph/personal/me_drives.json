@@ -1,0 +1,9 @@
+{
+  "body": {
+    "error": {
+      "code": "accessDenied",
+      "message": "Access denied"
+    }
+  },
+  "status": 403
+}

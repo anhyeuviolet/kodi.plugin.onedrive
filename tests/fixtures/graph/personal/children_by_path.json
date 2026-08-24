@@ -1,0 +1,770 @@
+{
+  "body": {
+    "value": [
+      {
+        "folder": {
+          "childCount": 14
+        },
+        "id": "01GLNPJGCKPPAFBHEIDFFN",
+        "lastModifiedDateTime": "2020-01-01T00:00:00Z",
+        "name": "Brackets-[2]-00",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 55142956,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 1
+        },
+        "id": "01JKDENLNMLAJNMCIOGKPN",
+        "lastModifiedDateTime": "2020-01-02T01:01:00Z",
+        "name": "Fifty Percent 50% 01",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 586,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 1
+        },
+        "id": "01JLDNHMAGJOCMIHBKINKA",
+        "lastModifiedDateTime": "2020-01-03T02:02:00Z",
+        "name": "uong-dan-dai-02",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 0,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 0
+        },
+        "id": "01CGOJPPHAEMNCOLNIPIPB",
+        "lastModifiedDateTime": "2020-01-04T03:03:00Z",
+        "name": "Delta-03",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 0,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 19
+        },
+        "id": "01OEPFBAEIPDKKAMGLBDDM",
+        "lastModifiedDateTime": "2020-01-05T04:04:00Z",
+        "name": "Tai lieu chung 04",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 2791111578,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 6
+        },
+        "id": "01AILDHJMENMDNJDFBNIOD",
+        "lastModifiedDateTime": "2020-01-06T05:05:00Z",
+        "name": "uong-dan-dai-05",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 0,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 3
+        },
+        "id": "01IOHAKANIBMBOHADAMJMP",
+        "lastModifiedDateTime": "2020-01-07T06:06:00Z",
+        "name": "Ampersand&Co-06",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 39173934,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 0
+        },
+        "id": "01FKCHCICFCHIPEGEAPPAF",
+        "lastModifiedDateTime": "2020-01-08T07:07:00Z",
+        "name": "Echo Foxtrot Golf 07",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 0,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 1
+        },
+        "id": "01HJCNPKJAIDEANPPFOGEB",
+        "lastModifiedDateTime": "2020-01-09T08:08:00Z",
+        "name": "Fifty-Percent-50%-08",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 44425,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 3
+        },
+        "id": "01ANJGEAGAHLPBCGIPFGDA",
+        "lastModifiedDateTime": "2020-01-10T09:09:00Z",
+        "name": "Semi;colon-09",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 361534,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 0
+        },
+        "id": "01HPMOMIMBGAAOBKJABDKJ",
+        "lastModifiedDateTime": "2020-01-11T10:10:00Z",
+        "name": "Brackets-[2]-10",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 0,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 1
+        },
+        "id": "01JKMJBMELEMLDMPDEIJFH",
+        "lastModifiedDateTime": "2020-01-12T11:11:00Z",
+        "name": "Fifty-Percent-50%-11",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 1816899,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 1
+        },
+        "id": "01BAFENMLDKHMCDAAPDOKK",
+        "lastModifiedDateTime": "2020-01-13T12:12:00Z",
+        "name": "Estimate%s Two 12",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 52165819,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 0
+        },
+        "id": "01MMGBBDKBEJLCMGKIEGHO",
+        "lastModifiedDateTime": "2020-01-14T13:13:00Z",
+        "name": "Round-(2019)-13",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 0,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 8
+        },
+        "id": "01FCOFLGAGEAMDJFBGJCBB",
+        "lastModifiedDateTime": "2020-01-15T14:14:00Z",
+        "name": "Echo Foxtrot Golf 14",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 23505419,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 1
+        },
+        "id": "01LDICMHKEBICLCKMBDGPL",
+        "lastModifiedDateTime": "2020-01-16T15:15:00Z",
+        "name": "Tai-lieu-chung-15",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 0,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 6
+        },
+        "id": "01BNPDJGHAKAJEOPMCJGIB",
+        "lastModifiedDateTime": "2020-01-17T16:16:00Z",
+        "name": "An-so-cuoi-16",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 981822,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 1
+        },
+        "id": "01KKOHCDCJMEKEMKDOLCHD",
+        "lastModifiedDateTime": "2020-01-18T17:17:00Z",
+        "name": "Alpha Two 17",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 1751,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 2
+        },
+        "id": "01DBGCELDPLGBBGJCNCHHC",
+        "lastModifiedDateTime": "2020-01-19T18:18:00Z",
+        "name": "Bravo Charlie 18",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 25054778,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 1
+        },
+        "id": "01JABGBLDPBHHJJEFMCDGN",
+        "lastModifiedDateTime": "2020-01-20T19:19:00Z",
+        "name": "Trailing dot. 19",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 0,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 2
+        },
+        "id": "01OMCAALLNFBBOOHBFOJDL",
+        "lastModifiedDateTime": "2020-01-21T20:20:00Z",
+        "name": "Alpha-20",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 3728,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 1
+        },
+        "id": "01KEJKCCIBEFFBCKILNCIM",
+        "lastModifiedDateTime": "2020-01-22T21:21:00Z",
+        "name": "Fifty-Percent-50%-21",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 453326,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 3
+        },
+        "id": "01AHHPPJFGAKABGCDIDMGF",
+        "lastModifiedDateTime": "2020-01-23T22:22:00Z",
+        "name": "An-so-cuoi-22",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 375287050,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 1
+        },
+        "id": "01ALDGFBGMENCCFLFBCAPK",
+        "lastModifiedDateTime": "2020-01-24T23:23:00Z",
+        "name": "Estimate%s Two 23",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 15802918,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 0
+        },
+        "id": "01DEHEGECEKOIBHBCAKEMA",
+        "lastModifiedDateTime": "2020-01-25T00:24:00Z",
+        "name": "Round (2019) 24",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 0,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 0
+        },
+        "id": "01ENHIDNGBFJCPCFECLENA",
+        "lastModifiedDateTime": "2020-01-26T01:25:00Z",
+        "name": "uong dan dai 25",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 0,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 101
+        },
+        "id": "01PPPFJDLMFCJGFIKCEAEJ",
+        "lastModifiedDateTime": "2020-01-27T02:26:00Z",
+        "name": "Question?Mark Two 26",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 168051257,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 26
+        },
+        "id": "01JKICAIAFCNPHCMJLMIOE",
+        "lastModifiedDateTime": "2020-01-28T03:27:00Z",
+        "name": "Ryan's Files 27",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 365769863,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 0
+        },
+        "id": "01IPKFFJOGMNJAIOFNABBE",
+        "lastModifiedDateTime": "2020-01-01T04:28:00Z",
+        "name": "Bravo Charlie 28",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 0,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 1
+        },
+        "id": "01ABKMDLGJNDGPPDCKDJOO",
+        "lastModifiedDateTime": "2020-01-02T05:29:00Z",
+        "name": "Estimate%s Two 29",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 4210,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 0
+        },
+        "id": "01HKCDFHLMBBLMHBMOMKAP",
+        "lastModifiedDateTime": "2020-01-03T06:30:00Z",
+        "name": "Brackets [2] 30",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 0,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 5
+        },
+        "id": "01ALCCLKFKGKDLJEFFEAMD",
+        "lastModifiedDateTime": "2020-01-04T07:31:00Z",
+        "name": "uong dan dai 31",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 8315801,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 0
+        },
+        "id": "01OGDCBMFOFOJDGNFDABIL",
+        "lastModifiedDateTime": "2020-01-05T08:32:00Z",
+        "name": "Tai lieu chung 32",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 0,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 2
+        },
+        "id": "01EBAAKADHAHHMKFDGBCPF",
+        "lastModifiedDateTime": "2020-01-06T09:33:00Z",
+        "name": "Plus+Sign Two 33",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 1418,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 1
+        },
+        "id": "01LLKJFFEEFCJFPBMKLEEA",
+        "lastModifiedDateTime": "2020-01-07T10:34:00Z",
+        "name": "Round-(2019)-34",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 0,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 9
+        },
+        "id": "01KPGDCFPEAPBCMIJNMJDG",
+        "lastModifiedDateTime": "2020-01-08T11:35:00Z",
+        "name": "An-so-cuoi-35",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 34106307,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 0
+        },
+        "id": "01NMNNFMJBHFHDKDCFDKOB",
+        "lastModifiedDateTime": "2020-01-09T12:36:00Z",
+        "name": "Estimate%s Two 36",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 0,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 5
+        },
+        "id": "01JGDOHCMDBCCGFHGHJHAD",
+        "lastModifiedDateTime": "2020-01-10T13:37:00Z",
+        "name": "Brackets [2] 37",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 65380096,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 4
+        },
+        "id": "01KGHNJKEGFHNEIPEGIBBC",
+        "lastModifiedDateTime": "2020-01-11T14:38:00Z",
+        "name": "Delta Two 38",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 37074710,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 3
+        },
+        "id": "01OFOLEOPCIPMIJCOBGNID",
+        "lastModifiedDateTime": "2020-01-12T15:39:00Z",
+        "name": "Semi;colon-39",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 0,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 1
+        },
+        "id": "01PLKDDKHFNGJOMHBNELNM",
+        "lastModifiedDateTime": "2020-01-13T16:40:00Z",
+        "name": "Trailing-dot.-40",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 29069,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 0
+        },
+        "id": "01MPJBJICFBLCOCDPINELH",
+        "lastModifiedDateTime": "2020-01-14T17:41:00Z",
+        "name": "Trailing dot. 41",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 0,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 0
+        },
+        "id": "01MPDPACLKCHPOFLOCCDOO",
+        "lastModifiedDateTime": "2020-01-15T18:42:00Z",
+        "name": "Semi;colon Two 42",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 0,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 3
+        },
+        "id": "01CPLNHMKPMLOJNGGIJJLE",
+        "lastModifiedDateTime": "2020-01-16T19:43:00Z",
+        "name": "Round (2019) 43",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 476122,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 1
+        },
+        "id": "01DIGDGDKAIHICFHMPADCA",
+        "lastModifiedDateTime": "2020-01-17T20:44:00Z",
+        "name": "Ẩn số cuối 44",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 0,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 6
+        },
+        "id": "01GOMJHFIJOMNJPDGALJGC",
+        "lastModifiedDateTime": "2020-01-18T21:45:00Z",
+        "name": "Anh nghi he 45",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 744964628,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 1
+        },
+        "id": "01CNAODOFJKCGENDHEPHGH",
+        "lastModifiedDateTime": "2020-01-19T22:46:00Z",
+        "name": "Anh-nghi-he-46",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 585138,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 3
+        },
+        "id": "01MBKNNOHABGCPFPDADIKA",
+        "lastModifiedDateTime": "2020-01-20T23:47:00Z",
+        "name": "Round-(2019)-47",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 0,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 1
+        },
+        "id": "01HLNDDJDHJFKACLLMIJAD",
+        "lastModifiedDateTime": "2020-01-21T00:48:00Z",
+        "name": "Semi;colon-48",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 0,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 0
+        },
+        "id": "01OACGKELENNEJMIHCFDOH",
+        "lastModifiedDateTime": "2020-01-22T01:49:00Z",
+        "name": "Ryan's-Files-49",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 0,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 3
+        },
+        "id": "01POJKHFBCOKBJEHBNFCDP",
+        "lastModifiedDateTime": "2020-01-23T02:50:00Z",
+        "name": "Delta Two 50",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 117827,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 3
+        },
+        "id": "01BEPICBDBICMDLNKFJIHA",
+        "lastModifiedDateTime": "2020-01-24T03:51:00Z",
+        "name": "Ampersand&Co-51",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 973375,
+        "thumbnails": []
+      },
+      {
+        "folder": {
+          "childCount": 28
+        },
+        "id": "01FCLEFCODMCPDJMONIKJL",
+        "lastModifiedDateTime": "2020-01-25T04:52:00Z",
+        "name": "Round (2019) 52",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 21454546,
+        "thumbnails": []
+      },
+      {
+        "@microsoft.graph.downloadUrl": "https://example.invalid/download/01GMJMAGEDGFEAJBMJEAPE",
+        "file": {
+          "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        },
+        "id": "01GMJMAGEDGFEAJBMJEAPE",
+        "lastModifiedDateTime": "2020-01-26T05:53:00Z",
+        "name": "Ryan's Files 53.xlsx",
+        "parentReference": {
+          "driveId": "b!HOBEIKDKNONDPJ",
+          "id": "01LNELODFEPIEEDHLDADAB"
+        },
+        "size": 9635,
+        "thumbnails": [
+          {
+            "large": {
+              "url": "https://example.invalid/thumb"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "status": 200
+}

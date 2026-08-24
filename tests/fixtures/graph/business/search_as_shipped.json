@@ -1,0 +1,9 @@
+{
+  "body": {
+    "error": {
+      "code": "notSupported",
+      "message": "Only createdDateTime,remoteItem.shared.sharedBy.group.id,remoteItem.shared.sharedBy.user.id,remoteItem/bundle/album is supported for filtering"
+    }
+  },
+  "status": 501
+}
