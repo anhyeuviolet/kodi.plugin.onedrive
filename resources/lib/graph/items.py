@@ -77,6 +77,63 @@ MEDIA_FACET_PRECEDENCE = ('video', 'audio', 'image')
 # substitution the shipped code performed already got right.
 REMOTE_FIRST_FACETS = ('folder', 'file', 'video', 'image', 'audio', 'package')
 
+# Which thumbnail size to ask for, most wanted first.
+#
+# THE GEOMETRY. Graph offers three documented sizes, measured on the longest
+# edge: small 96, medium 176, large 800. Estuary draws a Container.Content()
+# list row into a 60 x 55 box in the skin's 1080-line coordinate system. So at a
+# 1080 GUI, `small` over-samples that box by 1.6x; at a 2160 GUI it UNDER-samples
+# it, at 0.8x. `medium` is the smallest documented size that still over-samples a
+# 4K panel. `large`, which is what shipped, is roughly 178x the drawn pixel count
+# at 1080p -- fetched once per visible row, on every listing.
+#
+# THE ASSUMPTION, stated as one. That the television's GUI resolution is 2160 is
+# an assumption, not a measurement. If it is 1080, `small` is defensible and
+# `medium` is a threefold over-fetch. One `System.ScreenResolution` reading on
+# the device settles it, and the acceptance run is where to take it.
+#
+# THE SECOND ASSUMPTION, and the measurement that settles it. That 60 x 55 box is
+# the Container.Content() branch of Estuary's View_55_WideList.xml, which a
+# plugin listing falls into only when no content type has been set. Measured, not
+# believed: across this add-on's own code and the vendored package together, all
+# 46 Python modules under resources/lib/, there is no setContent call. If a later
+# phase adds one, a different item layout applies with different geometry, and
+# this constant is the thing that has to be revisited.
+#
+# Re-run that measurement as a check for a CALL, not for the bare name -- an AST
+# walk for a Call node whose callee is setContent. A plain `grep -rn setContent
+# resources/lib/` now matches this very comment, so it reports a hit on a tree
+# that makes no such call, and reading that hit as a real one would send the next
+# person hunting a caller that does not exist.
+#
+# THE FALLBACK CHAIN IS INDEPENDENT OF ALL OF THAT, and costs nothing. Graph
+# documents the thumbnails collection as nullable, one entry in the committed
+# fixture set carries an empty thumbnails list, and reading a single size key
+# unconditionally is what turns that into a blank row.
+#
+# KNOWN LIMITATION, not solved here: a wall or poster view wants `large`.
+# extract_item cannot know which view is active, because the item is built before
+# the skin chooses one.
+THUMBNAIL_PREFERENCE = ('medium', 'large', 'small')
+
+
+def pick_thumbnail_url(entry):
+    """The first thumbnail URL in preference order, or None.
+
+    None when the collection is absent, empty, or carries no usable URL at any
+    preferred size -- so the caller sets no thumbnail key rather than setting an
+    empty one, which renders as a blank image rather than as no image.
+    """
+    thumbnails = Utils.get_safe_value(entry, 'thumbnails')
+    if not isinstance(thumbnails, list) or not thumbnails:
+        return None
+    first_set = thumbnails[0]
+    for size in THUMBNAIL_PREFERENCE:
+        url = Utils.get_safe_value(Utils.get_safe_value(first_set, size, {}), 'url')
+        if url:
+            return url
+    return None
+
 
 def merge_remote_item(entry):
     """Flatten a shared entry's `remoteItem` into it, field by field.
@@ -243,10 +300,11 @@ def extract_item(entry, include_download_info=False):
             }
         break
 
-    thumbnails = Utils.get_safe_value(entry, 'thumbnails')
-    if isinstance(thumbnails, list) and thumbnails:
-        item['thumbnail'] = Utils.get_safe_value(
-            Utils.get_safe_value(thumbnails[0], 'large', {}), 'url', '')
+    # Only when a URL was actually found. Setting the key to '' would render as a
+    # blank image where no image at all renders as no image.
+    thumbnail_url = pick_thumbnail_url(entry)
+    if thumbnail_url:
+        item['thumbnail'] = thumbnail_url
 
     if include_download_info:
         item['download_info'] = {

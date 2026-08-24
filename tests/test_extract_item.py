@@ -49,7 +49,12 @@ import json
 
 import pytest
 
-from resources.lib.graph.items import extract_item, merge_remote_item
+from resources.lib.graph.items import (
+    THUMBNAIL_PREFERENCE,
+    extract_item,
+    merge_remote_item,
+    pick_thumbnail_url,
+)
 
 FIXTURES = 'tests/fixtures/graph'
 
@@ -326,3 +331,80 @@ def test_merge_does_not_mutate_its_input(shared_entry):
         'the entries come from a module-scoped fixture and from a response body '
         'the caller may read again; mutating one would make extraction depend on '
         'call order')
+
+
+# ---------------------------------------------------------------------------
+# The thumbnail choice (BROWSE-12)
+# ---------------------------------------------------------------------------
+#
+# The recorded entries carry all three sizes together, so the single-size rows
+# below are CONSTRUCTED. They prove the fallback chain, which exists independently
+# of which size is preferred: Graph documents the thumbnails collection as
+# nullable, and one entry in the committed fixture set carries an empty list.
+#
+# One note for a later reader, so nobody concludes the fixtures are wrong: Graph's
+# own list-thumbnails page carries a Remark saying that expanding the thumbnails
+# collection on a children listing does not work for OneDrive for Business and
+# SharePoint. The live capture on 2026-08-24 returned populated thumbnails on
+# exactly that call, and the committed fixtures carry them. The measurement wins.
+
+
+def test_all_three_sizes_present_yields_medium(business_folder):
+    mkv = business_folder['value'][0]
+    sizes = mkv['thumbnails'][0]
+    assert {'small', 'medium', 'large'} <= set(sizes), (
+        'this fixture is supposed to carry all three sizes')
+    assert extract_item(mkv)['thumbnail'] == sizes['medium']['url'], (
+        'large is roughly 178x the drawn pixel count of an Estuary list row at '
+        '1080p, fetched once per visible row; medium is the smallest documented '
+        'size that still over-samples a 4K panel')
+
+
+def test_only_large_yields_large():
+    """CONSTRUCTED - the fixtures carry all three sizes together."""
+    entry = {'id': 'x', 'name': 'n',
+             'thumbnails': [{'large': {'url': 'L'}}]}
+    assert extract_item(entry)['thumbnail'] == 'L'
+
+
+def test_only_small_yields_small():
+    """CONSTRUCTED, same reason."""
+    entry = {'id': 'x', 'name': 'n',
+             'thumbnails': [{'small': {'url': 'S'}}]}
+    assert extract_item(entry)['thumbnail'] == 'S'
+
+
+def test_an_empty_url_falls_through_to_the_next_preference():
+    """CONSTRUCTED. A present size with an unusable URL must not win."""
+    entry = {'id': 'x', 'name': 'n',
+             'thumbnails': [{'medium': {'url': ''}, 'large': {'url': 'L'}}]}
+    assert extract_item(entry)['thumbnail'] == 'L'
+
+
+def test_an_empty_thumbnails_list_yields_no_key(business_folder):
+    """READ from the capture - the .srt carries thumbnails: []."""
+    srt = business_folder['value'][1]
+    assert srt['thumbnails'] == []
+    item = extract_item(srt)
+    assert 'thumbnail' not in item, (
+        'reading a single size key unconditionally is what turns a nullable '
+        'collection into a blank row')
+
+
+def test_no_thumbnails_key_at_all_yields_no_key():
+    assert 'thumbnail' not in extract_item({'id': 'x', 'name': 'n'})
+
+
+def test_no_usable_url_at_any_size_yields_no_key():
+    entry = {'id': 'x', 'name': 'n', 'thumbnails': [{'medium': {'url': ''}}]}
+    assert 'thumbnail' not in extract_item(entry)
+
+
+def test_the_preference_order_is_recorded():
+    assert THUMBNAIL_PREFERENCE == ('medium', 'large', 'small')
+
+
+def test_pick_returns_none_rather_than_raising_on_a_reshaped_collection():
+    for thumbnails in (None, [], 'not-a-list', [{}], [{'medium': {}}]):
+        assert pick_thumbnail_url(
+            {'id': 'x', 'thumbnails': thumbnails}) is None
