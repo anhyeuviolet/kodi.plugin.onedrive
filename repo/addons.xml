@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addons>
-<addon id="plugin.onedrive.kn" name="OneDrive KN" version="1.0.0" provider-name="Kenny Nguyen">
+<addon id="plugin.onedrive.kn" name="OneDrive KN" version="1.0.1" provider-name="Kenny Nguyen">
 	<requires>
 		<import addon="xbmc.python" version="3.0.1" />
 	</requires>
@@ -38,6 +38,15 @@ Play all your media from OneDrive including Videos, Music and Pictures.
 			<fanart>fanart.jpg</fanart>
 		</assets>
 		<news>
+v1.0.1:
+- Folder names containing a space, a # or a % now open. Before this, such a folder produced no request at all.
+- A video file is no longer also treated as an image, so it plays instead of opening in the picture viewer.
+- The shared Personal Vault now shows its name instead of a blank row, and opens in the drive that holds it.
+- Search works on a business drive. It previously failed outright, and afterwards ordinary browsing failed too until Kodi was restarted.
+- Very large folders no longer stop partway. Paging was rebuilt and is held to 1,500 pages.
+- Cancelling a slow listing now ends it cleanly instead of showing an error.
+- Thumbnails are fetched at a size suited to the row they are drawn in, rather than the largest available.
+
 v1.0.0:
 - First release under a new add-on id, maintained independently of the original.
 - Signing in now goes straight to Microsoft: a code appears on screen and you enter it on your phone. It no longer passes through a third-party sign-in server.
