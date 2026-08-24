@@ -37,6 +37,15 @@ the *character classes* -- a name with a space, one with a bracket, one with a
 non-ASCII letter -- and later plans read them. ROADMAP success criterion 2 names
 three exact strings by hand, and a criterion written as text is checked against
 text: `ENCODING_CASES` below carries those three rows verbatim.
+
+The OData half of the file, and what it does not claim. BROWSE-06 -- "a search
+query containing a single quote succeeds" -- is Phase 4's requirement and is not
+claimed here. What lands here is the rule ROADMAP criterion 2 names by hand,
+written once so that both places that build an OData string literal reach it,
+and Phase 4 inherits it rather than deriving it a third time. Quote-doubling and
+percent-encoding answer to different specifications -- OData v4.01 section 2.2
+and RFC 3986 -- and they are applied in that order, because the literal is a
+layer below the URL.
 """
 
 import pytest
@@ -218,3 +227,164 @@ def test_the_recorded_capture_shows_no_request_was_ever_sent(graph_envelope):
         'the capture records %r rather than the InvalidURL http.client raises '
         'on a request line carrying a disallowed character'
         % (envelope['transport_error'],))
+
+
+# ---------------------------------------------------------------------------
+# The OData string literal (ROADMAP criterion 2, second half)
+# ---------------------------------------------------------------------------
+
+# Each row is (text, expected literal). Doubling only; the percent-encoding is
+# the layer above and has its own table below.
+ODATA_CASES = [
+    ("O'Neil", "O''Neil"),
+    ('plain', 'plain'),
+    ('', ''),
+]
+
+
+@pytest.mark.parametrize('text,expected', ODATA_CASES)
+def test_a_single_quote_is_doubled_inside_an_odata_literal(text, expected):
+    doubled = paths.odata_literal(text)
+
+    assert doubled == expected, (
+        'the query %r becomes the literal %r, not %r. An undoubled quote closes '
+        "the literal early, and everything after it is read by the service as "
+        'expression rather than as text' % (text, doubled, expected))
+
+
+ODATA_QUOTED_CASES = [
+    # Both apostrophes survive the encoder untouched, because "'" is a sub-delim
+    # and is in the pchar safe set.
+    ("O'Neil", "O''Neil"),
+    # The space and the "#" are the URL layer's problem; the apostrophe is the
+    # literal layer's. One call answers both.
+    ("it's a #1 file", "it''s%20a%20%231%20file"),
+]
+
+
+@pytest.mark.parametrize('text,expected', ODATA_QUOTED_CASES)
+def test_a_query_is_doubled_and_then_percent_encoded(text, expected):
+    quoted = paths.odata_quoted(text)
+
+    assert quoted == expected, (
+        'the query %r goes into the URL as %r, not %r' % (text, quoted,
+                                                          expected))
+
+
+def test_the_rule_is_doubling_first_and_percent_encoding_second():
+    """The order is part of the rule, not an implementation detail.
+
+    Encoding first and doubling second would produce a URL Graph accepts too --
+    but only by a coincidence of *this* encoder, which leaves "'" alone because
+    it is a sub-delim. The moment the safe set stops including it, the reversed
+    order silently stops doubling anything at all: there is no literal quote
+    left to double, only a `%27` the service will decode back into one after the
+    doubling step has already run.
+
+    That is why the rule is about the literal and belongs below the URL layer.
+    The composition is asserted through the two exported names, and then the
+    reversal is shown failing against an encoder that does encode the quote --
+    which is the only way to make the difference visible at all.
+    """
+    from urllib.parse import quote
+
+    name = "O'Neil"
+
+    assert paths.odata_quoted(name) == paths.encode_segment(
+        paths.odata_literal(name)), (
+        'odata_quoted is no longer the encoder applied to the doubled literal, '
+        'so the two exported names and the one call sites use have drifted '
+        'apart')
+
+    assert quote(paths.odata_literal(name)) == 'O%27%27Neil', (
+        'doubling first survives an encoder that encodes the quote: the service '
+        'decodes %27%27 back into a doubled quote, which is still one literal '
+        "apostrophe")
+    assert paths.odata_literal(quote(name)) == 'O%27Neil', (
+        'the reversed order is expected to lose the doubling entirely against '
+        'such an encoder; if it no longer does, the argument for fixing the '
+        'order has to be re-made rather than assumed')
+
+
+# The output the shipped `get_subtitles` produced before this refactor, for a
+# name carrying an apostrophe. It already doubled by hand, so what changes is
+# only how many characters of the doubled literal survive as themselves: the
+# service decodes both spellings to the same OData literal, which is what the
+# assertion below compares.
+TODAYS_SUBTITLE_QUERY = 'O%27%27Neil'
+
+
+def test_the_subtitle_search_asks_the_service_for_the_same_literal(tmp_path):
+    """A refactor of `get_subtitles`, not a fix to it.
+
+    This call site already doubled by hand; the change is that it stops carrying
+    its own copy of the rule. The OData literal the service parses must be
+    identical to what it received before, and it is -- `%27%27` and `''` decode
+    to the same two characters. Comparing the decoded forms is what says that,
+    where comparing the raw strings would report a difference that does not
+    exist anywhere the query is actually read.
+    """
+    from urllib.parse import unquote
+
+    with kodi_stubs(tmp_path / 'profile'):
+        from resources.lib.provider.onedrive import OneDrive
+
+        requested = []
+
+        def record(path, **kwargs):
+            requested.append(path)
+            return {'value': []}
+
+        provider = OneDrive()
+        provider._driveid = 'synthetic-drive-id'
+        provider.get = record
+
+        provider.get_subtitles('synthetic-parent-id', "O'Neil.mkv")
+
+    assert len(requested) == 1, (
+        'get_subtitles made %d request(s), not 1: %r' % (len(requested),
+                                                        requested))
+    asked = requested[0]
+
+    assert "search(q='O''Neil')" in asked, (
+        'the subtitle search asks for %r, which does not carry the doubled '
+        'literal. An undoubled quote here means the search for a subtitle '
+        'beside a file whose name contains an apostrophe returns nothing, and '
+        'the video plays without subtitles for a reason nothing reports'
+        % (asked,))
+    assert unquote(asked).endswith(unquote(TODAYS_SUBTITLE_QUERY) + "')"), (
+        'the literal this call site sends has changed from %r. This was meant '
+        'to be a refactor: the doubling rule moved, the request did not'
+        % (TODAYS_SUBTITLE_QUERY,))
+
+
+def test_a_search_query_with_an_apostrophe_no_longer_closes_the_literal(tmp_path):
+    """The call site that never doubled at all.
+
+    `search` went straight to the percent-encoder, which emits a single `%27`;
+    the service decodes it back into a quote, and that quote ends the literal.
+    Everything the user typed after it is then read as expression. This is the
+    tampering T-02-02 names, and it is the half of the rule that is a fix rather
+    than a refactor.
+    """
+    with kodi_stubs(tmp_path / 'profile'):
+        from resources.lib.provider.onedrive import OneDrive
+
+        requested = []
+
+        def record(path, **kwargs):
+            requested.append(path)
+            return {'value': []}
+
+        provider = OneDrive()
+        provider._driveid = 'synthetic-drive-id'
+        provider.get = record
+
+        provider.search("O'Neil")
+
+    asked = requested[0]
+
+    assert "search(q='O''Neil')" in asked, (
+        'the search asks for %r. The quote the user typed is not doubled, so '
+        'the service reads the rest of what they typed as an expression rather '
+        'than as the text they were searching for' % (asked,))
