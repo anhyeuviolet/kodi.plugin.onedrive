@@ -36,6 +36,18 @@ package had grown a dependency on Kodi that nobody noticed:
                          makes a fifteen-minute poll loop interruptible within a
                          second.
   * `log(message)`    -- one line to the Kodi log.
+
+The module sits in `resources/lib/kodi/` because that is the directory CI-01
+names as the only place in this tree allowed to import a Kodi module at import
+time. What the enforcing gate reads is the *directory*, not this filename: a
+second adapter added beside this one inherits the permission without anybody
+editing an exemption list, and a copy of this file left one level up is a
+failure whatever it is called.
+
+`resources/lib/kodi/` is not the bottom of the stack. `Logger` and `KodiUtils`
+below are imported from the vendored tree, so the adapter layer depends on
+`resources/lib/vendor/`. Only `resources/lib/auth/` and `resources/lib/graph/`
+are leaves, and it is those two that the arrangement above exists to keep pure.
 """
 
 import os

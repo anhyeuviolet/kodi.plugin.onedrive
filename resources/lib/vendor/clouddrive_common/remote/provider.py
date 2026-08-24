@@ -21,9 +21,9 @@ import json
 import re
 import urllib.parse
 
-from resources.lib import auth_context
 from resources.lib.auth import device_code, refresh, store
 from resources.lib.auth.lock import RefreshLock
+from resources.lib.kodi import auth_context
 from resources.lib.vendor.clouddrive_common.exception import ExceptionUtils, \
     RequestException
 from resources.lib.vendor.clouddrive_common.remote.oauth2 import OAuth2

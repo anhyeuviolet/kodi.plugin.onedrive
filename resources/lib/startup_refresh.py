@@ -335,7 +335,7 @@ class StartupRefreshService(object):
     def start(self):
         # Imported here rather than at module scope so the behaviour above can
         # be driven without a stub Kodi library, exactly as the auth package is.
-        from resources.lib import auth_context
+        from resources.lib.kodi import auth_context
         from resources.lib.vendor.clouddrive_common.account import AccountManager
         from resources.lib.vendor.clouddrive_common.remote.provider import (
             Provider, resolve_client_id)

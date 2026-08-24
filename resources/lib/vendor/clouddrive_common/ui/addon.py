@@ -26,8 +26,8 @@ import time
 import urllib.parse
 from urllib.error import HTTPError, URLError
 
-from resources.lib import auth_context
 from resources.lib.auth import device_code, errors, store
+from resources.lib.kodi import auth_context
 from resources.lib.vendor.clouddrive_common.account import AccountManager, AccountNotFoundException, \
     DriveNotFoundException
 from resources.lib.vendor.clouddrive_common.exception import UIException, ExceptionUtils, RequestException
