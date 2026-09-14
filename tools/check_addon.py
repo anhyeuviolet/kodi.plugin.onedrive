@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
-"""Require a clean checker run; retry only completed reports with read timeouts."""
+"""Require a clean checker run; retry recognized network failures only."""
 
 import argparse
 from pathlib import Path
@@ -29,13 +29,30 @@ SUMMARY = re.compile(r'^WARN: We found no problems and (\d+) warnings, please ch
 READ_TIMEOUT = re.compile(
     r"^WARN: HTTPS?ConnectionPool\(host='[^']+', port=\d+\): "
     r'Read timed out\. \(read timeout=[\d.]+\)$')
+MISSING_REPOSITORY = "AttributeError: 'Repository' object has no attribute 'addons'"
+REPOSITORY_FRAME = re.compile(
+    r'^  File "[^"]*[/\\]kodi_addon_checker[/\\]addons[/\\]Repository\.py", '
+    r'line \d+, in __contains__$')
 
 
 def verdict(status, output):
-    """Return clean, retry, or fail. Unknown/incomplete reports always fail."""
+    """Return clean, retry, or fail; unknown crashes and addon findings fail."""
     lines = ANSI.sub('', output).splitlines()
     warnings = [line for line in lines if line.startswith('WARN:')]
-    if status != 0 or any(line.startswith(('ERROR:', 'PROBLEM:')) for line in lines):
+    if any(line.startswith(('ERROR:', 'PROBLEM:')) for line in lines):
+        return 'fail'
+    if status != 0:
+        # Checker 0.0.36's Repository.__init__ catches RequestException and
+        # returns before assigning self.addons. __contains__ then crashes when
+        # checking branch indexes. Retry only that exact upstream failure, with
+        # no addon warnings; other AttributeErrors remain immediate failures.
+        frames = [line for line in lines if line.startswith('  File "')]
+        if (status == 1 and not warnings and frames
+                and 'Traceback (most recent call last):' in lines
+                and REPOSITORY_FRAME.fullmatch(frames[-1])
+                and '    for addon in self.addons:' in lines
+                and lines[-1] == MISSING_REPOSITORY):
+            return 'retry'
         return 'fail'
     if not warnings:
         return 'clean' if CLEAN in lines else 'fail'
@@ -67,7 +84,7 @@ def check(branch, addon, *, run=None, sleep=None, log_dir=Path('.')):
             return 0
         if outcome == 'retry' and attempt < 3:
             delay = attempt * 10
-            print('Only network read timeouts reported; retrying in %ds.' % delay,
+            print('Recognized checker network failure; retrying in %ds.' % delay,
                   flush=True)
             sleep(delay)
             continue

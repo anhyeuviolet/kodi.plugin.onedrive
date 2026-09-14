@@ -119,7 +119,8 @@ jobs:
       #      thing users install is the archive.
       #
       # Warnings still fail, even when the checker exits zero. A completed
-      # report containing only network read timeouts is retried up to 3 times;
-      # success requires a fresh zero-problem, zero-warning report.
+      # report containing only network read timeouts, or the checker's known
+      # missing-repository-data crash, is retried up to 3 times. Success still
+      # requires a fresh zero-problem, zero-warning report.
       - name: kodi-addon-checker (${{ matrix.branch }})
         run: python tools/check_addon.py --branch ${{ matrix.branch }} extracted/plugin.onedrive.kn
