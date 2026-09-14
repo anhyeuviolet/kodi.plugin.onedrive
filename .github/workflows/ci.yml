@@ -118,53 +118,8 @@ jobs:
       #      tree. Those two differ by everything in EXCLUDED_TOP_LEVEL, and the
       #      thing users install is the archive.
       #
-      # The WARN grep is the point of this step. The tool exits 1 only when
-      # problem_count > 0; a warning falls off the end of its main() and exits 0,
-      # and there is no flag that makes warnings fail. So a fifth warning would
-      # be a green leg and a line nobody reads. Asserting it here is what makes
-      # the report clean rather than merely passing -- and a leg that is green
-      # over warnings teaches its reader that warnings do not matter, after which
-      # a real one is invisible.
-      #
-      # pipefail so the checker's own exit code survives the tee, and
-      # `|| status=$?` so this step's default `bash -e` does not abort at the
-      # pipeline before the WARN assertion below has run. Without that, a PROBLEM
-      # would end the step early and the warning report would never be printed --
-      # correct in its verdict, but silent about the rest of what the tool found.
-      #
-      # The ANSI strip is not cosmetic and it is not optional. This tool colours
-      # its output unconditionally -- it does not test for a tty -- so every line
-      # it writes arrives prefixed with an escape sequence and a warning reads as
-      # ESC[35mWARN: rather than WARN:. An anchored grep for '^WARN:' therefore
-      # matches nothing, on every run, and the assertion below would certify a
-      # clean report while the tool was printing warnings. That was measured
-      # here, not reasoned about: with a non-whitelisted file planted in the
-      # extracted tree, the tool printed two WARN lines and '^WARN:' counted
-      # zero. Stripping first is a no-op if a future version stops colouring, so
-      # this is correct either way.
+      # Warnings still fail, even when the checker exits zero. A completed
+      # report containing only network read timeouts is retried up to 3 times;
+      # success requires a fresh zero-problem, zero-warning report.
       - name: kodi-addon-checker (${{ matrix.branch }})
-        run: |
-          set -o pipefail
-          status=0
-          kodi-addon-checker --branch ${{ matrix.branch }} \
-            extracted/plugin.onedrive.kn 2>&1 | tee checker.log || status=$?
-          echo "checker exited ${status}"
-
-          sed 's/\x1b\[[0-9;]*m//g' checker.log > checker.plain
-
-          if grep -q '^WARN:' checker.plain; then
-            echo "::error::kodi-addon-checker reported warnings on branch ${{ matrix.branch }}. The tool exits 0 on warnings, so this step asserts their absence. Offending lines:"
-            grep '^WARN:' checker.plain
-            exit 1
-          fi
-
-          # The zero-warning summary is a positive assertion, not an inference
-          # from the absence of WARN lines: a run that produced no output at all
-          # would otherwise pass this step.
-          if ! grep -q 'We found no problems and no warnings' checker.plain; then
-            echo "::error::kodi-addon-checker did not print its zero-problem, zero-warning summary on branch ${{ matrix.branch }}. Either the run did not complete or the tool's summary wording changed; this step asserts the clean result rather than inferring it. Output was:"
-            cat checker.plain
-            exit 1
-          fi
-
-          exit ${status}
+        run: python tools/check_addon.py --branch ${{ matrix.branch }} extracted/plugin.onedrive.kn
