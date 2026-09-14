@@ -257,25 +257,21 @@ class OneDrive(Provider):
                                   keep=graph_items.is_file)
     
     def get_subtitles(self, parent, name, item_driveid=None, include_download_info=False):
+        # Sidecars belong to the directory, regardless of their filename.
+        # Search is indexed, recursive and paginated; it is not a sibling list.
+        if not parent:
+            return []
         item_driveid = Utils.default(item_driveid, self._driveid)
-        subtitles = []
-        # Reached through the same rule as `search` above. This call site
-        # already doubled by hand; what changes is that the rule now lives in
-        # one place instead of two, so the next fix to it cannot land on only
-        # one of them.
-        search_url = '/drives/'+item_driveid+'/items/' + parent + '/search(q=\''+graph_paths.odata_quoted(Utils.str(Utils.remove_extension(name)))+'\')'
-        files = self.get(search_url)
-        # Through the same defensive read as every other listing. This is the one
-        # call site where an error body is not hypothetical: it is the search
-        # endpoint, and the recorded 501 notSupported in the fixture set came
-        # back from exactly this endpoint carrying an `error` key and no entry
-        # list. Reading the key unconditionally turned a subtitle lookup that
-        # found nothing into a KeyError traceback during playback (BROWSE-07).
-        for f in graph_pager.entries_of(files):
-            subtitle = self._extract_item(f, include_download_info)
-            if subtitle['name_extension'].lower() in ('srt','idx','sub','sbv','ass','ssa','smi'):
-                subtitles.append(subtitle)
-        return subtitles
+        files = self.get('/drives/'+item_driveid+'/items/'+parent+'/children')
+        extensions = ('srt', 'idx', 'sub', 'sbv', 'ass', 'ssa', 'smi')
+
+        def is_subtitle(entry):
+            return (isinstance(entry.get('file'), dict)
+                    and 'folder' not in entry
+                    and Utils.get_extension(entry.get('name', '')).lower() in extensions)
+
+        return self.process_files(files, include_download_info=include_download_info,
+                                  keep=is_subtitle)
                 
     def get_item(self, item_driveid=None, item_id=None, path=None, find_subtitles=False, include_download_info=False):
         item_driveid = Utils.default(item_driveid, self._driveid)
@@ -294,7 +290,8 @@ class OneDrive(Provider):
         
         item = self._extract_item(f, include_download_info)
         if find_subtitles:
-            subtitles = self.get_subtitles(item['parent'], item['name'], item_driveid, include_download_info)
+            subtitle_driveid = Utils.default(item.get('drive_id'), item_driveid)
+            subtitles = self.get_subtitles(item['parent'], item['name'], subtitle_driveid, include_download_info)
             if subtitles:
                 item['subtitles'] = subtitles
         return item

@@ -284,14 +284,16 @@ class Source(BaseHandler):
         key = '%s%s-subtitles' % (driveid, path,)
         Logger.debug('Testing subtitles from cache: %s' % key)
         subtitles = self._items_cache.get(key)
-        if not subtitles:
+        # Old versions cached the video dictionary here. Replace those entries,
+        # but keep an empty list: no sidecars is also a valid cached result.
+        if not isinstance(subtitles, list):
             provider = self._get_provider()
             provider.configure(self._account_manager, driveid)
             self.is_path_possible(driveid, path)
             item_driveid = Utils.default(Utils.get_safe_value(item, 'drive_id'), driveid)
             subtitles = provider.get_subtitles(item['parent'], item['name'], item_driveid)
             Logger.debug('Saving subtitles in cache: %s' % key)
-            self._items_cache.set(key, item)
+            self._items_cache.set(key, subtitles)
         return subtitles
     
     def handle_resource_request(self, data):

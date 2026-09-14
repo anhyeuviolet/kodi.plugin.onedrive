@@ -306,56 +306,8 @@ def test_the_rule_is_doubling_first_and_percent_encoding_second():
         'order has to be re-made rather than assumed')
 
 
-# The output the shipped `get_subtitles` produced before this refactor, for a
-# name carrying an apostrophe. It already doubled by hand, so what changes is
-# only how many characters of the doubled literal survive as themselves: the
-# service decodes both spellings to the same OData literal, which is what the
-# assertion below compares.
-TODAYS_SUBTITLE_QUERY = 'O%27%27Neil'
-
-
-def test_the_subtitle_search_asks_the_service_for_the_same_literal(tmp_path):
-    """A refactor of `get_subtitles`, not a fix to it.
-
-    This call site already doubled by hand; the change is that it stops carrying
-    its own copy of the rule. The OData literal the service parses must be
-    identical to what it received before, and it is -- `%27%27` and `''` decode
-    to the same two characters. Comparing the decoded forms is what says that,
-    where comparing the raw strings would report a difference that does not
-    exist anywhere the query is actually read.
-    """
-    from urllib.parse import unquote
-
-    with kodi_stubs(tmp_path / 'profile'):
-        from resources.lib.provider.onedrive import OneDrive
-
-        requested = []
-
-        def record(path, **kwargs):
-            requested.append(path)
-            return {'value': []}
-
-        provider = OneDrive()
-        provider._driveid = 'synthetic-drive-id'
-        provider.get = record
-
-        provider.get_subtitles('synthetic-parent-id', "O'Neil.mkv")
-
-    assert len(requested) == 1, (
-        'get_subtitles made %d request(s), not 1: %r' % (len(requested),
-                                                        requested))
-    asked = requested[0]
-
-    assert "search(q='O''Neil')" in asked, (
-        'the subtitle search asks for %r, which does not carry the doubled '
-        'literal. An undoubled quote here means the search for a subtitle '
-        'beside a file whose name contains an apostrophe returns nothing, and '
-        'the video plays without subtitles for a reason nothing reports'
-        % (asked,))
-    assert unquote(asked).endswith(unquote(TODAYS_SUBTITLE_QUERY) + "')"), (
-        'the literal this call site sends has changed from %r. This was meant '
-        'to be a refactor: the doubling rule moved, the request did not'
-        % (TODAYS_SUBTITLE_QUERY,))
+# Subtitle discovery uses parent IDs, not a filename search literal.
+# Its sibling listing and Unicode cases are covered in test_subtitles.py.
 
 
 def test_a_search_query_with_an_apostrophe_no_longer_closes_the_literal(tmp_path):

@@ -371,3 +371,21 @@ a deliberately short profile (`tries=2`, `delay=5`, `backoff=1`) giving a worst 
 `2 × 30 + 5 = 65 seconds`. That is the number the refresh lock's `LIFETIME_SECONDS = 90` is set
 against, and it sits twenty-five seconds clear of it. Changing either without the other is how a
 lock comes to expire underneath the request still holding it.
+
+
+### Subtitle playback fixes (1.0.2)
+
+Local changes to `clouddrive_common`:
+
+- `service/source.py` caches the subtitle list instead of video metadata, accepts
+  empty lists as cache hits, and replaces dictionary entries left by older versions.
+- `service/player.py` starts HTTP-source subtitle lookup at `onAVStarted`. A
+  playback generation and URL check discard results after stop, next, or replay.
+- `ui/addon.py` passes raw subtitle names to the URL builder so names are encoded
+  once, including spaces, Unicode and literal percent signs.
+
+Provider-owned discovery in `resources/lib/provider/onedrive.py` now lists all
+children of the video's actual parent drive/folder and follows every page. It
+offers all supported subtitle files in that directory regardless of basename.
+Synthetic Graph/Kodi regression coverage lives in `tests/test_subtitles.py`;
+actual subtitle rendering still requires a Kodi playback check.

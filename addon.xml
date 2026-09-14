@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="plugin.onedrive.kn" name="OneDrive KN" version="1.0.1" provider-name="Kenny Nguyen">
+<addon id="plugin.onedrive.kn" name="OneDrive KN" version="1.0.2" provider-name="Kenny Nguyen">
 	<requires>
 		<import addon="xbmc.python" version="3.0.1" />
 	</requires>
@@ -37,6 +37,12 @@ Play all your media from OneDrive including Videos, Music and Pictures.
 			<fanart>fanart.jpg</fanart>
 		</assets>
 		<news>
+v1.0.2:
+- Load subtitle files from the video's folder, including different filenames and additional listing pages.
+- Use the correct drive when finding subtitles beside shared videos.
+- Fix subtitle caching on repeated HTTP-source playback and attach subtitles only after media is ready.
+- Preserve spaces, Unicode and percent signs in subtitle URLs.
+
 v1.0.1:
 - Folder names containing a space, a # or a % now open. Before this, such a folder produced no request at all.
 - A video file is no longer also treated as an image, so it plays instead of opening in the picture viewer.

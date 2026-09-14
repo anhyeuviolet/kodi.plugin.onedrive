@@ -63,6 +63,7 @@ class PlayerService(object):
 class KodiPlayer(KodiUtils.kodi_player_class()):
     def __init__(self, *args):
         self.iskrypton = KodiUtils.get_home_property('iskrypton') == 'true'
+        self._playback_generation = 0
 
     def set_source_url_matcher(self, source_url_matcher):
         self.source_url_matcher = source_url_matcher
@@ -71,12 +72,9 @@ class KodiPlayer(KodiUtils.kodi_player_class()):
         self.addonid = addonid
 
     def onPlayBackStarted(self):
+        self._playback_generation += 1
         if self.isPlaying():
             Logger.debug('playback started: %s' % self.getPlayingFile())
-            if self.isPlaying() and KodiUtils.get_addon_setting('set_subtitle') == 'true' and self.source_url_matcher.match(self.getPlayingFile()):
-                    t = threading.Thread(target=self.get_subtitles, name='%s-getsubtitles' % threading.current_thread().name)
-                    t.setDaemon(True)
-                    t.start()
     
             if self.isPlaying() and self.iskrypton and KodiUtils.get_addon_setting('save_resume_watched') == 'true':
                 dbid = KodiUtils.get_home_property('dbid')
@@ -86,6 +84,17 @@ class KodiPlayer(KodiUtils.kodi_player_class()):
                     t.setDaemon(True)
                     t.start()
 
+    def onAVStarted(self):
+        if not self.isPlaying() or KodiUtils.get_addon_setting('set_subtitle') != 'true':
+            return
+        playing_file = self.getPlayingFile()
+        if self.source_url_matcher.match(playing_file):
+            t = threading.Thread(target=self.get_subtitles,
+                                 args=(playing_file, self._playback_generation),
+                                 name='%s-getsubtitles' % threading.current_thread().name)
+            t.daemon = True
+            t.start()
+
     def onPlayBackEnded(self):
         self.player_stopped()
 
@@ -93,6 +102,7 @@ class KodiPlayer(KodiUtils.kodi_player_class()):
         self.player_stopped()
 
     def player_stopped(self):
+        self._playback_generation += 1
         if self.iskrypton:
             self.saveProgress()
         KodiPlayer.cleanup()
@@ -147,15 +157,20 @@ class KodiPlayer(KodiUtils.kodi_player_class()):
         del monitor
         Logger.debug('tracking progress finished')
 
-    def get_subtitles(self):
+    def get_subtitles(self, playing_file, generation):
         try:
             from resources.lib.vendor.clouddrive_common.remote.request import Request
             from resources.lib.vendor.clouddrive_common.service.download import DownloadServiceUtil
-            response = Request(self.getPlayingFile()+'?subtitles', None).request_json()
-            if response and 'driveid' in response and 'subtitles' in response:
+            response = Request(playing_file+'?subtitles', None).request_json()
+            if response and 'driveid' in response and isinstance(response.get('subtitles'), list):
                 driveid = response['driveid']
                 subtitles = response['subtitles']
                 for subtitle in subtitles:
+                    # A lookup can outlive a stop, next video, or replay of the
+                    # same URL. Never attach its result to a later playback.
+                    if (generation != self._playback_generation or not self.isPlaying()
+                            or self.getPlayingFile() != playing_file):
+                        return
                     url = DownloadServiceUtil.build_download_url(driveid, Utils.default(Utils.get_safe_value(subtitle, 'drive_id'), driveid), subtitle['id'], urllib.parse.quote(Utils.str(subtitle['name'])))
                     Logger.debug('subtitle: %s' % url)
                     self.setSubtitles(url)

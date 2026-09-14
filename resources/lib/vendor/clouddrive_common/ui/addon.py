@@ -922,7 +922,7 @@ class CloudDriveAddon:
         if find_subtitles and 'subtitles' in item:
             subtitles = []
             for subtitle in item['subtitles']:
-                subtitles.append(self._get_item_play_url(urllib.parse.quote(Utils.str(subtitle['name'])), driveid, Utils.default(Utils.get_safe_value(subtitle, 'drive_id'), driveid), subtitle['id'], True))
+                subtitles.append(self._get_item_play_url(subtitle['name'], driveid, Utils.default(Utils.get_safe_value(subtitle, 'drive_id'), driveid), subtitle['id'], True))
             list_item.setSubtitles(subtitles)
         if not self.cancel_operation():
             xbmcplugin.setResolvedUrl(self._addon_handle, succeeded, list_item)
