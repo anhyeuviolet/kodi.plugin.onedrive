@@ -21,7 +21,11 @@ import os
 import urllib.parse
 from urllib.error import HTTPError
 
+import datetime
+
 from resources.lib import quickaccess
+from resources.lib.graph import items as graph_items
+from resources.lib.vendor.clouddrive_common.cache.cache import Cache
 from resources.lib.vendor.clouddrive_common.exception import ExceptionUtils
 from resources.lib.vendor.clouddrive_common.export import ExportManager
 from resources.lib.vendor.clouddrive_common.ui.addon import CloudDriveAddon
@@ -55,6 +59,8 @@ class OneDriveAddon(CloudDriveAddon):
     # True when this invocation fills a widget rather than a window somebody
     # opened. Class-level so an instance built without __init__ reads False.
     _quiet = False
+    _large_thumbnails = False
+    _current_listing = None
     
     def __init__(self):
         super(OneDriveAddon, self).__init__()
@@ -63,6 +69,27 @@ class OneDriveAddon(CloudDriveAddon):
             # The count only feeds the progress bar, and it costs one request
             # to Graph before every listing.
             self._child_count_supported = False
+        self._large_thumbnails = self._setting_on('large_thumbnails', False)
+        self._provider.thumbnail_preference = (
+            graph_items.LARGE_THUMBNAIL_PREFERENCE if self._large_thumbnails
+            else graph_items.THUMBNAIL_PREFERENCE)
+        # The folder whose listing is being built, so each row can offer to
+        # refresh it. Set by _list_folder.
+        self._current_listing = None
+
+    def _add_sort_methods(self):
+        if Utils.get_safe_value(self._addon_params, 'action') == '_latest_videos':
+            # Newest first is the whole point of that listing, and Kodi opens
+            # a listing in the order of the first sort method it was given.
+            import xbmcplugin
+            for method in (xbmcplugin.SORT_METHOD_UNSORTED,
+                           xbmcplugin.SORT_METHOD_DATE,
+                           xbmcplugin.SORT_METHOD_LABEL,
+                           xbmcplugin.SORT_METHOD_SIZE):
+                xbmcplugin.addSortMethod(handle=self._addon_handle,
+                                         sortMethod=method)
+            return
+        super(OneDriveAddon, self)._add_sort_methods()
         
     def get_provider(self):
         return self._provider
@@ -179,6 +206,15 @@ class OneDriveAddon(CloudDriveAddon):
             if 'params' in folder:
                 params.update(folder['params'])
             add(folder['name'], params, folder.get('context_options'))
+        if content_type == 'video':
+            latest = {'action': '_latest_videos', 'content_type': content_type,
+                      'driveid': driveid}
+            if start:
+                latest['item_driveid'] = start['item_driveid']
+                latest['item_id'] = start['item_id']
+            else:
+                latest['path'] = '/'
+            add(self._addon_string(30092), latest)
         if content_type in ('video', 'audio'):
             add(self._common_addon.getLocalizedString(32000),
                 {'action': '_list_exports', 'content_type': content_type,
@@ -190,6 +226,116 @@ class OneDriveAddon(CloudDriveAddon):
             add(self._addon_string(30077),
                 {'action': '_list_accounts', 'content_type': content_type})
         return rows
+
+    # ------------------------------------------------------------------
+    # Folder listing cache
+    # ------------------------------------------------------------------
+
+    LISTING_CACHE = 'listing'
+
+    def _listing_cache(self):
+        try:
+            minutes = int(self._addon.getSetting('browse_cache_minutes') or 30)
+        except ValueError:
+            minutes = 30
+        if minutes <= 0:
+            return None
+        return Cache(self._addonid, self.LISTING_CACHE,
+                     datetime.timedelta(minutes=minutes))
+
+    def _listing_key(self, driveid, item_driveid, item_id, path):
+        return quickaccess.listing_cache_key(
+            driveid, item_driveid, item_id, path,
+            'L' if self._large_thumbnails else 'M')
+
+    def _folder_items(self, driveid, item_driveid=None, item_id=None,
+                      path=None, progress=True):
+        """A folder's items, from the listing cache when it holds them.
+
+        None when the listing was cancelled. The vendored listing asked OneDrive
+        on every visit; a folder opened again within the cache time is now
+        drawn without a network round trip.
+        """
+        provider = self.get_provider()
+        provider.configure(self._account_manager, driveid)
+        cache = self._listing_cache()
+        key = self._listing_key(driveid, item_driveid, item_id, path)
+        if cache and key:
+            items = cache.get(key)
+            if isinstance(items, list):
+                return items
+        if progress and self._child_count_supported:
+            item = provider.get_item(item_driveid, item_id, path)
+            if item:
+                self._load_target = Utils.get_safe_value(
+                    Utils.get_safe_value(item, 'folder', {}), 'child_count', 0)
+                self._progress_dialog_bg.create(
+                    self._addon_name,
+                    self._common_addon.getLocalizedString(32049)
+                    % Utils.str(self._load_target))
+        items = provider.get_folder_items(
+            item_driveid, item_id, path,
+            on_items_page_completed=(self.on_items_page_completed
+                                     if progress else None))
+        if self.cancel_operation():
+            return None
+        if cache and key:
+            try:
+                cache.set(key, items)
+            except (TypeError, ValueError) as ex:
+                # A listing that cannot be stored is still a listing.
+                Logger.debug('listing not cached: %s' % Utils.str(ex))
+        return items
+
+    def _list_folder(self, driveid, item_driveid=None, item_id=None, path=None):
+        items = self._folder_items(driveid, item_driveid, item_id, path)
+        if items is None:
+            return
+        self._current_listing = {
+            'driveid': driveid, 'item_driveid': item_driveid or '',
+            'item_id': item_id or '', 'path': path or ''}
+        self._process_items(items, driveid)
+
+    def _refresh_listing(self, driveid, item_driveid=None, item_id=None,
+                         path=None):
+        cache = self._listing_cache()
+        key = self._listing_key(driveid, item_driveid or None, item_id or None,
+                                path or None)
+        if cache and key:
+            cache.remove(key)
+        KodiUtils.executebuiltin('Container.Refresh')
+
+    def _clear_cache(self):
+        super(OneDriveAddon, self)._clear_cache()
+        Cache(self._addonid, self.LISTING_CACHE, 0).clear()
+
+    def _latest_videos(self, driveid, item_driveid=None, item_id=None,
+                       path=None):
+        """The newest videos in a folder and the folders below it."""
+        root = {'item_driveid': item_driveid, 'id': item_id, 'path': path}
+
+        def list_children(folder):
+            if folder is root:
+                items = self._folder_items(driveid, item_driveid, item_id,
+                                           path, progress=False)
+            else:
+                items = self._folder_items(
+                    driveid,
+                    Utils.default(Utils.get_safe_value(folder, 'drive_id'),
+                                  item_driveid or driveid),
+                    folder.get('id'), progress=False)
+            return items or []
+
+        extensions = self._video_file_extensions
+
+        def is_video(item):
+            return 'video' in item or item.get('name_extension') in extensions
+
+        self.get_provider().configure(self._account_manager, driveid)
+        videos = quickaccess.newest_videos(list_children, root, is_video)
+        if self.cancel_operation():
+            return
+        self._process_items(videos, driveid)
 
     def _process_items(self, items, driveid):
         if self._content_type == 'video':
@@ -207,6 +353,12 @@ class OneDriveAddon(CloudDriveAddon):
     def get_context_options(self, list_item, params, is_folder):
         options = super(OneDriveAddon, self).get_context_options(
             list_item, params, is_folder)
+        if self._current_listing:
+            refresh = {'action': '_refresh_listing',
+                       'content_type': self._content_type}
+            refresh.update(self._current_listing)
+            options.append((self._addon_string(30093),
+                            self._run_plugin(refresh)))
         if not is_folder or not params.get('item_id'):
             return options
         content_type = self._content_type
@@ -218,6 +370,11 @@ class OneDriveAddon(CloudDriveAddon):
              'driveid': driveid, 'item_driveid': item_driveid,
              'item_id': item_id, 'name': Utils.str(list_item.getLabel())})))
         if content_type == 'video':
+            latest = {'action': '_latest_videos', 'content_type': content_type,
+                      'driveid': driveid, 'item_driveid': item_driveid,
+                      'item_id': item_id}
+            options.append((self._addon_string(30092),
+                            'Container.Update(%s)' % self._url(latest)))
             for kind, string_id in (('movies', 30083), ('tvshows', 30084)):
                 options.append((self._addon_string(string_id), self._run_plugin(
                     {'action': '_add_to_library', 'content_type': content_type,
@@ -531,6 +688,8 @@ class OneDriveAddon(CloudDriveAddon):
         actions['_set_start_folder'] = self._set_start_folder
         actions['_clear_start_folder'] = self._clear_start_folder
         actions['_add_to_library'] = self._add_to_library
+        actions['_latest_videos'] = self._latest_videos
+        actions['_refresh_listing'] = self._refresh_listing
         return actions
 
     def _rename_action(self):

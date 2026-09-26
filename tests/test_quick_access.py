@@ -353,10 +353,12 @@ def test_folders_offer_start_folder_and_library_and_files_do_not(tmp_path):
                   'item_driveid': 'drive-1', 'item_id': 'F1'}
         folder = addon.get_context_options(xbmcgui.ListItem('Phim'),
                                            dict(params), True)
-        actions = [_params(cmd[len('RunPlugin('):-1]).get('action')
+        actions = [_params(cmd[cmd.index('(') + 1:-1]).get('action')
                    for _, cmd in folder]
-        assert actions == ['_set_start_folder', '_add_to_library',
-                           '_add_to_library']
+        assert actions == ['_set_start_folder', '_latest_videos',
+                           '_add_to_library', '_add_to_library']
+        # Opened in place, so Back returns to the folder list.
+        assert folder[1][1].startswith('Container.Update(')
         assert _params(folder[0][1][len('RunPlugin('):-1])['name'] == 'Phim'
         assert addon.get_context_options(xbmcgui.ListItem('a.mkv'),
                                          dict(params), False) == []
@@ -460,3 +462,213 @@ def test_a_widget_logs_a_failure_instead_of_raising_a_dialog(tmp_path):
         assert addon._dialog.shown == []
         assert isinstance(addon._dialog, _Dialog), 'the real dialog is restored'
         assert recorder.end_of_directory is False
+
+
+# ---------------------------------------------------------------------------
+# Latest videos
+# ---------------------------------------------------------------------------
+
+def _tree():
+    """root -> a.mkv, Show/ -> S1/ -> e1.mkv, e2.mkv ; Show/deep/ -> ..."""
+    return {
+        'root': [{'id': 'a', 'name': 'a.mkv', 'last_modified_date': '2026-01-01T00:00:00Z'},
+                 {'id': 'show', 'name': 'Show', 'folder': {}},
+                 {'id': 'n', 'name': 'notes.txt', 'last_modified_date': '2026-09-01T00:00:00Z'}],
+        'show': [{'id': 's1', 'name': 'S1', 'folder': {}},
+                 {'id': 'nodate', 'name': 'x.mkv'}],
+        's1': [{'id': 'e1', 'name': 'e1.mkv', 'last_modified_date': '2026-03-01T00:00:00Z'},
+               {'id': 'e2', 'name': 'e2.mkv', 'last_modified_date': '2026-05-01T10:00:00Z'},
+               {'id': 'deeper', 'name': 'Extras', 'folder': {}}],
+        'deeper': [{'id': 'too-deep', 'name': 'z.mkv', 'last_modified_date': '2027-01-01T00:00:00Z'}],
+    }
+
+
+def _walk(**kwargs):
+    tree = _tree()
+    listed = []
+
+    def children(folder):
+        key = 'root' if folder == 'ROOT' else folder['id']
+        listed.append(key)
+        return tree.get(key, [])
+    videos = quickaccess.newest_videos(
+        children, 'ROOT', lambda item: item['name'].endswith('.mkv'), **kwargs)
+    return [v['id'] for v in videos], listed
+
+
+def test_latest_videos_are_newest_first_and_skip_other_files():
+    ids, listed = _walk()
+    assert ids == ['e2', 'e1', 'a', 'nodate']
+    assert 'deeper' not in listed, 'two levels below the folder, no further'
+
+
+def test_latest_videos_respect_the_listing_cap_and_the_limit():
+    ids, listed = _walk(max_listings=2)
+    assert listed == ['root', 'show']
+    assert _walk(limit=1)[0] == ['e2']
+
+
+def test_the_latest_listing_opens_newest_first(tmp_path, monkeypatch):
+    with kodi_stubs(tmp_path / 'p'):
+        import xbmcplugin
+        added = []
+        monkeypatch.setattr(xbmcplugin, 'addSortMethod',
+                            lambda handle, sortMethod: added.append(sortMethod))
+        addon = _addon(tmp_path)
+        addon._addon_params = {'action': '_latest_videos'}
+        addon._add_sort_methods()
+        assert added[0] == xbmcplugin.SORT_METHOD_UNSORTED
+        added.clear()
+        addon._addon_params = {'action': '_list_folder'}
+        addon._add_sort_methods()
+        assert added[0] == xbmcplugin.SORT_METHOD_LABEL, 'other listings unchanged'
+
+
+def test_latest_videos_walks_folders_through_the_provider(tmp_path):
+    tree = _tree()
+
+    class Provider(object):
+        def configure(self, account_manager, driveid):
+            pass
+
+        def get_folder_items(self, item_driveid=None, item_id=None, path=None,
+                             on_items_page_completed=None):
+            items = tree['root' if path == '/' else item_id]
+            return [dict(i, name_extension=i['name'].rsplit('.', 1)[-1]) for i in items]
+
+    with kodi_stubs(tmp_path / 'p') as recorder:
+        addon = _addon(tmp_path, settings={'browse_cache_minutes': '0'})
+        addon.get_provider = lambda: Provider()
+        addon._video_file_extensions = ['mkv']
+        shown = []
+        addon._process_items = lambda items, driveid: shown.extend(
+            i['id'] for i in items)
+        addon._latest_videos('drive-1', path='/')
+        assert shown == ['e2', 'e1', 'a', 'nodate']
+
+
+def test_the_home_screen_offers_latest_videos_for_the_start_folder(tmp_path):
+    with kodi_stubs(tmp_path / 'p') as recorder:
+        addon = _addon(tmp_path)
+        quickaccess.set_start_folder(addon._profile_path, 'drive-1', 'video',
+                                     'drive-1', 'F1', 'Phim')
+        addon._list_drive('drive-1')
+        latest = [_params(url) for url, _, _ in recorder.directory_items
+                  if _params(url).get('action') == '_latest_videos']
+        assert latest and latest[0]['item_id'] == 'F1'
+
+
+# ---------------------------------------------------------------------------
+# Folder listing cache
+# ---------------------------------------------------------------------------
+
+def test_cache_keys_cover_folders_and_skip_changing_lists():
+    key = quickaccess.listing_cache_key
+    assert key('d', 'd', 'F1', None, 'M') is not None
+    assert key('d', None, None, '/', 'M') is not None
+    assert key('d', None, None, 'recent', 'M') is None
+    assert key('d', None, None, 'sharedWithMe', 'M') is None
+    assert key('d', 'd', 'F1', None, 'M') != key('d', 'd', 'F1', None, 'L')
+    assert key('d', 'd', 'F1', None, 'M') != key('d2', 'd', 'F1', None, 'M')
+
+
+class _MemoryCache(object):
+    def __init__(self):
+        self.data = {}
+
+    def get(self, key):
+        return self.data.get(key)
+
+    def set(self, key, value):
+        self.data[key] = value
+
+    def remove(self, key):
+        self.data.pop(key, None)
+
+
+class _CountingProvider(object):
+    def __init__(self):
+        self.calls = 0
+
+    def configure(self, account_manager, driveid):
+        pass
+
+    def get_folder_items(self, item_driveid=None, item_id=None, path=None,
+                         on_items_page_completed=None):
+        self.calls += 1
+        return [{'id': 'v%d' % self.calls, 'name': 'v.mkv'}]
+
+
+def _cached_addon(tmp_path):
+    from resources.lib.addon import OneDriveAddon
+    addon = _addon(tmp_path)
+    del addon._list_folder                    # the real one, this time
+    provider = _CountingProvider()
+    cache = _MemoryCache()
+    addon.get_provider = lambda: provider
+    addon._listing_cache = lambda: cache
+    addon._child_count_supported = False
+    addon._process_items = lambda items, driveid: addon.listed.append(
+        [i['id'] for i in items])
+    return addon, provider, cache
+
+
+def test_a_folder_opened_again_is_drawn_from_the_cache(tmp_path):
+    with kodi_stubs(tmp_path / 'p'):
+        addon, provider, cache = _cached_addon(tmp_path)
+        addon._list_folder('drive-1', 'drive-1', 'F1')
+        addon._list_folder('drive-1', 'drive-1', 'F1')
+        assert provider.calls == 1
+        assert addon.listed == [['v1'], ['v1']]
+
+
+def test_refresh_drops_the_cached_listing(tmp_path):
+    with kodi_stubs(tmp_path / 'p'):
+        addon, provider, cache = _cached_addon(tmp_path)
+        addon._list_folder('drive-1', 'drive-1', 'F1')
+        addon._refresh_listing('drive-1', 'drive-1', 'F1', '')
+        addon._list_folder('drive-1', 'drive-1', 'F1')
+        assert provider.calls == 2
+        assert addon.listed[-1] == ['v2']
+
+
+def test_a_cancelled_listing_is_not_cached(tmp_path):
+    with kodi_stubs(tmp_path / 'p'):
+        addon, provider, cache = _cached_addon(tmp_path)
+        addon.cancel_operation = lambda: True
+        addon._list_folder('drive-1', 'drive-1', 'F1')
+        assert cache.data == {} and addon.listed == []
+
+
+def test_every_row_offers_to_refresh_the_folder_it_is_in(tmp_path):
+    with kodi_stubs(tmp_path / 'p'):
+        import xbmcgui
+        addon = _addon(tmp_path)
+        addon._current_listing = {'driveid': 'drive-1', 'item_driveid': 'drive-1',
+                                  'item_id': 'PARENT', 'path': ''}
+        options = addon.get_context_options(xbmcgui.ListItem('a.mkv'),
+                                            {'item_id': 'CHILD'}, False)
+        refresh = _params(options[0][1][len('RunPlugin('):-1])
+        assert refresh['action'] == '_refresh_listing'
+        assert refresh['item_id'] == 'PARENT'
+
+
+def test_a_cache_time_of_zero_turns_the_cache_off(tmp_path):
+    with kodi_stubs(tmp_path / 'p'):
+        addon = _addon(tmp_path, settings={'browse_cache_minutes': '0'})
+        addon._addonid = 'plugin.onedrive.kn'
+        assert addon._listing_cache() is None
+
+
+# ---------------------------------------------------------------------------
+# Sharper thumbnails
+# ---------------------------------------------------------------------------
+
+def test_sharper_thumbnails_prefer_the_large_size():
+    from resources.lib.graph import items as graph_items
+    entry = {'id': 'x', 'name': 'a.mkv',
+             'thumbnails': [{'medium': {'url': 'M'}, 'large': {'url': 'L'}}]}
+    assert graph_items.extract_item(entry)['thumbnail'] == 'M'
+    assert graph_items.extract_item(
+        entry, thumbnail_preference=graph_items.LARGE_THUMBNAIL_PREFERENCE
+    )['thumbnail'] == 'L'

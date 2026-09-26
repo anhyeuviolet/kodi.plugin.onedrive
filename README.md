@@ -71,7 +71,14 @@ below is in Settings → Quick access and can be switched off to get the previou
   that row's context menu. If the folder is deleted on OneDrive, the add-on forgets it and
   opens on the root.
 - **Faster folders.** A folder is listed with one request to OneDrive instead of two; the
-  second one only counted the items for the progress bar.
+  second one only counted the items for the progress bar. A folder opened again within 30
+  minutes (configurable, 0 turns it off) is drawn from a local cache without asking OneDrive
+  at all. *Refresh this folder* on any row's context menu fetches it again at once.
+- **Latest videos.** A *Latest videos* row on the first screen, and the same entry on any
+  video folder's context menu, lists the 50 newest videos in that folder and two levels of
+  folders below it, newest first. It works well as a home-screen widget.
+- **Sharper thumbnails.** An option that fetches the large thumbnail size, for skins' poster
+  and wall views. Off by default because it downloads more for every row.
 - **Video views.** Video folders declare themselves as videos, so the skin offers its poster,
   wall and info views.
 
@@ -91,6 +98,14 @@ and TV shows on the home screen.
 
 The add-on never writes into a folder it did not create. If the library folder already holds a
 folder with the same name, it refuses: an export empties its destination folder before it writes.
+
+## Playback
+
+Kodi plays a file from the add-on's local service at `127.0.0.1`. That service fetches the
+bytes from OneDrive and passes them on. It used to redirect Kodi to OneDrive's own download
+link instead. That link expires after about an hour, and Kodi keeps using it, so a long video
+could stop partway through. Now the service asks for a new link when the old one is refused,
+and when the connection to OneDrive breaks it carries on from the byte where it stopped.
 
 ## Requirements
 

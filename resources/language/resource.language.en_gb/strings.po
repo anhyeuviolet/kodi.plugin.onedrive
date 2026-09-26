@@ -333,6 +333,22 @@ msgctxt "#30091"
 msgid "All files"
 msgstr ""
 
+msgctxt "#30092"
+msgid "Latest videos"
+msgstr ""
+
+msgctxt "#30093"
+msgid "Refresh this folder"
+msgstr ""
+
+msgctxt "#30094"
+msgid "Keep folder listings for (minutes, 0 = always ask OneDrive)"
+msgstr ""
+
+msgctxt "#30095"
+msgid "Sharper thumbnails (for poster and wall views)"
+msgstr ""
+
 # The ids below belong to the bundled Cloud Drive common module and are
 # left exactly as the module numbers them. Several are resolved at runtime
 # rather than from a literal -- one from an exception message, two from a

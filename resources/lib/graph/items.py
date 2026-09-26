@@ -125,8 +125,13 @@ REMOTE_FIRST_FACETS = ('folder', 'file', 'video', 'image', 'audio', 'package')
 # the skin chooses one.
 THUMBNAIL_PREFERENCE = ('medium', 'large', 'small')
 
+# What the "sharper thumbnails" setting asks for instead. `large` is about 800
+# pixels on its long side, which a poster or wall view actually draws; the
+# setting is off by default because it is the heavier fetch on every row.
+LARGE_THUMBNAIL_PREFERENCE = ('large', 'medium', 'small')
 
-def pick_thumbnail_url(entry):
+
+def pick_thumbnail_url(entry, preference=THUMBNAIL_PREFERENCE):
     """The first thumbnail URL in preference order, or None.
 
     None when the collection is absent, empty, or carries no usable URL at any
@@ -137,7 +142,7 @@ def pick_thumbnail_url(entry):
     if not isinstance(thumbnails, list) or not thumbnails:
         return None
     first_set = thumbnails[0]
-    for size in THUMBNAIL_PREFERENCE:
+    for size in preference:
         url = Utils.get_safe_value(Utils.get_safe_value(first_set, size, {}), 'url')
         if url:
             return url
@@ -251,7 +256,8 @@ def merge_remote_item(entry):
     return merged
 
 
-def extract_item(entry, include_download_info=False):
+def extract_item(entry, include_download_info=False,
+                 thumbnail_preference=THUMBNAIL_PREFERENCE):
     """One `driveItem` mapping into the item shape the browse layer reads.
 
     `entry` is a response entry exactly as Graph sent it. It is not required to
@@ -328,7 +334,7 @@ def extract_item(entry, include_download_info=False):
 
     # Only when a URL was actually found. Setting the key to '' would render as a
     # blank image where no image at all renders as no image.
-    thumbnail_url = pick_thumbnail_url(entry)
+    thumbnail_url = pick_thumbnail_url(entry, thumbnail_preference)
     if thumbnail_url:
         item['thumbnail'] = thumbnail_url
 

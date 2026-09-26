@@ -229,3 +229,68 @@ def plan_library_export(exports, library_root, kind, driveid, item_driveid,
         'run_immediately': True,
     }
     return export, None
+
+
+# ---------------------------------------------------------------------------
+# Latest videos
+# ---------------------------------------------------------------------------
+
+# How far below the chosen folder to look, and how many folder listings one
+# request may cost. A series folder keeps its episodes one or two levels down;
+# the listing cap is what keeps a widget on the home screen from walking a
+# whole drive every time it is drawn.
+LATEST_MAX_DEPTH = 2
+LATEST_MAX_LISTINGS = 25
+LATEST_LIMIT = 50
+
+
+def newest_videos(list_children, root, is_video, max_depth=LATEST_MAX_DEPTH,
+                  max_listings=LATEST_MAX_LISTINGS, limit=LATEST_LIMIT):
+    """The newest videos under `root`, newest first, at most `limit` of them.
+
+    list_children(folder) -> the items of one folder, `folder` being `root` or
+    an item that list returned. Folders are walked breadth first, so when the
+    listing cap is reached it is the deepest folders that are left out.
+
+    Items are ordered by `last_modified_date`, which Graph sends as an ISO 8601
+    UTC timestamp, so comparing the strings compares the times. An item with no
+    date sorts last rather than failing the listing.
+    """
+    videos = []
+    queue = [(root, 0)]
+    listings = 0
+    while queue and listings < max_listings:
+        folder, depth = queue.pop(0)
+        listings += 1
+        for item in list_children(folder) or []:
+            if not isinstance(item, dict):
+                continue
+            if 'folder' in item:
+                if depth < max_depth:
+                    queue.append((item, depth + 1))
+            elif is_video(item):
+                videos.append(item)
+    videos.sort(key=lambda item: str(item.get('last_modified_date') or ''),
+                reverse=True)
+    return videos[:limit]
+
+
+# ---------------------------------------------------------------------------
+# Folder listing cache
+# ---------------------------------------------------------------------------
+
+# Listings that change on their own and are cheap to wrong: never cached.
+UNCACHED_PATHS = ('recent', 'sharedWithMe')
+
+
+def listing_cache_key(driveid, item_driveid, item_id, path, variant):
+    """The key a folder listing is cached under, or None for one never cached.
+
+    `variant` carries anything that changes what an item looks like -- the
+    thumbnail size -- so changing the setting cannot serve rows built the old
+    way.
+    """
+    if not item_id and (not path or path in UNCACHED_PATHS):
+        return None
+    return json.dumps([driveid, item_driveid or '', item_id or '', path or '',
+                       variant], separators=(',', ':'))

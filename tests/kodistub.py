@@ -252,6 +252,9 @@ def _build_modules(profile_dir, addon_path, recorder):
     xbmcplugin.SORT_METHOD_NONE = 0
     xbmcplugin.SORT_METHOD_LABEL = 1
     xbmcplugin.SORT_METHOD_UNSORTED = 2
+    xbmcplugin.SORT_METHOD_DATE = 3
+    xbmcplugin.SORT_METHOD_SIZE = 4
+    xbmcplugin.SORT_METHOD_DURATION = 5
 
     xbmcvfs = types.ModuleType('xbmcvfs')
     xbmcvfs.translatePath = lambda path: path
