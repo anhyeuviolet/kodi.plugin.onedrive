@@ -29,6 +29,15 @@ Play all your media from OneDrive including Videos, Music and Pictures.
   - שימוש ב-OneDrive כמקור
   - תוכנית זו אינה מזוהה עם או בחסות מיקרוסופט.
 		</description>		
+		<summary lang="vi_VN">Microsoft OneDrive cho KODI</summary>
+		<description lang="vi_VN">
+Phát mọi nội dung trên OneDrive, gồm video, nhạc và ảnh.
+ - Không giới hạn số tài khoản cá nhân hoặc doanh nghiệp.
+ - Tìm kiếm trong ổ của bạn.
+ - Mở thẳng thư mục video, thư mục khởi động, danh sách video mới nhất.
+ - Thêm thư mục video vào thư viện Kodi (tệp .strm) chỉ với một bước.
+ - Chương trình này không liên kết với và không được Microsoft tài trợ.
+		</description>
 		<license>GPL-3.0-or-later</license>
 		<source>https://github.com/anhyeuviolet/kodi.plugin.onedrive</source>
 		<forum>https://github.com/anhyeuviolet/kodi.plugin.onedrive/issues</forum>
@@ -45,6 +54,7 @@ v1.1.0:
 - Folders open faster and are cached; Refresh this folder fetches one again. Video folders offer the skin's video views.
 - Latest videos: the newest videos in a folder and its subfolders, newest first.
 - Optional sharper thumbnails for poster and wall views.
+- Vietnamese translation.
 - Works as a home-screen favourite or widget; a widget never raises a dialog.
 
 v1.0.2:

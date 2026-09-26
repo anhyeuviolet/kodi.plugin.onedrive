@@ -746,6 +746,7 @@ DYNAMIC_SCHEDULE_IDS = {32081, 32082}           # persisted export schedule type
 PO_FILES = {
     'en_gb': 'resources/language/resource.language.en_gb/strings.po',
     'he_il': 'resources/language/resource.language.he_il/strings.po',
+    'vi_vn': 'resources/language/resource.language.vi_vn/strings.po',
 }
 
 
@@ -844,6 +845,10 @@ def test_string_ids_partitioned():
         '32012 belongs to the vendored module and must survive; the module '
         'block 32000-32088 is contiguous')
 
+    assert sets['vi_vn'] == EXPECTED_STRING_IDS, (
+        'vi_vn is a complete translation and must stay one.\n  missing: %r'
+        % (sorted(EXPECTED_STRING_IDS - sets['vi_vn']),))
+
     he_il = sets['he_il']
     assert he_il <= EXPECTED_STRING_IDS, (
         'he_il declares ids outside the partition: %r'
@@ -876,6 +881,35 @@ def test_string_ids_partitioned():
             'these %s ids are resolved at runtime and cannot be seen by a '
             'static scan, so their absence would surface only to a user: %r'
             % (label, missing))
+
+
+def test_translations_keep_every_placeholder():
+    """A translation that drops or reorders a %s raises when it is formatted.
+
+    The catalogue is formatted with the % operator, so a sentence with one
+    placeholder too few fails as TypeError on the television, and one with the
+    two placeholders swapped puts the path where the content type belongs.
+    [CR] and [B] are compared too: they are layout, not words.
+    """
+    token = re.compile(r'%s|\[CR\]|\[/?B\]')
+    pair = re.compile(r'msgctxt "#(\d+)"\r?\nmsgid "((?:[^"\\]|\\.)*)"\r?\n'
+                      r'msgstr "((?:[^"\\]|\\.)*)"')
+    checked = 0
+    broken = []
+    for language, rel in PO_FILES.items():
+        if language == 'en_gb':
+            continue
+        for match in pair.finditer(_read(rel)):
+            string_id, source, translated = match.groups()
+            if not translated:
+                continue
+            checked += 1
+            if token.findall(source) != token.findall(translated):
+                broken.append('%s #%s: %r -> %r' % (
+                    language, string_id, token.findall(source),
+                    token.findall(translated)))
+    assert checked > 100, 'read only %d translated strings' % checked
+    assert not broken, '\n'.join(broken)
 
 
 # ---------------------------------------------------------------------------
