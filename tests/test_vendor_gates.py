@@ -667,6 +667,26 @@ def test_addon_xml_identity():
             '<%s> is %r; it must point at this repository' % (field, value))
 
 
+# The checker's metadata schema caps <news> at 1500 characters
+# (nonEmptyStringCapped), and a longer changelog fails all three checker legs
+# with nothing more specific than "schema validation failed". Kodi shows the
+# text only as the changelog of the version being installed, so older entries
+# are dropped rather than the newest one shortened.
+NEWS_MAX_LENGTH = 1500
+
+
+def test_addon_xml_news_fits_the_schema():
+    metadata = _addon_xml().find("./extension[@point='xbmc.addon.metadata']")
+    news = metadata.findtext('news') or ''
+    assert news.strip(), 'the manifest has no <news> for this version'
+    assert len(news) <= NEWS_MAX_LENGTH, (
+        '<news> is %d characters; the checker schema allows %d. Drop the '
+        'oldest version entries.' % (len(news), NEWS_MAX_LENGTH))
+    version = _addon_xml().get('version')
+    assert news.lstrip().startswith('v%s:' % version), (
+        '<news> does not open with an entry for version %s' % version)
+
+
 def test_addon_xml_imports():
     imports = _addon_xml().findall('./requires/import')
     assert len(imports) == 1, (
