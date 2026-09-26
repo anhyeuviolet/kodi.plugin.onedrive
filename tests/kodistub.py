@@ -232,7 +232,11 @@ def _build_modules(profile_dir, addon_path, recorder):
     xbmcplugin = types.ModuleType('xbmcplugin')
 
     def addDirectoryItems(handle, items, totalItems=0):
-        recorder.directory_items = list(items)
+        # Accumulated, as Kodi does: a listing may be handed over in more than
+        # one call before endOfDirectory closes it.
+        if recorder.directory_items is None:
+            recorder.directory_items = []
+        recorder.directory_items.extend(items)
         return True
 
     def endOfDirectory(handle, succeeded=True, updateListing=False,

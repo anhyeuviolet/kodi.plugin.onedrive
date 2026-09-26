@@ -56,6 +56,42 @@ yet been signed in on the television; that is the next piece of work.
   served an index of the whole drive on a loopback port with no authorisation check of any kind,
   which on Android means every installed application could read it.
 
+## Quick access
+
+Getting from the add-on to a video takes as few steps as the setting screen allows. Everything
+below is in Settings → Quick access and can be switched off to get the previous behaviour back.
+
+- **The only account opens directly.** With one signed-in account the add-on skips the account
+  list. An *Accounts* row at the top keeps adding, re-signing and removing accounts one step
+  away. An account that needs signing in again always keeps its own row.
+- **The first screen is the drive's folders.** Recent, Shared with me, Exports and Search are
+  pinned above the folders instead of forming a menu of their own.
+- **Start folder.** On any folder, context menu → *Set as start folder*: the add-on then opens
+  there, with an *All files* row on top leading back to the root. *Reset start folder* is on
+  that row's context menu. If the folder is deleted on OneDrive, the add-on forgets it and
+  opens on the root.
+- **Faster folders.** A folder is listed with one request to OneDrive instead of two; the
+  second one only counted the items for the progress bar.
+- **Video views.** Video folders declare themselves as videos, so the skin offers its poster,
+  wall and info views.
+
+**On the home screen.** Kodi's own context menu → *Add to favourites* works on any folder in the
+add-on, and the favourite opens that folder in one step. Skins with configurable widgets can use a
+folder as a widget; there the add-on shows no progress bar and no error dialogs, and a failure only
+reaches the log.
+
+**In the library.** On a video folder, context menu → *Add to library as movies* or *Add to
+library as TV shows*. This is the existing export (Exports) with sensible defaults: `.strm` files
+are written into `library/movies` or `library/tvshows` inside the add-on's data folder (or the
+folder chosen in the settings), later changes on OneDrive are followed, and Kodi's library is
+updated after each change. The first time, the add-on shows the folder's path. Add that folder once
+as a video source (Videos → Files → Add videos...) and set its content to Movies or TV shows. From
+then on the library scraper supplies posters and descriptions, and the videos show up under Movies
+and TV shows on the home screen.
+
+The add-on never writes into a folder it did not create. If the library folder already holds a
+folder with the same name, it refuses: an export empties its destination folder before it writes.
+
 ## Requirements
 
 Kodi 20 (Nexus), 21 (Omega) or 22 (Piers). Kodi 19 and earlier are not supported and the add-on

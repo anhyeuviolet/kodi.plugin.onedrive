@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="plugin.onedrive.kn" name="OneDrive KN" version="1.0.2" provider-name="Kenny Nguyen">
+<addon id="plugin.onedrive.kn" name="OneDrive KN" version="1.1.0" provider-name="Kenny Nguyen">
 	<requires>
 		<import addon="xbmc.python" version="3.0.1" />
 	</requires>
@@ -37,6 +37,13 @@ Play all your media from OneDrive including Videos, Music and Pictures.
 			<fanart>fanart.jpg</fanart>
 		</assets>
 		<news>
+v1.1.0:
+- With one account, the add-on opens straight on the drive's folders; Recent, Shared, Exports, Search and Accounts are pinned on top.
+- Set any folder as the start folder from its context menu.
+- Add a video folder to the Kodi library as movies or TV shows in one step.
+- Folders open faster, and video folders offer the skin's video views.
+- Works as a home-screen favourite or widget; a widget never raises a dialog.
+
 v1.0.2:
 - Load subtitle files from the video's folder, including different filenames and additional listing pages.
 - Use the correct drive when finding subtitles beside shared videos.
