@@ -38,6 +38,7 @@ Play all your media from OneDrive including Videos, Music and Pictures.
 		</assets>
 		<news>
 v1.1.0:
+- Playback no longer stops 20 to 60 minutes in: the add-on relays the video and renews OneDrive's expiring download link, resuming from the same byte.
 - With one account, the add-on opens straight on the drive's folders; Recent, Shared, Exports, Search and Accounts are pinned on top.
 - Set any folder as the start folder from its context menu.
 - Add a video folder to the Kodi library as movies or TV shows in one step.
