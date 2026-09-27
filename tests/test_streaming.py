@@ -272,3 +272,112 @@ def test_download_urls_are_reused_until_they_age(monkeypatch):
         assert urls.get('k', fetch, fresh=True) == 'u2'
         now['t'] += stream_service.URL_REUSE_SECONDS + 1
         assert urls.get('k', fetch) == 'u3'
+
+
+# ---------------------------------------------------------------------------
+# The first video after Kodi starts
+# ---------------------------------------------------------------------------
+
+def test_many_isolated_drops_are_all_resumed():
+    """The budget is failures in a row; delivered bytes reset it."""
+    onedrive = _OneDrive(drop_at=[1000] * 12)
+    _, body, _ = _play(onedrive, max_reopens=3)
+    assert body == FILE
+    assert len(onedrive.requests) == 13
+
+
+def test_a_reopen_that_fails_is_tried_again():
+    onedrive = _OneDrive(drop_at=[2000])
+    original_open = onedrive.open
+    refused = {'n': 0}
+
+    def cold(url, method, rng):
+        if rng == 'bytes=2000-' and refused['n'] < 2:
+            refused['n'] += 1
+            raise ConnectionRefusedError('network not back yet')
+        return original_open(url, method, rng)
+    onedrive.open = cold
+    waits = []
+
+    _, body, _ = _play(onedrive, wait=waits.append)
+    assert body == FILE
+    assert waits == [streaming.backoff(0), streaming.backoff(1),
+                     streaming.backoff(2)]
+
+
+def test_a_cold_first_open_is_tried_again():
+    """Name lookup and TLS to a CDN host nobody has talked to yet."""
+    onedrive = _OneDrive()
+    original_open = onedrive.open
+    failures = [TimeoutError('timed out'),
+                HTTPError('u', 503, 'busy', {}, io.BytesIO())]
+
+    def cold(url, method, rng):
+        if failures:
+            raise failures.pop(0)
+        return original_open(url, method, rng)
+    onedrive.open = cold
+    lines = []
+
+    sent, body, _ = _play(onedrive, log=lines.append)
+    assert sent['status'] == 200 and body == FILE
+    assert len(lines) == 2
+    assert not any('https://' in line for line in lines), (
+        'a download URL is a credential and never reaches the log')
+
+
+def test_a_first_open_that_keeps_failing_reaches_the_caller():
+    onedrive = _OneDrive()
+
+    def down(url, method, rng):
+        raise ConnectionRefusedError('no route')
+    onedrive.open = down
+    with pytest.raises(ConnectionRefusedError):
+        _play(onedrive, open_attempts=3)
+
+
+def test_starting_requests_share_one_lookup():
+    """Kodi opens several requests at once when a video starts."""
+    import threading
+    import time as real_time
+    from kodistub import kodi_stubs
+    with kodi_stubs('/nonexistent-profile'):
+        from resources.lib import stream_service
+        urls = stream_service.DownloadUrls()
+        fetched = []
+
+        def fetch():
+            fetched.append(1)
+            real_time.sleep(0.05)
+            return 'u%d' % len(fetched)
+
+        got = []
+        threads = [threading.Thread(target=lambda: got.append(urls.get('k', fetch)))
+                   for _ in range(4)]
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join()
+        assert fetched == [1] and got == ['u1'] * 4
+
+
+def test_a_url_replaced_by_another_request_is_not_replaced_again():
+    from kodistub import kodi_stubs
+    with kodi_stubs('/nonexistent-profile'):
+        from resources.lib import stream_service
+        now = {'t': 0.0}
+        urls = stream_service.DownloadUrls(clock=lambda: now['t'])
+        fetched = []
+
+        def fetch():
+            fetched.append(1)
+            return 'u%d' % len(fetched)
+        urls.get('k', fetch)
+        # A request that found u1 expired asks for a fresh one at t=5; by the
+        # time it runs, another request already replaced it at t=6.
+        now['t'] = 6.0
+        urls.get('k', fetch, fresh=True)
+        clock = iter([5.0, 7.0])
+        urls._clock = lambda: next(clock)
+        assert urls.get('k', fetch, fresh=True) == 'u2'
+        assert len(fetched) == 2

@@ -304,6 +304,34 @@ msgctxt "#30095"
 msgid "Sharper thumbnails (for poster and wall views)"
 msgstr "Ảnh thu nhỏ sắc nét hơn (cho giao diện Poster và Wall)"
 
+msgctxt "#30096"
+msgid "Set up the library folders as Kodi video sources automatically"
+msgstr "Tự động thiết lập thư mục thư viện thành nguồn video của Kodi"
+
+msgctxt "#30097"
+msgid "Added to the library. The videos appear in Videos > %s a few minutes after the first export. The folder itself shows under Videos > Files after Kodi restarts."
+msgstr "Đã thêm vào thư viện. Video sẽ xuất hiện trong Video > %s vài phút sau lần xuất đầu tiên. Bản thân thư mục sẽ hiện trong Video > Tệp sau khi khởi động lại Kodi."
+
+msgctxt "#30098"
+msgid "One TV show (seasons or episodes inside)"
+msgstr "Một bộ phim (bên trong là các mùa hoặc các tập)"
+
+msgctxt "#30099"
+msgid "A folder of TV shows (one show per subfolder)"
+msgstr "Thư mục chứa nhiều bộ phim (mỗi thư mục con là một bộ)"
+
+msgctxt "#30100"
+msgid "What does %s hold?"
+msgstr "%s chứa gì?"
+
+msgctxt "#30101"
+msgid "OneDrive movies"
+msgstr "Phim lẻ OneDrive"
+
+msgctxt "#30102"
+msgid "OneDrive TV shows"
+msgstr "Phim bộ OneDrive"
+
 msgctxt "#32000"
 msgid "Exports"
 msgstr "Xuất"

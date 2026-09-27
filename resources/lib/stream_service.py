@@ -45,32 +45,46 @@ from urllib.error import HTTPError
 URL_REUSE_SECONDS = 15 * 60
 
 # Per connection to OneDrive, for connect and for each read.
-UPSTREAM_TIMEOUT_SECONDS = 30
+UPSTREAM_TIMEOUT_SECONDS = 20
 
 
 class DownloadUrls(object):
     """Download URLs shared by the requests of one Kodi session.
 
     Kodi opens a new request for every seek, so reusing the URL spares a Graph
-    round trip each time.
+    round trip each time. When a video starts, Kodi opens several requests for
+    it at once (the headers, the index at the end of the file, the start of
+    the body); one lock per file makes them share one Graph call instead of
+    racing each other through a token check and an item lookup each, which on
+    the first video after Kodi starts is the slowest path there is.
     """
 
     def __init__(self, clock=time.monotonic):
         self._clock = clock
         self._lock = threading.Lock()
         self._urls = {}
+        self._key_locks = {}
 
     def get(self, key, fetch, fresh=False):
-        now = self._clock()
+        asked_at = self._clock()
         with self._lock:
-            if not fresh and key in self._urls:
-                url, fetched_at = self._urls[key]
-                if now - fetched_at < URL_REUSE_SECONDS:
+            key_lock = self._key_locks.setdefault(key, threading.Lock())
+        with key_lock:
+            with self._lock:
+                cached = self._urls.get(key)
+            if cached:
+                url, fetched_at = cached
+                if fresh:
+                    # Somebody else replaced it while this request waited
+                    # for the lock; that one is as fresh as it gets.
+                    if fetched_at > asked_at:
+                        return url
+                elif self._clock() - fetched_at < URL_REUSE_SECONDS:
                     return url
-        url = fetch()
-        with self._lock:
-            self._urls[key] = (url, self._clock())
-        return url
+            url = fetch()
+            with self._lock:
+                self._urls[key] = (url, self._clock())
+            return url
 
 
 _URLS = DownloadUrls()
@@ -113,17 +127,37 @@ class StreamingDownload(Download):
             self.send_header('Connection', 'close')
             self.end_headers()
 
+        range_header = self.headers.get('Range')
+        label = '%s %s range=%s' % (self.command, item_id, range_header or '-')
+
+        def log(message):
+            Logger.notice('stream %s: %s' % (label, message))
+
+        delivered = [0]
+
+        def write(data):
+            self.wfile.write(data)
+            delivered[0] += len(data)
+
         try:
-            streaming.relay(resolve, open_upstream, self.command,
-                            self.headers.get('Range'), send_head,
-                            self.wfile.write)
-        except (BrokenPipeError, ConnectionResetError):
-            # Kodi closed its end, which is what a seek or a stop looks like.
-            pass
+            streaming.relay(resolve, open_upstream, self.command, range_header,
+                            send_head, write, wait=time.sleep, log=log)
+        except (BrokenPipeError, ConnectionResetError) as e:
+            if not self.response_code_sent:
+                # Nothing reached Kodi: this was OneDrive, not a seek.
+                Logger.error('stream %s: %s' % (label, Utils.str(e)))
+                self.write_response(502)
+                return
+            # Kodi closed its end, which is what a seek or a stop looks like --
+            # unless OneDrive was the one that broke and could not be resumed,
+            # which relay() has already logged.
+            Logger.debug('stream %s: ended after %d bytes (%s)'
+                         % (label, delivered[0], type(e).__name__))
         except Exception as e:
             if self.response_code_sent:
                 # Mid-body; the only thing left is to end the connection.
-                Logger.error('relay ended: %s' % Utils.str(e))
+                Logger.error('stream %s: relay ended after %d bytes: %s'
+                             % (label, delivered[0], Utils.str(e)))
                 return
             status = 500
             httpex = ExceptionUtils.extract_exception(e, HTTPError)

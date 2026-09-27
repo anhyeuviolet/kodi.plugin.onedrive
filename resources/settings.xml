@@ -156,6 +156,11 @@
 						<heading>30076</heading>
 					</control>
 				</setting>
+				<setting id="library_auto_source" type="boolean" label="30096">
+					<level>1</level>
+					<default>true</default>
+					<control type="toggle"/>
+				</setting>
 			</group>
 		</category>
 		<category id="advanced" label="30032">

@@ -40,6 +40,12 @@ START_FOLDERS_FILE = 'start_folders.json'
 
 LIBRARY_KINDS = ('movies', 'tvshows')
 
+# Where a folder of several TV shows goes. Kodi reads each folder directly
+# inside a TV source as one show, so such a folder is a source of its own
+# (library/tvcollections/<name>/) rather than one more show under tvshows/.
+TV_COLLECTIONS = 'tvcollections'
+DESTINATION_KINDS = LIBRARY_KINDS + (TV_COLLECTIONS,)
+
 # Why a plan was refused. The add-on maps each one to a sentence; the plan never
 # carries words of its own.
 ALREADY_EXPORTED = 'already_exported'
@@ -161,7 +167,7 @@ def library_destination(library_root, kind):
     scraper to a source, not to a file: each folder is added once as a source
     with its own content type.
     """
-    if kind not in LIBRARY_KINDS:
+    if kind not in DESTINATION_KINDS:
         raise ValueError('unknown library kind: %r' % (kind,))
     return os.path.join(library_root, kind)
 
@@ -193,7 +199,7 @@ def plan_library_export(exports, library_root, kind, driveid, item_driveid,
     `exists(path)` answers whether a path exists on disk; it is injected so this
     stays free of Kodi's file functions.
     """
-    if kind not in LIBRARY_KINDS:
+    if kind not in DESTINATION_KINDS:
         return None, UNKNOWN_KIND
     if not valid_folder_name(name):
         return None, INVALID_NAME

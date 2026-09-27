@@ -23,7 +23,7 @@ from urllib.error import HTTPError
 
 import datetime
 
-from resources.lib import quickaccess
+from resources.lib import library_source, quickaccess
 from resources.lib.graph import items as graph_items
 from resources.lib.vendor.clouddrive_common.cache.cache import Cache
 from resources.lib.vendor.clouddrive_common.exception import ExceptionUtils
@@ -412,6 +412,10 @@ class OneDriveAddon(CloudDriveAddon):
         the export service joins it onto the library folder, and removing the
         export can delete that path, so a name taken from a plugin address
         anyone can construct would be a path anyone could choose.
+
+        The library folder is then made a Kodi video source with the right
+        content and scraper (resources/lib/library_source.py), so the videos
+        reach Movies or TV shows by themselves after the first export.
         """
         if kind not in quickaccess.LIBRARY_KINDS:
             return
@@ -422,14 +426,21 @@ class OneDriveAddon(CloudDriveAddon):
             self._dialog.ok(self._addon_name, self._addon_string(30090))
             return
         name = Utils.unicode(item['name'])
+        item_driveid = Utils.default(Utils.get_safe_value(item, 'drive_id'),
+                                     item_driveid)
+        destination_kind = kind
+        if kind == 'tvshows':
+            destination_kind = self._tv_destination_kind(
+                driveid, item_driveid, item['id'], name)
+            if destination_kind is None:
+                return
         root = self._library_root()
-        destination = quickaccess.library_destination(root, kind)
+        destination = quickaccess.library_destination(root, destination_kind)
         first_of_kind = not KodiUtils.file_exists(os.path.join(destination, ''))
         export_manager = ExportManager(self._profile_path)
         export, refusal = quickaccess.plan_library_export(
-            export_manager.get_exports(), root, kind, driveid,
-            Utils.default(Utils.get_safe_value(item, 'drive_id'), item_driveid),
-            item['id'], name,
+            export_manager.get_exports(), root, destination_kind, driveid,
+            item_driveid, item['id'], name,
             lambda path: (KodiUtils.file_exists(path)
                           or KodiUtils.file_exists(os.path.join(path, ''))))
         if refusal:
@@ -445,13 +456,118 @@ class OneDriveAddon(CloudDriveAddon):
             return
         if first_of_kind:
             KodiUtils.mkdirs(os.path.join(destination, ''))
+        # Before the export is saved: its first run ends with a library scan,
+        # and that scan must already know what the folder holds.
+        registered = self._register_library_source(destination_kind,
+                                                   destination, name)
         export_manager.save_export(export)
-        if first_of_kind:
-            content = KodiUtils.localize(342 if kind == 'movies' else 20343)
+        content = KodiUtils.localize(342 if kind == 'movies' else 20343)
+        if registered:
+            self._dialog.ok(self._addon_name, self._addon_string(30097) % content)
+        elif first_of_kind or destination_kind == quickaccess.TV_COLLECTIONS:
+            source = (os.path.join(destination, name)
+                      if destination_kind == quickaccess.TV_COLLECTIONS
+                      else destination)
             self._dialog.ok(self._addon_name, self._addon_string(30086)
-                            % (destination, content))
+                            % (source, content))
         else:
             KodiUtils.show_notification(self._addon_string(30085))
+
+    def _tv_destination_kind(self, driveid, item_driveid, item_id, name):
+        """'tvshows' for one show, TV_COLLECTIONS for a folder of shows.
+
+        Guessed from the folder's contents and shown to the user as the
+        preselected answer; None when they cancel.
+        """
+        try:
+            children = self._folder_items(driveid, item_driveid, item_id,
+                                          progress=False) or []
+        except Exception as ex:
+            Logger.debug('could not list %s: %s' % (item_id, Utils.str(ex)))
+            children = []
+        extensions = self._video_file_extensions
+        has_videos = any('folder' not in child and (
+            'video' in child or child.get('name_extension') in extensions)
+            for child in children)
+        folders = [Utils.unicode(child.get('name') or '') for child in children
+                   if 'folder' in child]
+        one_show = library_source.looks_like_one_show(folders, has_videos)
+        choice = self._dialog.select(
+            self._addon_string(30100) % name,
+            [self._addon_string(30098), self._addon_string(30099)],
+            preselect=0 if one_show else 1)
+        if choice == 0:
+            return 'tvshows'
+        if choice == 1:
+            return quickaccess.TV_COLLECTIONS
+        return None
+
+    def _register_library_source(self, destination_kind, destination, name):
+        """Make the folder a video source Kodi scans. True when done.
+
+        False sends the user to the one-time instructions instead: the setting
+        is off, the library lives in MySQL, there is no scraper, or anything
+        here failed. Never raises; the export is worth having either way.
+        """
+        if not self._setting_on('library_auto_source'):
+            return False
+        try:
+            if destination_kind == 'movies':
+                content = library_source.MOVIES
+                path, label = destination, self._addon_string(30101)
+            elif destination_kind == 'tvshows':
+                content = library_source.TVSHOWS
+                path, label = destination, self._addon_string(30102)
+            else:
+                content = library_source.TVSHOWS
+                path = os.path.join(destination, name)
+                label = '%s - %s' % (self._addon_string(30102), name)
+                KodiUtils.mkdirs(os.path.join(path, ''))
+            translate = lambda p: Utils.unicode(KodiUtils.translate_path(p))
+            if library_source.uses_external_database(
+                    translate('special://masterprofile/advancedsettings.xml')):
+                Logger.notice('library: video database is not SQLite; '
+                              'leaving the source to the user')
+                return False
+            database = library_source.find_video_database(
+                translate('special://database/'))
+            if not database:
+                return False
+            scraper = library_source.choose_scraper(
+                content, self._default_scraper(content), self._addon_enabled)
+            if not scraper:
+                Logger.notice('library: no %s scraper installed' % content)
+                return False
+            outcome = library_source.ensure_path_content(
+                database, path, content, scraper)
+            Logger.notice('library: %s as %s (%s): %s'
+                          % (path, content, scraper, outcome))
+            sources = translate('special://profile/sources.xml')
+            library_source.ensure_video_source(sources, label, path)
+            library_source.remember_source(
+                os.path.join(self._profile_path, library_source.REGISTRY_FILE),
+                label, path)
+            return True
+        except Exception as ex:
+            Logger.error('library: could not register %s: %s'
+                         % (destination, ExceptionUtils.full_stacktrace(ex)))
+            return False
+
+    @staticmethod
+    def _default_scraper(content):
+        setting = ('scrapers.moviesdefault' if content == library_source.MOVIES
+                   else 'scrapers.tvshowsdefault')
+        try:
+            response = KodiUtils.execute_json_rpc(
+                'Settings.GetSettingValue', {'setting': setting})
+            return response['result']['value']
+        except Exception:
+            return None
+
+    @staticmethod
+    def _addon_enabled(addon_id):
+        import xbmc
+        return bool(xbmc.getCondVisibility('System.HasAddon(%s)' % addon_id))
 
     def _handle_exception(self, ex, show_error_dialog=True):
         if not self._quiet:

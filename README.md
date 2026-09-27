@@ -91,10 +91,20 @@ reaches the log.
 library as TV shows*. This is the existing export (Exports) with sensible defaults: `.strm` files
 are written into `library/movies` or `library/tvshows` inside the add-on's data folder (or the
 folder chosen in the settings), later changes on OneDrive are followed, and Kodi's library is
-updated after each change. The first time, the add-on shows the folder's path. Add that folder once
-as a video source (Videos → Files → Add videos...) and set its content to Movies or TV shows. From
-then on the library scraper supplies posters and descriptions, and the videos show up under Movies
-and TV shows on the home screen.
+updated after each change.
+
+The add-on then sets the folder up as a Kodi video source by itself: it writes the content (Movies
+or TV shows) and Kodi's default scraper into the video database, and adds the folder to
+`sources.xml`. The videos appear under Movies or TV shows a few minutes after the first export,
+with no trip through Videos → Files → Add videos. (The folder itself is listed under Videos → Files
+after the next restart, because Kodi reads `sources.xml` only when it starts.) For *TV shows* the
+add-on asks whether the folder is one show or a folder of several shows, with its own guess
+preselected; a folder of several shows becomes a source of its own, so each subfolder is read as
+one show.
+
+This is skipped, and the add-on shows the folder's path to add by hand instead, when the setting
+*Set up the library folders as Kodi video sources automatically* is off, when the library lives in
+a shared MySQL/MariaDB database, or when no scraper is installed.
 
 The add-on never writes into a folder it did not create. If the library folder already holds a
 folder with the same name, it refuses: an export empties its destination folder before it writes.
@@ -105,7 +115,18 @@ Kodi plays a file from the add-on's local service at `127.0.0.1`. That service f
 bytes from OneDrive and passes them on. It used to redirect Kodi to OneDrive's own download
 link instead. That link expires after about an hour, and Kodi keeps using it, so a long video
 could stop partway through. Now the service asks for a new link when the old one is refused,
-and when the connection to OneDrive breaks it carries on from the byte where it stopped.
+and when the connection to OneDrive breaks it carries on from the byte where it stopped, as
+many times as it takes: only five failures in a row end the stream.
+
+The first video after Kodi starts had problems of its own. The export service ran its first
+pass at that moment (change lookups, `.strm` and artwork writes, a full library scan), and the
+first connection to OneDrive's download servers is the slowest one. Now the export service
+waits 90 seconds after Kodi starts and never runs while a video plays; opening a stream is
+retried when OneDrive cannot be reached or is busy; and the requests Kodi opens at once when a
+video starts share one link lookup.
+
+If a video still stops, the Kodi log has one line per event, starting `stream GET <item id>`:
+reopenings, retries, and why it ended. Download links are never written to the log.
 
 ## Requirements
 

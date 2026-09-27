@@ -349,6 +349,34 @@ msgctxt "#30095"
 msgid "Sharper thumbnails (for poster and wall views)"
 msgstr ""
 
+msgctxt "#30096"
+msgid "Set up the library folders as Kodi video sources automatically"
+msgstr ""
+
+msgctxt "#30097"
+msgid "Added to the library. The videos appear in Videos > %s a few minutes after the first export. The folder itself shows under Videos > Files after Kodi restarts."
+msgstr ""
+
+msgctxt "#30098"
+msgid "One TV show (seasons or episodes inside)"
+msgstr ""
+
+msgctxt "#30099"
+msgid "A folder of TV shows (one show per subfolder)"
+msgstr ""
+
+msgctxt "#30100"
+msgid "What does %s hold?"
+msgstr ""
+
+msgctxt "#30101"
+msgid "OneDrive movies"
+msgstr ""
+
+msgctxt "#30102"
+msgid "OneDrive TV shows"
+msgstr ""
+
 # The ids below belong to the bundled Cloud Drive common module and are
 # left exactly as the module numbers them. Several are resolved at runtime
 # rather than from a literal -- one from an exception message, two from a

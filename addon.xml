@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="plugin.onedrive.kn" name="OneDrive KN" version="1.1.0" provider-name="Kenny Nguyen">
+<addon id="plugin.onedrive.kn" name="OneDrive KN" version="1.2.0" provider-name="Kenny Nguyen">
 	<requires>
 		<import addon="xbmc.python" version="3.0.1" />
 	</requires>
@@ -46,22 +46,17 @@ Phát mọi nội dung trên OneDrive, gồm video, nhạc và ảnh.
 			<fanart>fanart.jpg</fanart>
 		</assets>
 		<news>
-v1.1.0:
-- Playback no longer stops 20 to 60 minutes in: the add-on relays the video and renews OneDrive's expiring download link, resuming from the same byte.
-- With one account, the add-on opens straight on the drive's folders; Recent, Shared, Exports, Search and Accounts are pinned on top.
-- Set any folder as the start folder from its context menu.
-- Add a video folder to the Kodi library as movies or TV shows in one step.
-- Folders open faster and are cached; Refresh this folder fetches one again. Video folders offer the skin's video views.
-- Latest videos: the newest videos in a folder and its subfolders, newest first.
-- Optional sharper thumbnails for poster and wall views.
-- Vietnamese translation.
-- Works as a home-screen favourite or widget; a widget never raises a dialog.
+v1.2.0:
+- First video after Kodi starts no longer stops: the export service waits until playback ends; opening retries a cold connection; one link lookup per video.
+- Playback resumes after any number of dropped connections.
+- Add to library registers the folder as a Kodi video source with a scraper, so videos appear in Movies / TV shows by themselves. A folder of several shows becomes a source of its own.
+- Stream events are logged (no links) for troubleshooting.
 
-v1.0.2:
-- Load subtitle files from the video's folder, including different filenames and additional listing pages.
-- Use the correct drive when finding subtitles beside shared videos.
-- Fix subtitle caching on repeated HTTP-source playback and attach subtitles only after media is ready.
-- Preserve spaces, Unicode and percent signs in subtitle URLs.
+v1.1.0:
+- Playback relays the video and renews OneDrive's expiring link.
+- One account opens straight on the drive's folders; start folder; Latest videos.
+- Add a folder to the library as movies or TV shows. Cached folder listings.
+- Vietnamese translation.
 		</news>
 		<disclaimer lang="en_GB">
 This add-on signs in with the OAuth 2.0 device authorization grant, directly to Microsoft. It shows

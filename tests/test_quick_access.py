@@ -184,6 +184,13 @@ class _Dialog(object):
         self.shown.append(('yesno', message))
         return False
 
+    # What select() answers; None means "keep what was preselected".
+    choice = None
+
+    def select(self, heading, options, preselect=-1, **kwargs):
+        self.shown.append(('select', heading, preselect))
+        return preselect if self.choice is None else self.choice
+
 
 class _AccountManager(object):
     def __init__(self, accounts):
@@ -212,7 +219,8 @@ def _addon(tmp_path, accounts=None, content_type='video', settings=None):
     xbmcaddon.Addon.settings.update(settings or {})
     # The sentences that carry a placeholder, so formatting them is exercised.
     xbmcaddon.Addon.strings.update({
-        30086: 'added; add %s as %s', 30088: 'taken: %s', 30089: 'exists: %s'})
+        30086: 'added; add %s as %s', 30088: 'taken: %s', 30089: 'exists: %s',
+        30097: 'registered; see %s', 30100: 'what is in %s?'})
     addon = object.__new__(OneDriveAddon)
     addon._addon = xbmcaddon.Addon()
     addon._common_addon = xbmcaddon.Addon()
@@ -417,8 +425,10 @@ def test_adding_to_the_library_takes_the_name_from_onedrive(tmp_path, monkeypatc
         assert export['destination_folder'] == destination
         assert os.path.isdir(destination), (
             'the folder must exist before the user is asked to add it as a source')
-        # First time for this kind: the one-time source instructions.
-        assert addon._dialog.shown and destination in addon._dialog.shown[0][1]
+        # One show or several: asked, with the guess preselected.
+        assert addon._dialog.shown[0] == ('select', 'what is in Phim bộ?', 0)
+        # No video database to write in the stub: the one-time instructions.
+        assert destination in addon._dialog.shown[-1][1]
 
 
 def test_a_file_is_not_added_to_the_library(tmp_path):
