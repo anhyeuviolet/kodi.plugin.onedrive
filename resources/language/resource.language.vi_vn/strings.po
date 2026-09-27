@@ -332,6 +332,38 @@ msgctxt "#30102"
 msgid "OneDrive TV shows"
 msgstr "Phim bộ OneDrive"
 
+msgctxt "#30103"
+msgid "Add videos to Favourites"
+msgstr "Thêm các video vào Yêu thích"
+
+msgctxt "#30104"
+msgid "Save as a playlist"
+msgstr "Lưu thành danh sách phát"
+
+msgctxt "#30105"
+msgid "Videos to add to Favourites"
+msgstr "Chọn video để thêm vào Yêu thích"
+
+msgctxt "#30106"
+msgid "Added %s to Favourites (%s were already there)."
+msgstr "Đã thêm %s video vào Yêu thích (%s video đã có sẵn)."
+
+msgctxt "#30107"
+msgid "No videos in this folder or the folders below it."
+msgstr "Không có video nào trong thư mục này hoặc các thư mục con."
+
+msgctxt "#30108"
+msgid "Saved %s with %s videos. Open it from Videos > Playlists."
+msgstr "Đã lưu %s với %s video. Mở từ Video > Danh sách phát."
+
+msgctxt "#30109"
+msgid "A playlist called %s already exists. Replace it?"
+msgstr "Đã có danh sách phát tên %s. Thay thế?"
+
+msgctxt "#30110"
+msgid "Some folders were too deep or too many to include."
+msgstr "Một số thư mục quá sâu hoặc quá nhiều nên không được đưa vào."
+
 msgctxt "#32000"
 msgid "Exports"
 msgstr "Xuất"
