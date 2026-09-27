@@ -389,3 +389,28 @@ children of the video's actual parent drive/folder and follows every page. It
 offers all supported subtitle files in that directory regardless of basename.
 Synthetic Graph/Kodi regression coverage lives in `tests/test_subtitles.py`;
 actual subtitle rendering still requires a Kodi playback check.
+
+### Quick access and playback (1.1.0)
+
+One local change to `clouddrive_common`:
+
+- `ui/addon.py`: the five `addSortMethod` calls at the end of `__init__` moved,
+  unchanged and in the same order, into a new `_add_sort_methods` method that
+  `__init__` calls. Kodi opens a listing in the order of the first sort method
+  it was given, and the *Latest videos* listing has to open newest first, so
+  `OneDriveAddon` overrides the method for that one action. Every other listing
+  gets exactly the calls it got before.
+
+Vendored code this add-on now bypasses rather than changes:
+
+- `service/download.py`: `service.py` installs
+  `resources/lib/stream_service.StreamingDownloadService`, whose handler relays
+  the file instead of answering with a 307 to OneDrive's short-lived download
+  URL. Kodi kept using that redirect target after it expired, which ended
+  playback 20 to 60 minutes in. The addresses Kodi is given are unchanged, so
+  `.strm` files written by earlier versions keep working. The reasoning and the
+  recovery rules are in `resources/lib/streaming.py`.
+- `ui/addon.py` `_list_folder`: `OneDriveAddon` overrides it to read folder
+  listings through a `Cache` named `listing` (Settings → Quick access, 30
+  minutes by default, 0 turns it off). The vendored body is reproduced in
+  `_folder_items`, including the guarded child-count read recorded above.

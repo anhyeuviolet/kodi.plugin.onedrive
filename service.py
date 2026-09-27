@@ -18,11 +18,11 @@
 #-------------------------------------------------------------------------------
 
 from resources.lib.startup_refresh import StartupRefreshService
-from resources.lib.vendor.clouddrive_common.service.download import DownloadService
+from resources.lib.stream_service import StreamingDownloadService
 from resources.lib.vendor.clouddrive_common.service.source import SourceService
 from resources.lib.vendor.clouddrive_common.service.utils import ServiceUtil
 from resources.lib.provider.onedrive import OneDrive
-from resources.lib.vendor.clouddrive_common.service.export import ExportService
+from resources.lib.export_service import PlaybackAwareExportService
 from resources.lib.vendor.clouddrive_common.service.player import PlayerService
 
 
@@ -38,11 +38,17 @@ from resources.lib.vendor.clouddrive_common.service.player import PlayerService
 # token exchange begins, and running inside the runner rather than before it
 # means the exchange delays none of them.
 #
-# The four above are untouched. One of them is scheduled for deletion in a later
+# The download listener relays the file itself rather than redirecting to
+# OneDrive's short-lived download URL, so playback does not stop when that URL
+# expires; resources/lib/streaming.py has the reasoning. The export listener
+# waits while a video plays, so its first pass after Kodi starts -- change
+# lookups, .strm writes, a library scan -- does not compete with the first
+# video of the session; resources/lib/export_service.py. The other two are
+# untouched. One of them is scheduled for deletion in a later
 # phase on security grounds and this is not that phase: doing it here would put
 # two unrelated changes in one commit and make the bisect that finds either of
 # them ambiguous.
 if __name__ == '__main__':
-    ServiceUtil.run([DownloadService(OneDrive), SourceService(OneDrive),
-                     ExportService(OneDrive), PlayerService(OneDrive),
+    ServiceUtil.run([StreamingDownloadService(OneDrive), SourceService(OneDrive),
+                     PlaybackAwareExportService(OneDrive), PlayerService(OneDrive),
                      StartupRefreshService(OneDrive)])

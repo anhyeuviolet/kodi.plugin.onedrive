@@ -104,15 +104,16 @@ REMOTE_FIRST_FACETS = ('folder', 'file', 'video', 'image', 'audio', 'package')
 # the Container.Content() branch of Estuary's View_55_WideList.xml, which a
 # plugin listing falls into only when no content type has been set. Measured, not
 # believed: across this add-on's own code and the vendored package together, all
-# 46 Python modules under resources/lib/, there is no setContent call. If a later
-# phase adds one, a different item layout applies with different geometry, and
-# this constant is the thing that has to be revisited.
+# 46 Python modules under resources/lib/, there was no setContent call. Quick
+# access added one: video listings now declare the 'videos' content type (see
+# OneDriveAddon._process_items), so Estuary draws them with its video layouts.
+# Those rows and thumbnails are at least as large as the 60 x 55 box, which
+# keeps `medium` the size to ask for first; a poster or wall view still wants
+# `large`, which is the known limitation below.
 #
-# Re-run that measurement as a check for a CALL, not for the bare name -- an AST
-# walk for a Call node whose callee is setContent. A plain `grep -rn setContent
-# resources/lib/` now matches this very comment, so it reports a hit on a tree
-# that makes no such call, and reading that hit as a real one would send the next
-# person hunting a caller that does not exist.
+# To find the caller, look for a CALL, not for the bare name -- an AST walk for a
+# Call node whose callee is setContent. A plain `grep -rn setContent
+# resources/lib/` also matches this very comment.
 #
 # THE FALLBACK CHAIN IS INDEPENDENT OF ALL OF THAT, and costs nothing. Graph
 # documents the thumbnails collection as nullable, one entry in the committed
@@ -124,8 +125,13 @@ REMOTE_FIRST_FACETS = ('folder', 'file', 'video', 'image', 'audio', 'package')
 # the skin chooses one.
 THUMBNAIL_PREFERENCE = ('medium', 'large', 'small')
 
+# What the "sharper thumbnails" setting asks for instead. `large` is about 800
+# pixels on its long side, which a poster or wall view actually draws; the
+# setting is off by default because it is the heavier fetch on every row.
+LARGE_THUMBNAIL_PREFERENCE = ('large', 'medium', 'small')
 
-def pick_thumbnail_url(entry):
+
+def pick_thumbnail_url(entry, preference=THUMBNAIL_PREFERENCE):
     """The first thumbnail URL in preference order, or None.
 
     None when the collection is absent, empty, or carries no usable URL at any
@@ -136,7 +142,7 @@ def pick_thumbnail_url(entry):
     if not isinstance(thumbnails, list) or not thumbnails:
         return None
     first_set = thumbnails[0]
-    for size in THUMBNAIL_PREFERENCE:
+    for size in preference:
         url = Utils.get_safe_value(Utils.get_safe_value(first_set, size, {}), 'url')
         if url:
             return url
@@ -250,7 +256,8 @@ def merge_remote_item(entry):
     return merged
 
 
-def extract_item(entry, include_download_info=False):
+def extract_item(entry, include_download_info=False,
+                 thumbnail_preference=THUMBNAIL_PREFERENCE):
     """One `driveItem` mapping into the item shape the browse layer reads.
 
     `entry` is a response entry exactly as Graph sent it. It is not required to
@@ -327,7 +334,7 @@ def extract_item(entry, include_download_info=False):
 
     # Only when a URL was actually found. Setting the key to '' would render as a
     # blank image where no image at all renders as no image.
-    thumbnail_url = pick_thumbnail_url(entry)
+    thumbnail_url = pick_thumbnail_url(entry, thumbnail_preference)
     if thumbnail_url:
         item['thumbnail'] = thumbnail_url
 

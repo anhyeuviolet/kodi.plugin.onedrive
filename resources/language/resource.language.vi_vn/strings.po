@@ -9,732 +9,681 @@ msgstr ""
 "POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Kodi Translation Team\n"
-"Language-Team: English (http://www.transifex.com/projects/p/xbmc-addons/language/en/)\n"
+"Language-Team: Vietnamese\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: en\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: vi_VN\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
 
 msgctxt "#30000"
 msgid "Player Service"
-msgstr ""
+msgstr "Dịch vụ phát"
 
 msgctxt "#30001"
 msgid "Export Service"
-msgstr ""
+msgstr "Dịch vụ xuất"
 
 msgctxt "#30002"
 msgid "Source Service"
-msgstr ""
+msgstr "Dịch vụ nguồn"
 
 msgctxt "#30003"
 msgid "Before export to library, remove previous files and folders"
-msgstr ""
+msgstr "Trước khi xuất vào thư viện, xóa các tệp và thư mục cũ"
 
 msgctxt "#30004"
 msgid "Automatically set subtitles from cloud drive"
-msgstr ""
+msgstr "Tự động gắn phụ đề từ ổ đám mây"
 
 msgctxt "#30005"
 msgid "Auto-Refreshed slideshow"
-msgstr ""
+msgstr "Trình chiếu ảnh tự làm mới"
 
 msgctxt "#30006"
 msgid "Refresh interval in minutes"
-msgstr ""
+msgstr "Khoảng làm mới (phút)"
 
 msgctxt "#30007"
 msgid "Special: Photos"
-msgstr ""
+msgstr "Đặc biệt: Ảnh"
 
 msgctxt "#30008"
 msgid "Special: Camera Roll"
-msgstr ""
+msgstr "Đặc biệt: Thư mục máy ảnh"
 
 msgctxt "#30009"
 msgid "Special: Music"
-msgstr ""
+msgstr "Đặc biệt: Nhạc"
 
 msgctxt "#30010"
 msgid "Recursive auto-refreshed slideshow"
-msgstr ""
+msgstr "Trình chiếu tự làm mới gồm cả thư mục con"
 
 msgctxt "#30011"
 msgid "Resume playing when resume point exists in library"
-msgstr ""
+msgstr "Phát tiếp khi thư viện có điểm dừng"
 
 msgctxt "#30017"
 msgid "Ask to resume if resume point exists in library"
-msgstr ""
+msgstr "Hỏi phát tiếp khi thư viện có điểm dừng"
 
 msgctxt "#30018"
 msgid "Save resume points and watched status in library"
-msgstr ""
+msgstr "Lưu điểm dừng và trạng thái đã xem vào thư viện"
 
 msgctxt "#30019"
 msgid "Do not include filename extension in a .strm"
-msgstr ""
+msgstr "Không ghi phần mở rộng tên tệp vào .strm"
 
 msgctxt "#30020"
 msgid "Hide exporting progress dialog"
-msgstr ""
-
-# 30030 and 30031 named the third category and its single row, which offered to
-# send an error report to a third party; 30033 labelled the row holding that
-# third party's address. All three settings rows are gone, and the code behind
-# the first two went with the error reporter in the previous plan, so the
-# strings are removed rather than left as orphans. The gap they leave is not
-# refilled: renumbering downwards would move labels the settings file and the
-# sign-in copy both reference by number.
+msgstr "Ẩn hộp tiến trình khi xuất"
 
 msgctxt "#30032"
 msgid "Advanced"
-msgstr ""
+msgstr "Nâng cao"
 
 msgctxt "#30034"
 msgid "Cache expiration time (in minutes)"
-msgstr ""
+msgstr "Thời gian lưu bộ nhớ đệm (phút)"
 
 msgctxt "#30035"
 msgid "Clear cache now"
-msgstr ""
-
-# Everything sign-in shows, taken as one contiguous block so the copy reads as
-# a group in this file. Written for a television: short sentences, no links, no
-# provider jargon, and no instruction that needs a keyboard.
-#
-# 30044 and 30046 onward are one sentence per outcome in
-# resources/lib/auth/errors.py. That module returns a symbolic outcome and a
-# bare failure code and holds no words at all, so these are the only place the
-# sentences exist and the two cannot drift apart. The pairing:
-#
-#   30044 unmapped                       30052 mfa_required
-#   30046 public_client_flows_off        30053 mfa_enrolment_required
-#   30047 consent_required               30054 password_expired
-#   30048 admin_consent_required         30055 application_disabled
-#   30049 not_assigned_to_application    30056 application_not_in_tenant
-#   30050 blocked_by_conditional_access  30057 device_code_rejected
-#   30051 blocked_by_security_defaults   30058 device_code_expired
-#
-# 30045 is appended to any outcome the table marks administrator-must-act, and
-# to nothing else. It is the only place the escape hatch is named, which is
-# what makes the tenant-block message and the custom identifier setting one
-# feature rather than two.
-#
-# 30059 is not part of that pairing. It belongs to re-authorisation: the one
-# case where the exchange succeeded and the answer is still no, because the
-# person signed in as somebody else on their phone.
+msgstr "Xóa bộ nhớ đệm ngay"
 
 msgctxt "#30036"
 msgid "Sign in to OneDrive"
-msgstr ""
+msgstr "Đăng nhập OneDrive"
 
 msgctxt "#30037"
 msgid "On your phone or computer, open the address below and enter this code."
-msgstr ""
+msgstr "Trên điện thoại hoặc máy tính, mở địa chỉ bên dưới và nhập mã này."
 
 msgctxt "#30038"
 msgid "This code expires in %s"
-msgstr ""
+msgstr "Mã này hết hạn sau %s"
 
 msgctxt "#30039"
 msgid "This code has expired."
-msgstr ""
+msgstr "Mã này đã hết hạn."
 
 msgctxt "#30040"
 msgid "Get a new code"
-msgstr ""
+msgstr "Lấy mã mới"
 
 msgctxt "#30041"
 msgid "You may be asked to sign in again on your phone. That is expected."
-msgstr ""
+msgstr "Bạn có thể được yêu cầu đăng nhập lại trên điện thoại. Điều đó là bình thường."
 
 msgctxt "#30042"
 msgid "Sign in again"
-msgstr ""
+msgstr "Đăng nhập lại"
 
 msgctxt "#30043"
 msgid "Sign-in needed"
-msgstr ""
+msgstr "Cần đăng nhập"
 
 msgctxt "#30044"
 msgid "Sign-in failed. Error code: %s"
-msgstr ""
+msgstr "Đăng nhập thất bại. Mã lỗi: %s"
 
 msgctxt "#30045"
 msgid "You can also use your own app registration: put its Client ID in this add-on's settings, under Advanced, at Expert level."
-msgstr ""
+msgstr "Bạn cũng có thể dùng app registration riêng: nhập Client ID của nó trong cài đặt của add-on này, mục Nâng cao, ở cấp Chuyên gia."
 
 msgctxt "#30046"
 msgid "Your app registration is not set up for sign-in on a device. Turn on 'Allow public client flows' for it. Adding a secret will not help."
-msgstr ""
+msgstr "App registration của bạn chưa được cấu hình để đăng nhập trên thiết bị. Hãy bật 'Allow public client flows' cho nó. Thêm secret sẽ không giúp gì."
 
 msgctxt "#30047"
 msgid "This app has not been given permission to read your files. Sign in again and choose Accept."
-msgstr ""
+msgstr "Ứng dụng này chưa được cấp quyền đọc tệp của bạn. Hãy đăng nhập lại và chọn Accept."
 
 msgctxt "#30048"
 msgid "Your organisation must approve this app before you can use it. Ask an administrator to approve it."
-msgstr ""
+msgstr "Tổ chức của bạn phải phê duyệt ứng dụng này trước khi bạn dùng được. Hãy nhờ quản trị viên phê duyệt."
 
 msgctxt "#30049"
 msgid "Your account is not assigned to this app. Ask an administrator to assign it."
-msgstr ""
+msgstr "Tài khoản của bạn chưa được gán cho ứng dụng này. Hãy nhờ quản trị viên gán."
 
 msgctxt "#30050"
 msgid "Your organisation's access policy blocks sign-in from a device like this. Ask an administrator."
-msgstr ""
+msgstr "Chính sách truy cập của tổ chức bạn chặn đăng nhập từ thiết bị như thế này. Hãy hỏi quản trị viên."
 
 msgctxt "#30051"
 msgid "Your organisation's security defaults block sign-in from a device like this. Ask an administrator."
-msgstr ""
+msgstr "Cấu hình bảo mật mặc định của tổ chức bạn chặn đăng nhập từ thiết bị như thế này. Hãy hỏi quản trị viên."
 
 msgctxt "#30052"
 msgid "Your organisation asks for a second sign-in step. Finish it on your phone, then try again."
-msgstr ""
+msgstr "Tổ chức của bạn yêu cầu bước đăng nhập thứ hai. Hoàn tất trên điện thoại rồi thử lại."
 
 msgctxt "#30053"
 msgid "Your organisation asks you to set up a second sign-in step first. Set it up on your phone, then try again."
-msgstr ""
+msgstr "Tổ chức của bạn yêu cầu thiết lập bước đăng nhập thứ hai trước. Thiết lập trên điện thoại rồi thử lại."
 
 msgctxt "#30054"
 msgid "Your password has expired. Change it on your phone, then try again."
-msgstr ""
+msgstr "Mật khẩu của bạn đã hết hạn. Đổi mật khẩu trên điện thoại rồi thử lại."
 
 msgctxt "#30055"
 msgid "This app is turned off in your organisation. Ask an administrator to turn it back on."
-msgstr ""
+msgstr "Ứng dụng này đã bị tắt trong tổ chức của bạn. Hãy nhờ quản trị viên bật lại."
 
 msgctxt "#30056"
 msgid "This app is not registered in your organisation. Ask an administrator to add it."
-msgstr ""
+msgstr "Ứng dụng này chưa được đăng ký trong tổ chức của bạn. Hãy nhờ quản trị viên thêm vào."
 
 msgctxt "#30057"
 msgid "The sign-in code was refused. Get a new code and try again."
-msgstr ""
+msgstr "Mã đăng nhập bị từ chối. Lấy mã mới rồi thử lại."
 
 msgctxt "#30058"
 msgid "The sign-in code expired before it was used. Get a new code and try again."
-msgstr ""
+msgstr "Mã đăng nhập đã hết hạn trước khi được dùng. Lấy mã mới rồi thử lại."
 
 msgctxt "#30059"
 msgid "You signed in as %s, which is a different account. Nothing was changed."
-msgstr ""
+msgstr "Bạn đã đăng nhập bằng %s, là một tài khoản khác. Không có gì thay đổi."
 
 msgctxt "#30067"
 msgid "Services"
-msgstr ""
+msgstr "Dịch vụ"
 
 msgctxt "#30068"
 msgid "Allow using OneDrive as a source"
-msgstr ""
+msgstr "Cho phép dùng OneDrive làm nguồn"
 
 msgctxt "#30069"
 msgid "     Source server port  -  http://localhost:<port>/source"
-msgstr ""
-
-# The custom application registration. 30070 is the label of the one setting a
-# user whose tenant refuses the built-in registration depends on, and 30071 is
-# the help beneath it. 30045 -- the sentence appended to every outcome the
-# error table marks administrator-must-act -- names this setting by category
-# and by level, so the wording of the three is one feature and not three.
+msgstr "     Cổng máy chủ nguồn  -  http://localhost:<port>/source"
 
 msgctxt "#30070"
 msgid "Client ID of your own app registration"
-msgstr ""
+msgstr "Client ID của app registration riêng"
 
 msgctxt "#30071"
 msgid "Leave this empty to use the registration built into the add-on. Fill it in only if your organisation blocks that one: paste the Application (client) ID of an app registration of your own. Anything that is not a valid ID is ignored and the built-in one is used."
-msgstr ""
-
-# Quick access: the first screen, the start folder and "Add to library".
-# 30086 is shown once per library folder, the first time something is added
-# to it; the two %s are that folder's path and Kodi's own name for the content
-# type (Movies or TV shows).
+msgstr "Để trống để dùng registration có sẵn trong add-on. Chỉ điền nếu tổ chức của bạn chặn registration đó: dán Application (client) ID của app registration của riêng bạn. Giá trị không phải ID hợp lệ sẽ bị bỏ qua và registration có sẵn được dùng."
 
 msgctxt "#30072"
 msgid "Quick access"
-msgstr ""
+msgstr "Truy cập nhanh"
 
 msgctxt "#30073"
 msgid "Open the only account directly"
-msgstr ""
+msgstr "Mở thẳng tài khoản duy nhất"
 
 msgctxt "#30074"
 msgid "Show the drive's folders on its first screen"
-msgstr ""
+msgstr "Hiện thư mục của ổ ngay ở màn hình đầu"
 
 msgctxt "#30075"
 msgid "Open folders faster (do not count items first)"
-msgstr ""
+msgstr "Mở thư mục nhanh hơn (không đếm số mục trước)"
 
 msgctxt "#30076"
 msgid "Library folder (empty: inside the add-on's data)"
-msgstr ""
+msgstr "Thư mục thư viện (để trống: trong dữ liệu của add-on)"
 
 msgctxt "#30077"
 msgid "Accounts"
-msgstr ""
+msgstr "Tài khoản"
 
 msgctxt "#30078"
 msgid "Set as start folder"
-msgstr ""
+msgstr "Đặt làm thư mục khởi động"
 
 msgctxt "#30079"
 msgid "Reset start folder"
-msgstr ""
+msgstr "Bỏ thư mục khởi động"
 
 msgctxt "#30080"
 msgid "Start folder: %s"
-msgstr ""
+msgstr "Thư mục khởi động: %s"
 
 msgctxt "#30081"
 msgid "Start folder reset"
-msgstr ""
+msgstr "Đã bỏ thư mục khởi động"
 
 msgctxt "#30082"
 msgid "The start folder no longer exists. Showing all files."
-msgstr ""
+msgstr "Thư mục khởi động không còn tồn tại. Đang hiện tất cả tệp."
 
 msgctxt "#30083"
 msgid "Add to library as movies"
-msgstr ""
+msgstr "Thêm vào thư viện dạng phim"
 
 msgctxt "#30084"
 msgid "Add to library as TV shows"
-msgstr ""
+msgstr "Thêm vào thư viện dạng TV show"
 
 msgctxt "#30085"
 msgid "Added to the library. The first export starts within a minute."
-msgstr ""
+msgstr "Đã thêm vào thư viện. Lần xuất đầu tiên sẽ bắt đầu trong vòng một phút."
 
 msgctxt "#30086"
 msgid "Added to the library. The first export starts within a minute.[CR][CR]One-time step: in Kodi open Videos > Files > Add videos..., browse to[CR]%s[CR]and set the content of that source to %s. New videos then reach the library by themselves."
-msgstr ""
+msgstr "Đã thêm vào thư viện. Lần xuất đầu tiên sẽ bắt đầu trong vòng một phút.[CR][CR]Bước làm một lần: trong Kodi mở Videos > Files > Add videos..., duyệt tới[CR]%s[CR]và đặt loại nội dung của nguồn đó là %s. Từ đó video mới sẽ tự vào thư viện."
 
 msgctxt "#30087"
 msgid "This folder is already in the library. Its settings are under Exports."
-msgstr ""
+msgstr "Thư mục này đã có trong thư viện. Cài đặt của nó nằm trong mục Xuất."
 
 msgctxt "#30088"
 msgid "Another folder called %s is already in this part of the library. Rename one of them on OneDrive first."
-msgstr ""
+msgstr "Đã có một thư mục khác tên %s trong phần thư viện này. Hãy đổi tên một trong hai trên OneDrive trước."
 
 msgctxt "#30089"
 msgid "The library folder already holds a folder called %s that this add-on did not create, so it was left alone."
-msgstr ""
+msgstr "Thư mục thư viện đã có một thư mục tên %s không do add-on này tạo, nên nó được giữ nguyên."
 
 msgctxt "#30090"
 msgid "Only a folder can be added to the library."
-msgstr ""
+msgstr "Chỉ có thể thêm thư mục vào thư viện."
 
 msgctxt "#30091"
 msgid "All files"
-msgstr ""
+msgstr "Tất cả tệp"
 
 msgctxt "#30092"
 msgid "Latest videos"
-msgstr ""
+msgstr "Video mới nhất"
 
 msgctxt "#30093"
 msgid "Refresh this folder"
-msgstr ""
+msgstr "Làm mới thư mục này"
 
 msgctxt "#30094"
 msgid "Keep folder listings for (minutes, 0 = always ask OneDrive)"
-msgstr ""
+msgstr "Giữ danh sách thư mục trong (phút, 0 = luôn hỏi OneDrive)"
 
 msgctxt "#30095"
 msgid "Sharper thumbnails (for poster and wall views)"
-msgstr ""
+msgstr "Ảnh thu nhỏ sắc nét hơn (cho giao diện Poster và Wall)"
 
 msgctxt "#30096"
 msgid "Set up the library folders as Kodi video sources automatically"
-msgstr ""
+msgstr "Tự động thiết lập thư mục thư viện thành nguồn video của Kodi"
 
 msgctxt "#30097"
 msgid "Added to the library. The videos appear in Videos > %s a few minutes after the first export. The folder itself shows under Videos > Files after Kodi restarts."
-msgstr ""
+msgstr "Đã thêm vào thư viện. Video sẽ xuất hiện trong Video > %s vài phút sau lần xuất đầu tiên. Bản thân thư mục sẽ hiện trong Video > Tệp sau khi khởi động lại Kodi."
 
 msgctxt "#30098"
 msgid "One TV show (seasons or episodes inside)"
-msgstr ""
+msgstr "Một bộ phim (bên trong là các mùa hoặc các tập)"
 
 msgctxt "#30099"
 msgid "A folder of TV shows (one show per subfolder)"
-msgstr ""
+msgstr "Thư mục chứa nhiều bộ phim (mỗi thư mục con là một bộ)"
 
 msgctxt "#30100"
 msgid "What does %s hold?"
-msgstr ""
+msgstr "%s chứa gì?"
 
 msgctxt "#30101"
 msgid "OneDrive movies"
-msgstr ""
+msgstr "Phim lẻ OneDrive"
 
 msgctxt "#30102"
 msgid "OneDrive TV shows"
-msgstr ""
-
-# The ids below belong to the bundled Cloud Drive common module and are
-# left exactly as the module numbers them. Several are resolved at runtime
-# rather than from a literal -- one from an exception message, two from a
-# schedule type that is persisted in the exports store -- so renumbering
-# them would break lookups no static rewrite can see.
+msgstr "Phim bộ OneDrive"
 
 msgctxt "#32000"
 msgid "Exports"
-msgstr ""
+msgstr "Xuất"
 
 msgctxt "#32001"
 msgid "Export of '%s' will be removed. Are you sure?"
-msgstr ""
+msgstr "Bản xuất '%s' sẽ bị xóa. Bạn chắc chứ?"
 
 msgctxt "#32002"
 msgid "Select destination folder"
-msgstr ""
+msgstr "Chọn thư mục đích"
 
 msgctxt "#32003"
 msgid "Run export now"
-msgstr ""
+msgstr "Xuất ngay"
 
 msgctxt "#32004"
 msgid "Export to .strm files..."
-msgstr ""
+msgstr "Xuất ra tệp .strm..."
 
 msgctxt "#32005"
 msgid "Add an account..."
-msgstr ""
+msgstr "Thêm tài khoản..."
 
 msgctxt "#32006"
 msgid "Remove Account..."
-msgstr ""
+msgstr "Xóa tài khoản..."
 
 msgctxt "#32007"
 msgid "Remove Drive..."
-msgstr ""
+msgstr "Xóa ổ..."
 
 msgctxt "#32008"
 msgid "Connecting with server, please wait..."
-msgstr ""
+msgstr "Đang kết nối tới máy chủ, vui lòng chờ..."
 
 msgctxt "#32009"
 msgid "Scan the QR code and sign in."
-msgstr ""
+msgstr "Quét mã QR và đăng nhập."
 
 msgctxt "#32010"
 msgid "or[CR]Go to this URL: %s[CR]enter the code and sign in: %s"
-msgstr ""
+msgstr "hoặc[CR]Vào địa chỉ: %s[CR]nhập mã và đăng nhập: %s"
 
 msgctxt "#32011"
 msgid "Expires in %s seconds..."
-msgstr ""
+msgstr "Hết hạn sau %s giây..."
 
 msgctxt "#32012"
 msgid "Yes! Count me in"
-msgstr ""
+msgstr "Có! Tôi tham gia"
 
 msgctxt "#32013"
 msgid "No"
-msgstr ""
+msgstr "Không"
 
 msgctxt "#32014"
 msgid "Retrieving credentials..."
-msgstr ""
+msgstr "Đang lấy thông tin đăng nhập..."
 
 msgctxt "#32015"
 msgid "Unable to login:"
-msgstr ""
+msgstr "Không thể đăng nhập:"
 
 msgctxt "#32016"
 msgid "Please try again."
-msgstr ""
+msgstr "Vui lòng thử lại."
 
 msgctxt "#32017"
 msgid "Retrieving drive information..."
-msgstr ""
+msgstr "Đang lấy thông tin ổ..."
 
 msgctxt "#32018"
 msgid "Unable to retrieve the drive information:"
-msgstr ""
+msgstr "Không thể lấy thông tin ổ:"
 
 msgctxt "#32019"
 msgid "The access to this resource has been denied. You might not have enough permission"
-msgstr ""
+msgstr "Truy cập tài nguyên này bị từ chối. Có thể bạn không đủ quyền"
 
 msgctxt "#32020"
 msgid "Adding account..."
-msgstr ""
+msgstr "Đang thêm tài khoản..."
 
 msgctxt "#32021"
 msgid "Unable to add account:"
-msgstr ""
+msgstr "Không thể thêm tài khoản:"
 
 msgctxt "#32022"
 msgid "Account '%s' will be removed. Are you sure?"
-msgstr ""
+msgstr "Tài khoản '%s' sẽ bị xóa. Bạn chắc chứ?"
 
 msgctxt "#32023"
 msgid "Drive '%s' will be removed. Are you sure?"
-msgstr ""
+msgstr "Ổ '%s' sẽ bị xóa. Bạn chắc chứ?"
 
 msgctxt "#32024"
 msgid "exporting"
-msgstr ""
+msgstr "đang xuất"
 
 msgctxt "#32025"
 msgid "Starting, please wait..."
-msgstr ""
+msgstr "Đang bắt đầu, vui lòng chờ..."
 
 msgctxt "#32026"
 msgid "The destination folder '%s' is invalid. It does not exist."
-msgstr ""
+msgstr "Thư mục đích '%s' không hợp lệ. Nó không tồn tại."
 
 msgctxt "#32027"
 msgid "Unknown error:"
-msgstr ""
+msgstr "Lỗi không xác định:"
 
 msgctxt "#32028"
 msgid "Unable to move your previous accounts information file. Please move it manually to %s or add your accounts again."
-msgstr ""
+msgstr "Không thể di chuyển tệp thông tin tài khoản cũ. Hãy tự chuyển nó tới %s hoặc thêm lại tài khoản."
 
 msgctxt "#32029"
 msgid "Need help? Go to the forum and post a message in: kodi.daro.mx/forum"
-msgstr ""
+msgstr "Cần trợ giúp? Vào diễn đàn và đăng bài tại: kodi.daro.mx/forum"
 
 msgctxt "#32030"
 msgid "Collaboration"
-msgstr ""
+msgstr "Cộng tác"
 
 msgctxt "#32031"
 msgid "Report errors automatically to help resolve them quickly"
-msgstr ""
+msgstr "Tự động báo lỗi để giúp sửa nhanh"
 
 msgctxt "#32032"
 msgid "Auto-Refreshed slideshow"
-msgstr ""
+msgstr "Trình chiếu ảnh tự làm mới"
 
 msgctxt "#32033"
 msgid "Yes"
-msgstr ""
+msgstr "Có"
 
 msgctxt "#32034"
 msgid "'%s' is not a folder"
-msgstr ""
+msgstr "'%s' không phải là thư mục"
 
 msgctxt "#32035"
 msgid "The server is temporary unavailable for this operation."
-msgstr ""
+msgstr "Máy chủ tạm thời không phục vụ được thao tác này."
 
 msgctxt "#32036"
 msgid "Something went wrong with this operation."
-msgstr ""
+msgstr "Đã có lỗi xảy ra với thao tác này."
 
 msgctxt "#32037"
 msgid "File or folder not found. Make sure is still in your drive."
-msgstr ""
+msgstr "Không tìm thấy tệp hoặc thư mục. Hãy kiểm tra nó còn trong ổ của bạn."
 
 msgctxt "#32038"
 msgid "Please try again later."
-msgstr ""
+msgstr "Vui lòng thử lại sau."
 
 msgctxt "#32039"
 msgid "Search..."
-msgstr ""
+msgstr "Tìm kiếm..."
 
 msgctxt "#32040"
 msgid "Searching '%s', please wait..."
-msgstr ""
+msgstr "Đang tìm '%s', vui lòng chờ..."
 
 msgctxt "#32041"
 msgid "Processing results, please wait..."
-msgstr ""
+msgstr "Đang xử lý kết quả, vui lòng chờ..."
 
 msgctxt "#32042"
 msgid "Enter text to search:"
-msgstr ""
+msgstr "Nhập nội dung cần tìm:"
 
 msgctxt "#32043"
 msgid "Something happened with the request%s."
-msgstr ""
+msgstr "Đã có sự cố với yêu cầu%s."
 
 msgctxt "#32044"
 msgid "Will try in %s seconds."
-msgstr ""
+msgstr "Sẽ thử lại sau %s giây."
 
 msgctxt "#32045"
 msgid "Attempt %s of %s."
-msgstr ""
+msgstr "Lần thử %s trên %s."
 
 msgctxt "#32046"
 msgid "The credentials for '%s' are no longer valid. You need to sign in again.%sDo you want to start the process?"
-msgstr ""
+msgstr "Thông tin đăng nhập của '%s' không còn hợp lệ. Bạn cần đăng nhập lại.%sBạn có muốn bắt đầu không?"
 
 msgctxt "#32047"
 msgid "%s of %s items loaded, please wait..."
-msgstr ""
+msgstr "Đã tải %s trên %s mục, vui lòng chờ..."
 
 msgctxt "#32048"
 msgid "%s items loaded, please wait..."
-msgstr ""
+msgstr "Đã tải %s mục, vui lòng chờ..."
 
 msgctxt "#32049"
 msgid "Loading %s items in this folder, please wait..."
-msgstr ""
+msgstr "Đang tải %s mục trong thư mục này, vui lòng chờ..."
 
 msgctxt "#32050"
 msgid "Do you want to help reporting errors to resolve them quickly?"
-msgstr ""
+msgstr "Bạn có muốn giúp báo lỗi để sửa nhanh hơn không?"
 
 msgctxt "#32051"
 msgid "Download"
-msgstr ""
+msgstr "Tải xuống"
 
 msgctxt "#32052"
 msgid "Files"
-msgstr ""
+msgstr "Tệp"
 
 msgctxt "#32053"
 msgid "Recent"
-msgstr ""
+msgstr "Gần đây"
 
 msgctxt "#32054"
 msgid "Resume from %s"
-msgstr ""
+msgstr "Phát tiếp từ %s"
 
 msgctxt "#32055"
 msgid "Export will start in less than %s seconds"
-msgstr ""
+msgstr "Việc xuất sẽ bắt đầu trong chưa đầy %s giây"
 
 msgctxt "#32056"
 msgid "Downloading %s"
-msgstr ""
+msgstr "Đang tải %s"
 
 msgctxt "#32057"
 msgid "File %s downloaded"
-msgstr ""
+msgstr "Đã tải xong tệp %s"
 
 msgctxt "#32058"
 msgid "Shared With Me"
-msgstr ""
+msgstr "Được chia sẻ với tôi"
 
 msgctxt "#32059"
 msgid "Exporting task already in progress."
-msgstr ""
+msgstr "Một tác vụ xuất đang chạy."
 
 msgctxt "#32060"
 msgid "Searching subtitle file %s, please wait..."
-msgstr ""
+msgstr "Đang tìm tệp phụ đề %s, vui lòng chờ..."
 
 msgctxt "#32061"
 msgid "Subtitle found! Playing this video with subtitle..."
-msgstr ""
+msgstr "Đã tìm thấy phụ đề! Đang phát video kèm phụ đề..."
 
 msgctxt "#32062"
 msgid "Subtitle not found for this video"
-msgstr ""
+msgstr "Không tìm thấy phụ đề cho video này"
 
 msgctxt "#32063"
 msgid "This account or drive is not registered.%sDo you want to add an account?"
-msgstr ""
+msgstr "Tài khoản hoặc ổ này chưa được đăng ký.%sBạn có muốn thêm tài khoản không?"
 
 msgctxt "#32064"
 msgid "Retrieving owner information..."
-msgstr ""
+msgstr "Đang lấy thông tin chủ sở hữu..."
 
 msgctxt "#32065"
 msgid "Unable to retrieve the owner information:"
-msgstr ""
+msgstr "Không thể lấy thông tin chủ sở hữu:"
 
 msgctxt "#32066"
 msgid "Unable to remove previous files and folders in %s"
-msgstr ""
+msgstr "Không thể xóa các tệp và thư mục cũ trong %s"
 
 msgctxt "#32067"
 msgid "Services"
-msgstr ""
+msgstr "Dịch vụ"
 
 msgctxt "#32068"
 msgid "Allow cloud drive addons to be used as a source"
-msgstr ""
+msgstr "Cho phép dùng các add-on ổ đám mây làm nguồn"
 
 msgctxt "#32069"
 msgid "     Source server port  -  http://localhost:<port>/source"
-msgstr ""
+msgstr "     Cổng máy chủ nguồn  -  http://localhost:<port>/source"
 
 msgctxt "#32070"
 msgid "There are no accounts added in %s."
-msgstr ""
+msgstr "Chưa có tài khoản nào được thêm trong %s."
 
 msgctxt "#32071"
 msgid "Go to [Add-ons > %s > Add an account...] to add one."
-msgstr ""
+msgstr "Vào [Add-ons > %s > Thêm tài khoản...] để thêm."
 
 msgctxt "#32072"
 msgid "[B]Security Error[/B]"
-msgstr ""
+msgstr "[B]Lỗi bảo mật[/B]"
 
 msgctxt "#32073"
 msgid "Ip change detected: [B]%s[/B] to [B]%s[/B]. Make sure you stay in the same network."
-msgstr ""
+msgstr "Phát hiện đổi IP: [B]%s[/B] sang [B]%s[/B]. Hãy đảm bảo bạn vẫn ở cùng mạng."
 
 msgctxt "#32074"
 msgid "Check your internet connection and try again."
-msgstr ""
+msgstr "Kiểm tra kết nối internet rồi thử lại."
 
 msgctxt "#32075"
 msgid "There is a problem with your network connection."
-msgstr ""
+msgstr "Kết nối mạng của bạn đang có vấn đề."
 
 msgctxt "#32076"
 msgid "No network connection detected."
-msgstr ""
+msgstr "Không phát hiện kết nối mạng."
 
 msgctxt "#32077"
 msgid "Unable to reach the server."
-msgstr ""
+msgstr "Không thể kết nối tới máy chủ."
 
 msgctxt "#32078"
 msgid "The SSL connection has failed (insecure connection detected)."
-msgstr ""
+msgstr "Kết nối SSL thất bại (phát hiện kết nối không an toàn)."
 
 msgctxt "#32079"
 msgid "Every"
-msgstr ""
+msgstr "Mỗi"
 
 msgctxt "#32080"
 msgid "at"
-msgstr ""
+msgstr "lúc"
 
 msgctxt "#32081"
 msgid "Startup"
-msgstr ""
+msgstr "Khi khởi động"
 
 msgctxt "#32082"
 msgid "Day"
-msgstr ""
+msgstr "Ngày"
 
 msgctxt "#32083"
 msgid "Schedules"
-msgstr ""
+msgstr "Lịch"
 
 msgctxt "#32084"
 msgid "%s is required."
-msgstr ""
+msgstr "Cần có %s."
 
 msgctxt "#32085"
 msgid "Destination"
-msgstr ""
+msgstr "Đích"
 
 msgctxt "#32086"
 msgid "Do you want to keep the local files of '%s'?"
-msgstr ""
+msgstr "Bạn có muốn giữ các tệp cục bộ của '%s' không?"
 
 msgctxt "#32087"
 msgid "Download of file %s failed"
-msgstr ""
+msgstr "Tải tệp %s thất bại"
 
 msgctxt "#32088"
 msgid "watching changes"
-msgstr ""
+msgstr "đang theo dõi thay đổi"

@@ -17,21 +17,573 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #-------------------------------------------------------------------------------
 
+import os
 import urllib.parse
+from urllib.error import HTTPError
 
+import datetime
+
+from resources.lib import library_source, quickaccess
+from resources.lib.graph import items as graph_items
+from resources.lib.vendor.clouddrive_common.cache.cache import Cache
+from resources.lib.vendor.clouddrive_common.exception import ExceptionUtils
+from resources.lib.vendor.clouddrive_common.export import ExportManager
 from resources.lib.vendor.clouddrive_common.ui.addon import CloudDriveAddon
+from resources.lib.vendor.clouddrive_common.ui.logger import Logger
+from resources.lib.vendor.clouddrive_common.ui.utils import KodiUtils
 from resources.lib.vendor.clouddrive_common.utils import Utils
 from resources.lib.provider.onedrive import OneDrive
+
+
+class _SilentDialog(object):
+    """Stands in for xbmcgui.Dialog while a widget reports a failure.
+
+    A widget is drawn on the home screen with nobody asking for it, so a failure
+    there is logged and not shown: a modal dialog over the home screen, raised
+    by a row the user never selected, is worse than an empty widget. Every
+    question is answered no, which is the answer that changes nothing.
+    """
+
+    def ok(self, *args, **kwargs):
+        return True
+
+    def yesno(self, *args, **kwargs):
+        return False
+
+    def notification(self, *args, **kwargs):
+        return None
 
 class OneDriveAddon(CloudDriveAddon):
     _provider = OneDrive()
     _action = None
+    # True when this invocation fills a widget rather than a window somebody
+    # opened. Class-level so an instance built without __init__ reads False.
+    _quiet = False
+    _large_thumbnails = False
+    _current_listing = None
     
     def __init__(self):
         super(OneDriveAddon, self).__init__()
+        self._quiet = self._running_as_widget()
+        if self._quiet or self._setting_on('fast_listing'):
+            # The count only feeds the progress bar, and it costs one request
+            # to Graph before every listing.
+            self._child_count_supported = False
+        self._large_thumbnails = self._setting_on('large_thumbnails', False)
+        self._provider.thumbnail_preference = (
+            graph_items.LARGE_THUMBNAIL_PREFERENCE if self._large_thumbnails
+            else graph_items.THUMBNAIL_PREFERENCE)
+        # The folder whose listing is being built, so each row can offer to
+        # refresh it. Set by _list_folder.
+        self._current_listing = None
+
+    def _add_sort_methods(self):
+        if Utils.get_safe_value(self._addon_params, 'action') == '_latest_videos':
+            # Newest first is the whole point of that listing, and Kodi opens
+            # a listing in the order of the first sort method it was given.
+            import xbmcplugin
+            for method in (xbmcplugin.SORT_METHOD_UNSORTED,
+                           xbmcplugin.SORT_METHOD_DATE,
+                           xbmcplugin.SORT_METHOD_LABEL,
+                           xbmcplugin.SORT_METHOD_SIZE):
+                xbmcplugin.addSortMethod(handle=self._addon_handle,
+                                         sortMethod=method)
+            return
+        super(OneDriveAddon, self)._add_sort_methods()
         
     def get_provider(self):
         return self._provider
+
+    # ------------------------------------------------------------------
+    # Quick access: fewer steps from the add-on to a video.
+    # ------------------------------------------------------------------
+
+    def _setting_on(self, setting_id, default=True):
+        # '' is what Kodi answers for a setting that was never stored, which is
+        # every new setting on an existing installation until its screen is
+        # saved once. That must read as the declared default, not as off.
+        value = self._addon.getSetting(setting_id)
+        if value == '':
+            return default
+        return value == 'true'
+
+    @staticmethod
+    def _running_as_widget():
+        # A listing opened by a person runs inside one of the media windows
+        # (Videos, Music, Pictures, Programs). A home-screen widget runs with
+        # the home window active instead.
+        import xbmc
+        return not xbmc.getCondVisibility('Window.IsMedia')
+
+    def _url(self, params):
+        return self._addon_url + '?' + urllib.parse.urlencode(params)
+
+    def _run_plugin(self, params):
+        return 'RunPlugin(' + self._url(params) + ')'
+
+    def list_accounts(self):
+        if self._setting_on('skip_single_account'):
+            drive = quickaccess.single_drive(self.get_accounts(),
+                                             self._needs_reauthorisation)
+            if drive:
+                self._home(drive['id'], skipped_accounts=True)
+                return
+        super(OneDriveAddon, self).list_accounts()
+
+    def _list_accounts(self):
+        """The full account list, reachable after it was skipped.
+
+        Skipping the list must not lose what only the list offers: adding a
+        second account, signing in again and removing an account.
+        """
+        super(OneDriveAddon, self).list_accounts()
+
+    def _list_drive(self, driveid):
+        if self._setting_on('merge_drive_menu'):
+            self._home(driveid)
+        else:
+            super(OneDriveAddon, self)._list_drive(driveid)
+
+    def _home(self, driveid, skipped_accounts=False):
+        """The drive's first screen: its folders, with the shortcuts on top.
+
+        Before, the first screen was a menu whose first row led to the folders,
+        so every visit cost one extra step. The menu's rows are kept, pinned to
+        the top of the same listing.
+        """
+        import xbmcplugin
+        # The failure handler reads the drive from the address to offer signing
+        # in again, and an address that skipped the account list names none.
+        if isinstance(self._addon_params, dict):
+            self._addon_params.setdefault('driveid', driveid)
+        start = quickaccess.get_start_folder(self._profile_path, driveid,
+                                             self._content_type)
+        rows = self._home_rows(driveid, start, skipped_accounts)
+        xbmcplugin.addDirectoryItems(self._addon_handle, rows, len(rows))
+        if start:
+            try:
+                self._list_folder(driveid, item_driveid=start['item_driveid'],
+                                  item_id=start['item_id'])
+                return
+            except Exception as ex:
+                httpex = ExceptionUtils.extract_exception(ex, HTTPError)
+                if httpex is None or httpex.code != 404:
+                    raise
+                # Deleted or moved out of reach on OneDrive. Forget it and fall
+                # back to the root, rather than leaving a first screen that can
+                # only ever show an error.
+                Logger.notice('start folder %s is gone; forgetting it'
+                              % start['item_id'])
+                quickaccess.clear_start_folder(self._profile_path, driveid,
+                                               self._content_type)
+                if not self._quiet:
+                    KodiUtils.show_notification(self._addon_string(30082))
+        self._list_folder(driveid, path='/')
+
+    def _home_rows(self, driveid, start, skipped_accounts):
+        import xbmcgui
+        rows = []
+        content_type = self._content_type
+
+        def add(label, params, context_options=None):
+            list_item = xbmcgui.ListItem('[B]%s[/B]' % Utils.unicode(label))
+            # Kept above the folders whatever sort order the user picks.
+            list_item.setProperty('SpecialSort', 'top')
+            if context_options:
+                list_item.addContextMenuItems(context_options)
+            rows.append((self._url(params), list_item, True))
+
+        if start:
+            add(self._addon_string(30091),
+                {'action': '_list_folder', 'path': '/',
+                 'content_type': content_type, 'driveid': driveid},
+                [(self._addon_string(30079), self._run_plugin(
+                    {'action': '_clear_start_folder',
+                     'content_type': content_type, 'driveid': driveid}))])
+        for folder in self.get_custom_drive_folders(driveid) or []:
+            params = {'action': '_list_folder', 'path': folder['path'],
+                      'content_type': content_type, 'driveid': driveid}
+            if 'params' in folder:
+                params.update(folder['params'])
+            add(folder['name'], params, folder.get('context_options'))
+        if content_type == 'video':
+            latest = {'action': '_latest_videos', 'content_type': content_type,
+                      'driveid': driveid}
+            if start:
+                latest['item_driveid'] = start['item_driveid']
+                latest['item_id'] = start['item_id']
+            else:
+                latest['path'] = '/'
+            add(self._addon_string(30092), latest)
+        if content_type in ('video', 'audio'):
+            add(self._common_addon.getLocalizedString(32000),
+                {'action': '_list_exports', 'content_type': content_type,
+                 'driveid': driveid})
+        add(self._common_addon.getLocalizedString(32039),
+            {'action': '_search', 'content_type': content_type,
+             'driveid': driveid})
+        if skipped_accounts:
+            add(self._addon_string(30077),
+                {'action': '_list_accounts', 'content_type': content_type})
+        return rows
+
+    # ------------------------------------------------------------------
+    # Folder listing cache
+    # ------------------------------------------------------------------
+
+    LISTING_CACHE = 'listing'
+
+    def _listing_cache(self):
+        try:
+            minutes = int(self._addon.getSetting('browse_cache_minutes') or 30)
+        except ValueError:
+            minutes = 30
+        if minutes <= 0:
+            return None
+        return Cache(self._addonid, self.LISTING_CACHE,
+                     datetime.timedelta(minutes=minutes))
+
+    def _listing_key(self, driveid, item_driveid, item_id, path):
+        return quickaccess.listing_cache_key(
+            driveid, item_driveid, item_id, path,
+            'L' if self._large_thumbnails else 'M')
+
+    def _folder_items(self, driveid, item_driveid=None, item_id=None,
+                      path=None, progress=True):
+        """A folder's items, from the listing cache when it holds them.
+
+        None when the listing was cancelled. The vendored listing asked OneDrive
+        on every visit; a folder opened again within the cache time is now
+        drawn without a network round trip.
+        """
+        provider = self.get_provider()
+        provider.configure(self._account_manager, driveid)
+        cache = self._listing_cache()
+        key = self._listing_key(driveid, item_driveid, item_id, path)
+        if cache and key:
+            items = cache.get(key)
+            if isinstance(items, list):
+                return items
+        if progress and self._child_count_supported:
+            item = provider.get_item(item_driveid, item_id, path)
+            if item:
+                self._load_target = Utils.get_safe_value(
+                    Utils.get_safe_value(item, 'folder', {}), 'child_count', 0)
+                self._progress_dialog_bg.create(
+                    self._addon_name,
+                    self._common_addon.getLocalizedString(32049)
+                    % Utils.str(self._load_target))
+        items = provider.get_folder_items(
+            item_driveid, item_id, path,
+            on_items_page_completed=(self.on_items_page_completed
+                                     if progress else None))
+        if self.cancel_operation():
+            return None
+        if cache and key:
+            try:
+                cache.set(key, items)
+            except (TypeError, ValueError) as ex:
+                # A listing that cannot be stored is still a listing.
+                Logger.debug('listing not cached: %s' % Utils.str(ex))
+        return items
+
+    def _list_folder(self, driveid, item_driveid=None, item_id=None, path=None):
+        items = self._folder_items(driveid, item_driveid, item_id, path)
+        if items is None:
+            return
+        self._current_listing = {
+            'driveid': driveid, 'item_driveid': item_driveid or '',
+            'item_id': item_id or '', 'path': path or ''}
+        self._process_items(items, driveid)
+
+    def _refresh_listing(self, driveid, item_driveid=None, item_id=None,
+                         path=None):
+        cache = self._listing_cache()
+        key = self._listing_key(driveid, item_driveid or None, item_id or None,
+                                path or None)
+        if cache and key:
+            cache.remove(key)
+        KodiUtils.executebuiltin('Container.Refresh')
+
+    def _clear_cache(self):
+        super(OneDriveAddon, self)._clear_cache()
+        Cache(self._addonid, self.LISTING_CACHE, 0).clear()
+
+    def _latest_videos(self, driveid, item_driveid=None, item_id=None,
+                       path=None):
+        """The newest videos in a folder and the folders below it."""
+        root = {'item_driveid': item_driveid, 'id': item_id, 'path': path}
+
+        def list_children(folder):
+            if folder is root:
+                items = self._folder_items(driveid, item_driveid, item_id,
+                                           path, progress=False)
+            else:
+                items = self._folder_items(
+                    driveid,
+                    Utils.default(Utils.get_safe_value(folder, 'drive_id'),
+                                  item_driveid or driveid),
+                    folder.get('id'), progress=False)
+            return items or []
+
+        extensions = self._video_file_extensions
+
+        def is_video(item):
+            return 'video' in item or item.get('name_extension') in extensions
+
+        self.get_provider().configure(self._account_manager, driveid)
+        videos = quickaccess.newest_videos(list_children, root, is_video)
+        if self.cancel_operation():
+            return
+        self._process_items(videos, driveid)
+
+    def _process_items(self, items, driveid):
+        if self._content_type == 'video':
+            # Lets the skin offer its video views (poster, wall, info) on the
+            # add-on's folders, as it does in the library.
+            import xbmcplugin
+            xbmcplugin.setContent(self._addon_handle, 'videos')
+        super(OneDriveAddon, self)._process_items(items, driveid)
+
+    def on_items_page_completed(self, items):
+        if self._quiet:
+            return
+        super(OneDriveAddon, self).on_items_page_completed(items)
+
+    def get_context_options(self, list_item, params, is_folder):
+        options = super(OneDriveAddon, self).get_context_options(
+            list_item, params, is_folder)
+        if self._current_listing:
+            refresh = {'action': '_refresh_listing',
+                       'content_type': self._content_type}
+            refresh.update(self._current_listing)
+            options.append((self._addon_string(30093),
+                            self._run_plugin(refresh)))
+        if not is_folder or not params.get('item_id'):
+            return options
+        content_type = self._content_type
+        driveid = params.get('driveid')
+        item_driveid = params.get('item_driveid') or driveid
+        item_id = params['item_id']
+        options.append((self._addon_string(30078), self._run_plugin(
+            {'action': '_set_start_folder', 'content_type': content_type,
+             'driveid': driveid, 'item_driveid': item_driveid,
+             'item_id': item_id, 'name': Utils.str(list_item.getLabel())})))
+        if content_type == 'video':
+            latest = {'action': '_latest_videos', 'content_type': content_type,
+                      'driveid': driveid, 'item_driveid': item_driveid,
+                      'item_id': item_id}
+            options.append((self._addon_string(30092),
+                            'Container.Update(%s)' % self._url(latest)))
+            for kind, string_id in (('movies', 30083), ('tvshows', 30084)):
+                options.append((self._addon_string(string_id), self._run_plugin(
+                    {'action': '_add_to_library', 'content_type': content_type,
+                     'driveid': driveid, 'item_driveid': item_driveid,
+                     'item_id': item_id, 'kind': kind})))
+        return options
+
+    def _set_start_folder(self, driveid, item_driveid, item_id, name=None):
+        # Only the drive's own account list can have produced `driveid`; one
+        # that no stored account holds is refused here, before anything is
+        # written, by the same lookup every other action makes.
+        self._account_manager.get_by_driveid('drive', driveid)
+        quickaccess.set_start_folder(self._profile_path, driveid,
+                                     self._content_type, item_driveid, item_id,
+                                     Utils.unicode(name or ''))
+        KodiUtils.show_notification(self._addon_string(30080)
+                                    % Utils.unicode(name or item_id))
+
+    def _clear_start_folder(self, driveid):
+        quickaccess.clear_start_folder(self._profile_path, driveid,
+                                       self._content_type)
+        KodiUtils.show_notification(self._addon_string(30081))
+        KodiUtils.executebuiltin('Container.Refresh')
+
+    def _library_root(self):
+        configured = Utils.unicode(self._addon.getSetting('library_folder') or '')
+        if configured:
+            return Utils.unicode(KodiUtils.translate_path(configured))
+        return os.path.join(self._profile_path, 'library')
+
+    def _add_to_library(self, driveid, item_driveid, item_id, kind):
+        """Export a folder as .strm files into a library folder, in one step.
+
+        The name written to disk is read from OneDrive, never from the address:
+        the export service joins it onto the library folder, and removing the
+        export can delete that path, so a name taken from a plugin address
+        anyone can construct would be a path anyone could choose.
+
+        The library folder is then made a Kodi video source with the right
+        content and scraper (resources/lib/library_source.py), so the videos
+        reach Movies or TV shows by themselves after the first export.
+        """
+        if kind not in quickaccess.LIBRARY_KINDS:
+            return
+        provider = self.get_provider()
+        provider.configure(self._account_manager, driveid)
+        item = provider.get_item(item_driveid, item_id)
+        if not item or 'folder' not in item:
+            self._dialog.ok(self._addon_name, self._addon_string(30090))
+            return
+        name = Utils.unicode(item['name'])
+        item_driveid = Utils.default(Utils.get_safe_value(item, 'drive_id'),
+                                     item_driveid)
+        destination_kind = kind
+        if kind == 'tvshows':
+            destination_kind = self._tv_destination_kind(
+                driveid, item_driveid, item['id'], name)
+            if destination_kind is None:
+                return
+        root = self._library_root()
+        destination = quickaccess.library_destination(root, destination_kind)
+        first_of_kind = not KodiUtils.file_exists(os.path.join(destination, ''))
+        export_manager = ExportManager(self._profile_path)
+        export, refusal = quickaccess.plan_library_export(
+            export_manager.get_exports(), root, destination_kind, driveid,
+            item_driveid, item['id'], name,
+            lambda path: (KodiUtils.file_exists(path)
+                          or KodiUtils.file_exists(os.path.join(path, ''))))
+        if refusal:
+            if refusal == quickaccess.ALREADY_EXPORTED:
+                message = self._addon_string(30087)
+            elif refusal == quickaccess.NAME_TAKEN:
+                message = self._addon_string(30088) % name
+            elif refusal == quickaccess.FOLDER_EXISTS:
+                message = self._addon_string(30089) % name
+            else:
+                message = self._addon_string(30090)
+            self._dialog.ok(self._addon_name, message)
+            return
+        if first_of_kind:
+            KodiUtils.mkdirs(os.path.join(destination, ''))
+        # Before the export is saved: its first run ends with a library scan,
+        # and that scan must already know what the folder holds.
+        registered = self._register_library_source(destination_kind,
+                                                   destination, name)
+        export_manager.save_export(export)
+        content = KodiUtils.localize(342 if kind == 'movies' else 20343)
+        if registered:
+            self._dialog.ok(self._addon_name, self._addon_string(30097) % content)
+        elif first_of_kind or destination_kind == quickaccess.TV_COLLECTIONS:
+            source = (os.path.join(destination, name)
+                      if destination_kind == quickaccess.TV_COLLECTIONS
+                      else destination)
+            self._dialog.ok(self._addon_name, self._addon_string(30086)
+                            % (source, content))
+        else:
+            KodiUtils.show_notification(self._addon_string(30085))
+
+    def _tv_destination_kind(self, driveid, item_driveid, item_id, name):
+        """'tvshows' for one show, TV_COLLECTIONS for a folder of shows.
+
+        Guessed from the folder's contents and shown to the user as the
+        preselected answer; None when they cancel.
+        """
+        try:
+            children = self._folder_items(driveid, item_driveid, item_id,
+                                          progress=False) or []
+        except Exception as ex:
+            Logger.debug('could not list %s: %s' % (item_id, Utils.str(ex)))
+            children = []
+        extensions = self._video_file_extensions
+        has_videos = any('folder' not in child and (
+            'video' in child or child.get('name_extension') in extensions)
+            for child in children)
+        folders = [Utils.unicode(child.get('name') or '') for child in children
+                   if 'folder' in child]
+        one_show = library_source.looks_like_one_show(folders, has_videos)
+        choice = self._dialog.select(
+            self._addon_string(30100) % name,
+            [self._addon_string(30098), self._addon_string(30099)],
+            preselect=0 if one_show else 1)
+        if choice == 0:
+            return 'tvshows'
+        if choice == 1:
+            return quickaccess.TV_COLLECTIONS
+        return None
+
+    def _register_library_source(self, destination_kind, destination, name):
+        """Make the folder a video source Kodi scans. True when done.
+
+        False sends the user to the one-time instructions instead: the setting
+        is off, the library lives in MySQL, there is no scraper, or anything
+        here failed. Never raises; the export is worth having either way.
+        """
+        if not self._setting_on('library_auto_source'):
+            return False
+        try:
+            if destination_kind == 'movies':
+                content = library_source.MOVIES
+                path, label = destination, self._addon_string(30101)
+            elif destination_kind == 'tvshows':
+                content = library_source.TVSHOWS
+                path, label = destination, self._addon_string(30102)
+            else:
+                content = library_source.TVSHOWS
+                path = os.path.join(destination, name)
+                label = '%s - %s' % (self._addon_string(30102), name)
+                KodiUtils.mkdirs(os.path.join(path, ''))
+            translate = lambda p: Utils.unicode(KodiUtils.translate_path(p))
+            if library_source.uses_external_database(
+                    translate('special://masterprofile/advancedsettings.xml')):
+                Logger.notice('library: video database is not SQLite; '
+                              'leaving the source to the user')
+                return False
+            database = library_source.find_video_database(
+                translate('special://database/'))
+            if not database:
+                return False
+            scraper = library_source.choose_scraper(
+                content, self._default_scraper(content), self._addon_enabled)
+            if not scraper:
+                Logger.notice('library: no %s scraper installed' % content)
+                return False
+            outcome = library_source.ensure_path_content(
+                database, path, content, scraper)
+            Logger.notice('library: %s as %s (%s): %s'
+                          % (path, content, scraper, outcome))
+            sources = translate('special://profile/sources.xml')
+            library_source.ensure_video_source(sources, label, path)
+            library_source.remember_source(
+                os.path.join(self._profile_path, library_source.REGISTRY_FILE),
+                label, path)
+            return True
+        except Exception as ex:
+            Logger.error('library: could not register %s: %s'
+                         % (destination, ExceptionUtils.full_stacktrace(ex)))
+            return False
+
+    @staticmethod
+    def _default_scraper(content):
+        setting = ('scrapers.moviesdefault' if content == library_source.MOVIES
+                   else 'scrapers.tvshowsdefault')
+        try:
+            response = KodiUtils.execute_json_rpc(
+                'Settings.GetSettingValue', {'setting': setting})
+            return response['result']['value']
+        except Exception:
+            return None
+
+    @staticmethod
+    def _addon_enabled(addon_id):
+        import xbmc
+        return bool(xbmc.getCondVisibility('System.HasAddon(%s)' % addon_id))
+
+    def _handle_exception(self, ex, show_error_dialog=True):
+        if not self._quiet:
+            super(OneDriveAddon, self)._handle_exception(ex, show_error_dialog)
+            return
+        dialog = self._dialog
+        self._dialog = _SilentDialog()
+        try:
+            super(OneDriveAddon, self)._handle_exception(ex, False)
+        finally:
+            self._dialog = dialog
+        # A widget waits on its listing; close it as failed so the skin stops
+        # waiting. An action run with RunPlugin has no listing (handle -1).
+        if self._addon_handle is not None and self._addon_handle >= 0:
+            import xbmcplugin
+            xbmcplugin.endOfDirectory(self._addon_handle, succeeded=False)
     
     def get_custom_drive_folders(self, driveid):
         drive = self._account_manager.get_by_driveid('drive', driveid)
@@ -248,6 +800,12 @@ class OneDriveAddon(CloudDriveAddon):
         """
         actions = super(OneDriveAddon, self)._action_map()
         actions['_dialog_smoke'] = self._dialog_smoke
+        actions['_list_accounts'] = self._list_accounts
+        actions['_set_start_folder'] = self._set_start_folder
+        actions['_clear_start_folder'] = self._clear_start_folder
+        actions['_add_to_library'] = self._add_to_library
+        actions['_latest_videos'] = self._latest_videos
+        actions['_refresh_listing'] = self._refresh_listing
         return actions
 
     def _rename_action(self):

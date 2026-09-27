@@ -41,6 +41,10 @@ class OneDrive(Provider):
 
     def __init__(self, source_mode = False):
         super(OneDrive, self).__init__('onedrive', source_mode)
+        # Which thumbnail sizes to ask for, most wanted first. The browse layer
+        # replaces it when the user asks for sharper thumbnails; every other
+        # caller keeps the default.
+        self.thumbnail_preference = graph_items.THUMBNAIL_PREFERENCE
         
     def _get_api_url(self):
         return 'https://graph.microsoft.com/v1.0'
@@ -209,7 +213,9 @@ class OneDrive(Provider):
         # no Kodi module and is therefore testable against recorded JSON without
         # a stub library. The method stays because the vendored callers reach it
         # by name.
-        return graph_items.extract_item(f, include_download_info)
+        return graph_items.extract_item(f, include_download_info,
+                                        getattr(self, "thumbnail_preference",
+                                                graph_items.THUMBNAIL_PREFERENCE))
     
     def search(self, query, item_driveid=None, item_id=None, on_items_page_completed=None):
         item_driveid = Utils.default(item_driveid, self._driveid)

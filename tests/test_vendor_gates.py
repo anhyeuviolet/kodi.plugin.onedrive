@@ -667,6 +667,26 @@ def test_addon_xml_identity():
             '<%s> is %r; it must point at this repository' % (field, value))
 
 
+# The checker's metadata schema caps <news> at 1500 characters
+# (nonEmptyStringCapped), and a longer changelog fails all three checker legs
+# with nothing more specific than "schema validation failed". Kodi shows the
+# text only as the changelog of the version being installed, so older entries
+# are dropped rather than the newest one shortened.
+NEWS_MAX_LENGTH = 1500
+
+
+def test_addon_xml_news_fits_the_schema():
+    metadata = _addon_xml().find("./extension[@point='xbmc.addon.metadata']")
+    news = metadata.findtext('news') or ''
+    assert news.strip(), 'the manifest has no <news> for this version'
+    assert len(news) <= NEWS_MAX_LENGTH, (
+        '<news> is %d characters; the checker schema allows %d. Drop the '
+        'oldest version entries.' % (len(news), NEWS_MAX_LENGTH))
+    version = _addon_xml().get('version')
+    assert news.lstrip().startswith('v%s:' % version), (
+        '<news> does not open with an entry for version %s' % version)
+
+
 def test_addon_xml_imports():
     imports = _addon_xml().findall('./requires/import')
     assert len(imports) == 1, (
@@ -710,7 +730,8 @@ def test_addon_xml_imports():
 # and the sign-in copy reference by number.
 ADDON_STRING_IDS = (set(range(30000, 30012)) | set(range(30017, 30021))
                     | {30032, 30034, 30035} | set(range(30036, 30060))
-                    | set(range(30067, 30070)) | set(range(30070, 30072)))
+                    | set(range(30067, 30070)) | set(range(30070, 30072))
+                    | set(range(30072, 30103)))
 # The vendored module's contiguous block, left exactly where it was: the module
 # resolves some of these dynamically and one is persisted, so a mechanical
 # renumber cannot see them and would invalidate stored data.
@@ -725,6 +746,7 @@ DYNAMIC_SCHEDULE_IDS = {32081, 32082}           # persisted export schedule type
 PO_FILES = {
     'en_gb': 'resources/language/resource.language.en_gb/strings.po',
     'he_il': 'resources/language/resource.language.he_il/strings.po',
+    'vi_vn': 'resources/language/resource.language.vi_vn/strings.po',
 }
 
 
@@ -789,11 +811,12 @@ def test_localize_owns_this_addons_block():
 
 
 def test_string_ids_partitioned():
-    assert len(ADDON_STRING_IDS) == 48, (
+    assert len(ADDON_STRING_IDS) == 79, (
         'the add-on owns 22 of the renumbered ids -- three of the original 25 '
         'went with the settings rows they labelled -- the 23 the sign-in copy '
-        "added, re-authorisation's wrong-account refusal, and the label and "
-        'help of the custom application identifier')
+        "added, re-authorisation's wrong-account refusal, the label and "
+        'help of the custom application identifier, the 24 of quick '
+        'access, and the 7 of the library source set-up')
     assert len(MODULE_STRING_IDS) == 89, 'the module owns 89 ids'
 
     sets = {}
@@ -821,6 +844,10 @@ def test_string_ids_partitioned():
     assert 32012 in en_gb, (
         '32012 belongs to the vendored module and must survive; the module '
         'block 32000-32088 is contiguous')
+
+    assert sets['vi_vn'] == EXPECTED_STRING_IDS, (
+        'vi_vn is a complete translation and must stay one.\n  missing: %r'
+        % (sorted(EXPECTED_STRING_IDS - sets['vi_vn']),))
 
     he_il = sets['he_il']
     assert he_il <= EXPECTED_STRING_IDS, (
@@ -854,6 +881,35 @@ def test_string_ids_partitioned():
             'these %s ids are resolved at runtime and cannot be seen by a '
             'static scan, so their absence would surface only to a user: %r'
             % (label, missing))
+
+
+def test_translations_keep_every_placeholder():
+    """A translation that drops or reorders a %s raises when it is formatted.
+
+    The catalogue is formatted with the % operator, so a sentence with one
+    placeholder too few fails as TypeError on the television, and one with the
+    two placeholders swapped puts the path where the content type belongs.
+    [CR] and [B] are compared too: they are layout, not words.
+    """
+    token = re.compile(r'%s|\[CR\]|\[/?B\]')
+    pair = re.compile(r'msgctxt "#(\d+)"\r?\nmsgid "((?:[^"\\]|\\.)*)"\r?\n'
+                      r'msgstr "((?:[^"\\]|\\.)*)"')
+    checked = 0
+    broken = []
+    for language, rel in PO_FILES.items():
+        if language == 'en_gb':
+            continue
+        for match in pair.finditer(_read(rel)):
+            string_id, source, translated = match.groups()
+            if not translated:
+                continue
+            checked += 1
+            if token.findall(source) != token.findall(translated):
+                broken.append('%s #%s: %r -> %r' % (
+                    language, string_id, token.findall(source),
+                    token.findall(translated)))
+    assert checked > 100, 'read only %d translated strings' % checked
+    assert not broken, '\n'.join(broken)
 
 
 # ---------------------------------------------------------------------------

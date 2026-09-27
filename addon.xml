@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="plugin.onedrive.kn" name="OneDrive KN" version="1.0.2" provider-name="Kenny Nguyen">
+<addon id="plugin.onedrive.kn" name="OneDrive KN" version="1.2.0" provider-name="Kenny Nguyen">
 	<requires>
 		<import addon="xbmc.python" version="3.0.1" />
 	</requires>
@@ -29,6 +29,15 @@ Play all your media from OneDrive including Videos, Music and Pictures.
   - שימוש ב-OneDrive כמקור
   - תוכנית זו אינה מזוהה עם או בחסות מיקרוסופט.
 		</description>		
+		<summary lang="vi_VN">Microsoft OneDrive cho KODI</summary>
+		<description lang="vi_VN">
+Phát mọi nội dung trên OneDrive, gồm video, nhạc và ảnh.
+ - Không giới hạn số tài khoản cá nhân hoặc doanh nghiệp.
+ - Tìm kiếm trong ổ của bạn.
+ - Mở thẳng thư mục video, thư mục khởi động, danh sách video mới nhất.
+ - Thêm thư mục video vào thư viện Kodi (tệp .strm) chỉ với một bước.
+ - Chương trình này không liên kết với và không được Microsoft tài trợ.
+		</description>
 		<license>GPL-3.0-or-later</license>
 		<source>https://github.com/anhyeuviolet/kodi.plugin.onedrive</source>
 		<forum>https://github.com/anhyeuviolet/kodi.plugin.onedrive/issues</forum>
@@ -37,26 +46,17 @@ Play all your media from OneDrive including Videos, Music and Pictures.
 			<fanart>fanart.jpg</fanart>
 		</assets>
 		<news>
-v1.0.2:
-- Load subtitle files from the video's folder, including different filenames and additional listing pages.
-- Use the correct drive when finding subtitles beside shared videos.
-- Fix subtitle caching on repeated HTTP-source playback and attach subtitles only after media is ready.
-- Preserve spaces, Unicode and percent signs in subtitle URLs.
+v1.2.0:
+- First video after Kodi starts no longer stops: the export service waits until playback ends; opening retries a cold connection; one link lookup per video.
+- Playback resumes after any number of dropped connections.
+- Add to library registers the folder as a Kodi video source with a scraper, so videos appear in Movies / TV shows by themselves. A folder of several shows becomes a source of its own.
+- Stream events are logged (no links) for troubleshooting.
 
-v1.0.1:
-- Folder names containing a space, a # or a % now open. Before this, such a folder produced no request at all.
-- A video file is no longer also treated as an image, so it plays instead of opening in the picture viewer.
-- The shared Personal Vault now shows its name instead of a blank row, and opens in the drive that holds it.
-- Search works on a business drive. It previously failed outright, and afterwards ordinary browsing failed too until Kodi was restarted.
-- Very large folders no longer stop partway. Paging was rebuilt and is held to 1,500 pages.
-- Cancelling a slow listing now ends it cleanly instead of showing an error.
-- Thumbnails are fetched at a size suited to the row they are drawn in, rather than the largest available.
-
-v1.0.0:
-- First release under a new add-on id, maintained independently of the original.
-- Signing in now goes straight to Microsoft: a code appears on screen and you enter it on your phone. It no longer passes through a third-party sign-in server.
-- Self-contained: the Cloud Drive common module is bundled, so no separate module add-on is needed.
-- Requires Kodi 20 or newer.
+v1.1.0:
+- Playback relays the video and renews OneDrive's expiring link.
+- One account opens straight on the drive's folders; start folder; Latest videos.
+- Add a folder to the library as movies or TV shows. Cached folder listings.
+- Vietnamese translation.
 		</news>
 		<disclaimer lang="en_GB">
 This add-on signs in with the OAuth 2.0 device authorization grant, directly to Microsoft. It shows

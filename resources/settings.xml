@@ -105,6 +105,64 @@
 				</setting>
 			</group>
 		</category>
+		<!--
+			Quick access. The first three change only how the add-on is browsed
+			and default to on; each can be turned off to get the previous
+			behaviour back exactly. The library folder is where "Add to library"
+			writes its .strm files; empty means a folder inside this add-on's
+			own data, which needs no permission to write.
+		-->
+		<category id="quickaccess" label="30072">
+			<group id="1">
+				<setting id="skip_single_account" type="boolean" label="30073">
+					<level>0</level>
+					<default>true</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="merge_drive_menu" type="boolean" label="30074">
+					<level>0</level>
+					<default>true</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="fast_listing" type="boolean" label="30075">
+					<level>0</level>
+					<default>true</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="browse_cache_minutes" type="integer" label="30094">
+					<level>0</level>
+					<default>30</default>
+					<constraints>
+						<minimum>0</minimum>
+						<maximum>240</maximum>
+					</constraints>
+					<control type="edit" format="integer"/>
+				</setting>
+				<setting id="large_thumbnails" type="boolean" label="30095">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+			</group>
+			<group id="2">
+				<setting id="library_folder" type="path" label="30076">
+					<level>1</level>
+					<default></default>
+					<constraints>
+						<writable>true</writable>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="button" format="path">
+						<heading>30076</heading>
+					</control>
+				</setting>
+				<setting id="library_auto_source" type="boolean" label="30096">
+					<level>1</level>
+					<default>true</default>
+					<control type="toggle"/>
+				</setting>
+			</group>
+		</category>
 		<category id="advanced" label="30032">
 			<group id="1">
 				<!--

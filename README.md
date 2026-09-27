@@ -56,6 +56,78 @@ yet been signed in on the television; that is the next piece of work.
   served an index of the whole drive on a loopback port with no authorisation check of any kind,
   which on Android means every installed application could read it.
 
+## Quick access
+
+Getting from the add-on to a video takes as few steps as the setting screen allows. Everything
+below is in Settings → Quick access and can be switched off to get the previous behaviour back.
+
+- **The only account opens directly.** With one signed-in account the add-on skips the account
+  list. An *Accounts* row at the top keeps adding, re-signing and removing accounts one step
+  away. An account that needs signing in again always keeps its own row.
+- **The first screen is the drive's folders.** Recent, Shared with me, Exports and Search are
+  pinned above the folders instead of forming a menu of their own.
+- **Start folder.** On any folder, context menu → *Set as start folder*: the add-on then opens
+  there, with an *All files* row on top leading back to the root. *Reset start folder* is on
+  that row's context menu. If the folder is deleted on OneDrive, the add-on forgets it and
+  opens on the root.
+- **Faster folders.** A folder is listed with one request to OneDrive instead of two; the
+  second one only counted the items for the progress bar. A folder opened again within 30
+  minutes (configurable, 0 turns it off) is drawn from a local cache without asking OneDrive
+  at all. *Refresh this folder* on any row's context menu fetches it again at once.
+- **Latest videos.** A *Latest videos* row on the first screen, and the same entry on any
+  video folder's context menu, lists the 50 newest videos in that folder and two levels of
+  folders below it, newest first. It works well as a home-screen widget.
+- **Sharper thumbnails.** An option that fetches the large thumbnail size, for skins' poster
+  and wall views. Off by default because it downloads more for every row.
+- **Video views.** Video folders declare themselves as videos, so the skin offers its poster,
+  wall and info views.
+
+**On the home screen.** Kodi's own context menu → *Add to favourites* works on any folder in the
+add-on, and the favourite opens that folder in one step. Skins with configurable widgets can use a
+folder as a widget; there the add-on shows no progress bar and no error dialogs, and a failure only
+reaches the log.
+
+**In the library.** On a video folder, context menu → *Add to library as movies* or *Add to
+library as TV shows*. This is the existing export (Exports) with sensible defaults: `.strm` files
+are written into `library/movies` or `library/tvshows` inside the add-on's data folder (or the
+folder chosen in the settings), later changes on OneDrive are followed, and Kodi's library is
+updated after each change.
+
+The add-on then sets the folder up as a Kodi video source by itself: it writes the content (Movies
+or TV shows) and Kodi's default scraper into the video database, and adds the folder to
+`sources.xml`. The videos appear under Movies or TV shows a few minutes after the first export,
+with no trip through Videos → Files → Add videos. (The folder itself is listed under Videos → Files
+after the next restart, because Kodi reads `sources.xml` only when it starts.) For *TV shows* the
+add-on asks whether the folder is one show or a folder of several shows, with its own guess
+preselected; a folder of several shows becomes a source of its own, so each subfolder is read as
+one show.
+
+This is skipped, and the add-on shows the folder's path to add by hand instead, when the setting
+*Set up the library folders as Kodi video sources automatically* is off, when the library lives in
+a shared MySQL/MariaDB database, or when no scraper is installed.
+
+The add-on never writes into a folder it did not create. If the library folder already holds a
+folder with the same name, it refuses: an export empties its destination folder before it writes.
+
+## Playback
+
+Kodi plays a file from the add-on's local service at `127.0.0.1`. That service fetches the
+bytes from OneDrive and passes them on. It used to redirect Kodi to OneDrive's own download
+link instead. That link expires after about an hour, and Kodi keeps using it, so a long video
+could stop partway through. Now the service asks for a new link when the old one is refused,
+and when the connection to OneDrive breaks it carries on from the byte where it stopped, as
+many times as it takes: only five failures in a row end the stream.
+
+The first video after Kodi starts had problems of its own. The export service ran its first
+pass at that moment (change lookups, `.strm` and artwork writes, a full library scan), and the
+first connection to OneDrive's download servers is the slowest one. Now the export service
+waits 90 seconds after Kodi starts and never runs while a video plays; opening a stream is
+retried when OneDrive cannot be reached or is busy; and the requests Kodi opens at once when a
+video starts share one link lookup.
+
+If a video still stops, the Kodi log has one line per event, starting `stream GET <item id>`:
+reopenings, retries, and why it ended. Download links are never written to the log.
+
 ## Requirements
 
 Kodi 20 (Nexus), 21 (Omega) or 22 (Piers). Kodi 19 and earlier are not supported and the add-on
