@@ -364,6 +364,7 @@ def test_folders_offer_start_folder_and_library_and_files_do_not(tmp_path):
         actions = [_params(cmd[cmd.index('(') + 1:-1]).get('action')
                    for _, cmd in folder]
         assert actions == ['_set_start_folder', '_latest_videos',
+                           '_add_to_favourites', '_create_playlist',
                            '_add_to_library', '_add_to_library']
         # Opened in place, so Back returns to the folder list.
         assert folder[1][1].startswith('Container.Update(')

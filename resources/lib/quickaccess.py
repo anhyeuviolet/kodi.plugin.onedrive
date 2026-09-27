@@ -35,6 +35,7 @@ is not its own.
 
 import json
 import os
+import re
 
 START_FOLDERS_FILE = 'start_folders.json'
 
@@ -300,3 +301,109 @@ def listing_cache_key(driveid, item_driveid, item_id, path, variant):
         return None
     return json.dumps([driveid, item_driveid or '', item_id or '', path or '',
                        variant], separators=(',', ':'))
+
+
+# ---------------------------------------------------------------------------
+# Collections: Favourites and playlists made from a folder
+# ---------------------------------------------------------------------------
+
+# A folder's videos, walked deeper than Latest videos: a playlist of a series
+# wants every episode, not the newest fifty. Still bounded, because each
+# listing is a request and the user is waiting on a busy dialog.
+COLLECT_MAX_DEPTH = 4
+COLLECT_MAX_LISTINGS = 100
+FAVOURITES_LIMIT = 200
+PLAYLIST_LIMIT = 2000
+
+_DIGITS = re.compile(r'(\d+)')
+
+
+def natural_key(name):
+    """Episode 2 before Episode 10, whatever the case."""
+    return [(0, int(part), '') if part.isdigit() else (1, 0, part.casefold())
+            for part in _DIGITS.split(name or '') if part]
+
+
+def collect_videos(list_children, root, is_video, max_depth=COLLECT_MAX_DEPTH,
+                   max_listings=COLLECT_MAX_LISTINGS, limit=None):
+    """Every video under `root`, in the order a person would watch them.
+
+    Returns (videos, complete). Each video is (folders, item): `folders` is the
+    list of folder names from `root` down to the one holding it. Ordered by
+    folder path and then by name, both naturally (2 before 10). `complete` is
+    False when a cap cut the walk short, so the caller can say so.
+    """
+    found = []
+    queue = [(root, [], 0)]
+    listings = 0
+    complete = True
+    while queue:
+        if listings >= max_listings:
+            complete = False
+            break
+        folder, names, depth = queue.pop(0)
+        listings += 1
+        for item in list_children(folder) or []:
+            if not isinstance(item, dict):
+                continue
+            if 'folder' in item:
+                if depth < max_depth:
+                    queue.append((item, names + [str(item.get('name') or '')],
+                                  depth + 1))
+                else:
+                    complete = False
+            elif is_video(item):
+                found.append((names, item))
+    found.sort(key=lambda entry: ([natural_key(n) for n in entry[0]],
+                                  natural_key(str(entry[1].get('name') or ''))))
+    if limit is not None and len(found) > limit:
+        found = found[:limit]
+        complete = False
+    return found, complete
+
+
+def video_label(folders, name):
+    """What a Favourites row or playlist entry is called.
+
+    The file name without its extension, after the folder holding it when that
+    is not the chosen folder itself -- "Season 1 - Episode 01" rather than
+    twelve rows all called "Episode 01".
+    """
+    stem = name.rsplit('.', 1)[0] if '.' in (name or '')[1:] else (name or '')
+    return '%s - %s' % (folders[-1], stem) if folders else stem
+
+
+def favourites_to_add(existing_paths, candidates):
+    """The candidates whose path is not a favourite yet, in order, once each.
+
+    Kodi's AddFavourite removes a favourite that is already there, so adding
+    one twice would take it away again.
+    """
+    seen = set(existing_paths or ())
+    result = []
+    for candidate in candidates:
+        if candidate['path'] in seen:
+            continue
+        seen.add(candidate['path'])
+        result.append(candidate)
+    return result
+
+
+_UNSAFE_FILE_CHARS = re.compile(r'[\\/:*?"<>|\x00-\x1f]+')
+
+
+def playlist_filename(name):
+    """A file name for the playlist of the folder `name`, safe on every OS."""
+    cleaned = _UNSAFE_FILE_CHARS.sub(' ', name or '').strip(' .')
+    cleaned = re.sub(r'\s+', ' ', cleaned)[:80] or 'OneDrive'
+    return 'OneDrive - %s.m3u' % cleaned
+
+
+def m3u_playlist(entries):
+    """An extended M3U playlist of (label, url) entries, as text."""
+    lines = ['#EXTM3U']
+    for label, url in entries:
+        label = re.sub(r'[\r\n]+', ' ', label or '')
+        lines.append('#EXTINF:-1,%s' % label)
+        lines.append(url)
+    return '\n'.join(lines) + '\n'

@@ -106,6 +106,19 @@ This is skipped, and the add-on shows the folder's path to add by hand instead, 
 *Set up the library folders as Kodi video sources automatically* is off, when the library lives in
 a shared MySQL/MariaDB database, or when no scraper is installed.
 
+**As Favourites or a playlist.** On a video folder, context menu → *Add videos to Favourites*
+lists the videos in the folder and in the folders below it (four levels, at most 200 videos),
+in watching order -- Season 2 before Season 10, Episode 2 before Episode 10 -- all ticked;
+untick the ones you do not want. They are added through Kodi's own Favourites service, so they
+show up at once, with their thumbnails, as "Season 2 - Episode 10" rather than a dozen rows
+called "Episode 10". A video already in Favourites is skipped, including one added by hand.
+
+*Save as a playlist* writes the same list (up to 2,000 videos) as `OneDrive - <folder>.m3u`
+under Videos → Playlists, where it plays in order and can be used as a widget. Every entry plays
+through the add-on, so the playlist never holds a link that expires. Both are snapshots of the
+folder: run them again to pick up new videos. For a collection that keeps itself up to date,
+use *Add to library*.
+
 The add-on never writes into a folder it did not create. If the library folder already holds a
 folder with the same name, it refuses: an export empties its destination folder before it writes.
 

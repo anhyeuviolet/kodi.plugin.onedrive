@@ -375,6 +375,12 @@ class OneDriveAddon(CloudDriveAddon):
                       'item_id': item_id}
             options.append((self._addon_string(30092),
                             'Container.Update(%s)' % self._url(latest)))
+            for action, string_id in (('_add_to_favourites', 30103),
+                                      ('_create_playlist', 30104)):
+                options.append((self._addon_string(string_id), self._run_plugin(
+                    {'action': action, 'content_type': content_type,
+                     'driveid': driveid, 'item_driveid': item_driveid,
+                     'item_id': item_id})))
             for kind, string_id in (('movies', 30083), ('tvshows', 30084)):
                 options.append((self._addon_string(string_id), self._run_plugin(
                     {'action': '_add_to_library', 'content_type': content_type,
@@ -568,6 +574,152 @@ class OneDriveAddon(CloudDriveAddon):
     def _addon_enabled(addon_id):
         import xbmc
         return bool(xbmc.getCondVisibility('System.HasAddon(%s)' % addon_id))
+
+    # ------------------------------------------------------------------
+    # Favourites and playlists made from a folder
+    # ------------------------------------------------------------------
+
+    def _play_url(self, driveid, item_driveid, item_id):
+        # The same address, parameter for parameter and in the same order, as
+        # the row in a folder listing: a video the user already added to
+        # Favourites by hand is then recognised and not added twice.
+        return self._url({'content_type': 'video',
+                          'item_driveid': item_driveid, 'item_id': item_id,
+                          'driveid': driveid, 'action': 'play'})
+
+    def _collect_folder_videos(self, driveid, item_driveid, item_id, limit):
+        """(folder item, [(folders, video)], complete), or None if not a folder."""
+        provider = self.get_provider()
+        provider.configure(self._account_manager, driveid)
+        folder = provider.get_item(item_driveid, item_id)
+        if not folder or 'folder' not in folder:
+            return None
+        root = {'id': item_id}
+        extensions = self._video_file_extensions
+
+        def list_children(entry):
+            if entry is root:
+                return self._folder_items(driveid, item_driveid, item_id,
+                                          progress=False) or []
+            return self._folder_items(
+                driveid,
+                Utils.default(Utils.get_safe_value(entry, 'drive_id'),
+                              item_driveid or driveid),
+                entry.get('id'), progress=False) or []
+
+        def is_video(entry):
+            return 'video' in entry or entry.get('name_extension') in extensions
+
+        KodiUtils.executebuiltin('ActivateWindow(busydialognocancel)')
+        try:
+            videos, complete = quickaccess.collect_videos(
+                list_children, root, is_video, limit=limit)
+        finally:
+            KodiUtils.executebuiltin('Dialog.Close(busydialognocancel)')
+        return folder, videos, complete
+
+    def _entries(self, driveid, item_driveid, videos):
+        entries = []
+        for folders, video in videos:
+            video_driveid = Utils.default(
+                Utils.get_safe_value(video, 'drive_id'), item_driveid or driveid)
+            entries.append({
+                'label': quickaccess.video_label(
+                    folders, Utils.unicode(video.get('name') or '')),
+                'path': self._play_url(driveid, video_driveid, video['id']),
+                'thumbnail': video.get('thumbnail') or ''})
+        return entries
+
+    def _add_to_favourites(self, driveid, item_driveid, item_id):
+        """Add the videos of a folder, and of the folders below it, to Favourites.
+
+        Kodi's own "Add to favourites" takes one row at a time. This lists the
+        folder's videos, lets the user untick the ones they do not want (all
+        are ticked), and adds the rest through Kodi's JSON-RPC, which updates
+        Favourites at once. A favourite that is already there is skipped:
+        AddFavourite takes away a favourite it is given twice.
+        """
+        collected = self._collect_folder_videos(
+            driveid, item_driveid, item_id, quickaccess.FAVOURITES_LIMIT)
+        if collected is None:
+            self._dialog.ok(self._addon_name, self._addon_string(30090))
+            return
+        folder, videos, complete = collected
+        if not videos:
+            self._dialog.ok(self._addon_name, self._addon_string(30107))
+            return
+        entries = self._entries(driveid, item_driveid, videos)
+        chosen = self._dialog.multiselect(
+            self._addon_string(30105), [e['label'] for e in entries],
+            preselect=list(range(len(entries))))
+        if not chosen:
+            return
+        existing = self._favourite_paths()
+        wanted = quickaccess.favourites_to_add(
+            existing, [entries[i] for i in chosen])
+        added = 0
+        for entry in wanted:
+            params = {'title': entry['label'], 'type': 'media',
+                      'path': entry['path']}
+            if entry['thumbnail']:
+                params['thumbnail'] = entry['thumbnail']
+            response = KodiUtils.execute_json_rpc('Favourites.AddFavourite',
+                                                  params)
+            if isinstance(response, dict) and response.get('result') == 'OK':
+                added += 1
+            else:
+                Logger.error('favourite not added: %s' % Utils.str(response))
+        message = self._addon_string(30106) % (added, len(chosen) - len(wanted))
+        if not complete:
+            message += ' ' + self._addon_string(30110)
+        KodiUtils.show_notification(message)
+
+    @staticmethod
+    def _favourite_paths():
+        response = KodiUtils.execute_json_rpc(
+            'Favourites.GetFavourites', {'properties': ['path']})
+        try:
+            favourites = response['result']['favourites'] or []
+        except (KeyError, TypeError):
+            return set()
+        return set(f.get('path') for f in favourites if isinstance(f, dict))
+
+    def _create_playlist(self, driveid, item_driveid, item_id):
+        """Save a folder's videos as a playlist under Videos > Playlists.
+
+        An .m3u of the add-on's own play addresses: every entry plays through
+        the add-on, so the playlist never holds a link that expires. It is a
+        snapshot of the folder; making it again brings it up to date.
+        """
+        collected = self._collect_folder_videos(
+            driveid, item_driveid, item_id, quickaccess.PLAYLIST_LIMIT)
+        if collected is None:
+            self._dialog.ok(self._addon_name, self._addon_string(30090))
+            return
+        folder, videos, complete = collected
+        if not videos:
+            self._dialog.ok(self._addon_name, self._addon_string(30107))
+            return
+        name = Utils.unicode(folder.get('name') or '')
+        filename = quickaccess.playlist_filename(name)
+        playlists = Utils.unicode(KodiUtils.translate_path(
+            'special://profile/playlists/video/'))
+        KodiUtils.mkdirs(os.path.join(playlists, ''))
+        target = os.path.join(playlists, filename)
+        if os.path.exists(target) and not self._dialog.yesno(
+                self._addon_name, self._addon_string(30109) % filename):
+            return
+        entries = self._entries(driveid, item_driveid, videos)
+        text = quickaccess.m3u_playlist([(e['label'], e['path'])
+                                         for e in entries])
+        temporary = target + '.tmp'
+        with open(temporary, 'w', encoding='utf-8') as out:
+            out.write(text)
+        os.replace(temporary, target)
+        message = self._addon_string(30108) % (filename, len(entries))
+        if not complete:
+            message += ' ' + self._addon_string(30110)
+        KodiUtils.show_notification(message, 8000)
 
     def _handle_exception(self, ex, show_error_dialog=True):
         if not self._quiet:
@@ -804,6 +956,8 @@ class OneDriveAddon(CloudDriveAddon):
         actions['_set_start_folder'] = self._set_start_folder
         actions['_clear_start_folder'] = self._clear_start_folder
         actions['_add_to_library'] = self._add_to_library
+        actions['_add_to_favourites'] = self._add_to_favourites
+        actions['_create_playlist'] = self._create_playlist
         actions['_latest_videos'] = self._latest_videos
         actions['_refresh_listing'] = self._refresh_listing
         return actions

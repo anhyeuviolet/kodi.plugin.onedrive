@@ -377,6 +377,38 @@ msgctxt "#30102"
 msgid "OneDrive TV shows"
 msgstr ""
 
+msgctxt "#30103"
+msgid "Add videos to Favourites"
+msgstr ""
+
+msgctxt "#30104"
+msgid "Save as a playlist"
+msgstr ""
+
+msgctxt "#30105"
+msgid "Videos to add to Favourites"
+msgstr ""
+
+msgctxt "#30106"
+msgid "Added %s to Favourites (%s were already there)."
+msgstr ""
+
+msgctxt "#30107"
+msgid "No videos in this folder or the folders below it."
+msgstr ""
+
+msgctxt "#30108"
+msgid "Saved %s with %s videos. Open it from Videos > Playlists."
+msgstr ""
+
+msgctxt "#30109"
+msgid "A playlist called %s already exists. Replace it?"
+msgstr ""
+
+msgctxt "#30110"
+msgid "Some folders were too deep or too many to include."
+msgstr ""
+
 # The ids below belong to the bundled Cloud Drive common module and are
 # left exactly as the module numbers them. Several are resolved at runtime
 # rather than from a literal -- one from an exception message, two from a
