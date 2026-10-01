@@ -106,6 +106,24 @@ This is skipped, and the add-on shows the folder's path to add by hand instead, 
 *Set up the library folders as Kodi video sources automatically* is off, when the library lives in
 a shared MySQL/MariaDB database, or when no scraper is installed.
 
+**OneDrive itself as a source (no `.strm` files).** Kodi can also browse the drive directly, as a
+web folder, and scan it into the library like a network share:
+
+1. Settings of this add-on → *Services* → turn on *Allow using OneDrive as a source*. It is off by
+   default because, once on, any program on the device can list your drive through it. It starts
+   listening within a few seconds; no restart is needed.
+2. Videos → Files → *Add videos...* → *Browse* is not needed: type the path
+   `http://127.0.0.1:8586/source/` (8586 is the port in the same settings group), press OK and
+   give the source a name.
+3. Open the new source: it shows `OneDrive KN/`, then one folder per account and drive, then your
+   folders. On the folder that holds your films or series, context menu → *Set content* → Movies
+   or TV shows. Kodi scans it with its scraper as it would a NAS.
+
+Files played from this source go through the add-on's relay, as everything else does, so a long
+film does not stop when OneDrive's link expires. Compared with *Add to library*: nothing is
+written to disk and nothing has to be exported, but every library scan reads the folders from
+OneDrive, and the source works only while the add-on's service is running on that device.
+
 **As Favourites or a playlist.** On a video folder, context menu → *Add videos to Favourites*
 lists the videos in the folder and in the folders below it (four levels, at most 200 videos),
 in watching order -- Season 2 before Season 10, Episode 2 before Episode 10 -- all ticked;

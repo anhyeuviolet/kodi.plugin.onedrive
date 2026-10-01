@@ -19,7 +19,7 @@
 
 from resources.lib.startup_refresh import StartupRefreshService
 from resources.lib.stream_service import StreamingDownloadService
-from resources.lib.vendor.clouddrive_common.service.source import SourceService
+from resources.lib.source_service import RelayingSourceService
 from resources.lib.vendor.clouddrive_common.service.utils import ServiceUtil
 from resources.lib.provider.onedrive import OneDrive
 from resources.lib.export_service import PlaybackAwareExportService
@@ -43,12 +43,12 @@ from resources.lib.vendor.clouddrive_common.service.player import PlayerService
 # expires; resources/lib/streaming.py has the reasoning. The export listener
 # waits while a video plays, so its first pass after Kodi starts -- change
 # lookups, .strm writes, a library scan -- does not compete with the first
-# video of the session; resources/lib/export_service.py. The other two are
-# untouched. One of them is scheduled for deletion in a later
-# phase on security grounds and this is not that phase: doing it here would put
-# two unrelated changes in one commit and make the bisect that finds either of
-# them ambiguous.
+# video of the session; resources/lib/export_service.py. The source listener
+# hands files to that relay too, and starts as soon as its setting is turned
+# on; resources/lib/source_service.py. The player listener is untouched. The
+# source listener stays off until the user turns it on, because it serves an
+# index of the drive to any program on the box (VENDORED.md).
 if __name__ == '__main__':
-    ServiceUtil.run([StreamingDownloadService(OneDrive), SourceService(OneDrive),
+    ServiceUtil.run([StreamingDownloadService(OneDrive), RelayingSourceService(OneDrive),
                      PlaybackAwareExportService(OneDrive), PlayerService(OneDrive),
                      StartupRefreshService(OneDrive)])
