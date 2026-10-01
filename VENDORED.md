@@ -285,9 +285,14 @@ the module's `service.py` was not copied. This is written down so that a later r
 "considered and discarded" from "overlooked".
 
 Separately, and not to be confused with the above: this repository's own `service.py` constructs
-`SourceService(OneDrive)` — a different construction, with a provider — alongside the download,
-export and player services. That instance survives this change unchanged, because the contract of
-this change is preserved behaviour. It is deleted in the same later cleanup.
+a source service with a provider — a different construction — alongside the download, export and
+player services. It is no longer slated for deletion: serving OneDrive as a Kodi source is how the
+drive is scanned into the library without `.strm` files, and users ask for it. It is now
+`RelayingSourceService` (`resources/lib/source_service.py`), a subclass that leaves the vendored file
+unchanged and differs in two ways: a file is redirected to the loopback download service, which
+relays it and renews OneDrive's expiring link, instead of to that link itself; and the listener
+starts as soon as `allow_directory_listing` is turned on rather than only at Kodi start. The setting
+stays off by default, for the reason recorded below.
 
 ## Recorded behaviour deviations
 

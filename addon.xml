@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="plugin.onedrive.kn" name="OneDrive KN" version="1.3.0" provider-name="Kenny Nguyen">
+<addon id="plugin.onedrive.kn" name="OneDrive KN" version="1.3.1" provider-name="Kenny Nguyen">
 	<requires>
 		<import addon="xbmc.python" version="3.0.1" />
 	</requires>
@@ -46,6 +46,9 @@ Phát mọi nội dung trên OneDrive, gồm video, nhạc và ảnh.
 			<fanart>fanart.jpg</fanart>
 		</assets>
 		<news>
+v1.3.1:
+- OneDrive as a Kodi source (http://127.0.0.1:8586/source/): files now play through the relay, so they no longer stop when OneDrive's link expires, and turning the setting on takes effect without restarting Kodi.
+
 v1.3.0:
 - Add videos to Favourites: a folder's videos, and its subfolders', ticked in watching order, added in one step. Existing favourites are kept.
 - Save as a playlist: a folder's videos as an .m3u under Videos > Playlists.
