@@ -118,8 +118,13 @@ def find_video_database(database_dir):
     return os.path.join(database_dir, best[1]) if best else None
 
 
-def ensure_path_content(db_path, path, content, scraper, now=None):
+def ensure_path_content(db_path, path, content, scraper, now=None,
+                        single_show=False):
     """Give `path` a content and a scraper in the video database.
+
+    `single_show` is Kodi's "Selected folder contains a single TV show": the
+    folder itself is one show, not a folder of shows. Kodi keeps that answer in
+    the useFolderNames column of a TV source.
 
     Returns ADDED, UPDATED (the row existed without a content), PRESENT (it
     already has this content) or KEPT (it has another one, chosen by somebody
@@ -140,7 +145,7 @@ def ensure_path_content(db_path, path, content, scraper, now=None):
             'strContent': content,
             'strScraper': scraper,
             'scanRecursive': SCAN_RECURSIVE[content],
-            'useFolderNames': 0,
+            'useFolderNames': 1 if (single_show and content == TVSHOWS) else 0,
             'strSettings': '',
             'noUpdate': 0,
             'exclude': 0,
@@ -320,3 +325,19 @@ def restore_sources(registry_path, sources_path, folder_exists=os.path.isdir):
         if ensure_video_source(sources_path, entry['name'], entry['path']):
             restored += 1
     return restored
+
+
+# ---------------------------------------------------------------------------
+# The add-on's own source address
+# ---------------------------------------------------------------------------
+
+def source_url(port, addon_name, drive_name, folders):
+    """The address Kodi reaches `folders` by under the add-on's source service.
+
+    Built the way Kodi builds it when the user browses there: every segment
+    quoted as the listing quotes its links, each folder ending in a slash.
+    """
+    import urllib.parse
+    segments = [addon_name, drive_name] + list(folders)
+    return 'http://127.0.0.1:%s/source/%s' % (
+        port, ''.join(urllib.parse.quote(s) + '/' for s in segments))

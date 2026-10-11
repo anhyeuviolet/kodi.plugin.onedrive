@@ -107,17 +107,20 @@ This is skipped, and the add-on shows the folder's path to add by hand instead, 
 a shared MySQL/MariaDB database, or when no scraper is installed.
 
 **OneDrive itself as a source (no `.strm` files).** Kodi can also browse the drive directly, as a
-web folder, and scan it into the library like a network share:
+web folder, and scan it into the library like a network share. On a video folder, context menu →
+*Add to Kodi as a source*, then choose Movies, TV shows (one show per subfolder) or One TV show.
+The add-on then does what used to be four manual steps:
 
-1. Settings of this add-on → *Services* → turn on *Allow using OneDrive as a source*. It is off by
-   default because, once on, any program on the device can list your drive through it. It starts
-   listening within a few seconds; no restart is needed.
-2. Videos → Files → *Add videos...* → *Browse* is not needed: type the path
-   `http://127.0.0.1:8586/source/` (8586 is the port in the same settings group), press OK and
-   give the source a name.
-3. Open the new source: it shows `OneDrive KN/`, then one folder per account and drive, then your
-   folders. On the folder that holds your films or series, context menu → *Set content* → Movies
-   or TV shows. Kodi scans it with its scraper as it would a NAS.
+- it turns on *Allow using OneDrive as a source*, after asking: once on, any program on the device
+  can list your drive through `http://127.0.0.1:8586/source/` without signing in;
+- it adds the folder's address under that service to `sources.xml` and gives it the content and
+  Kodi's default scraper in the video database;
+- it starts a library scan of that folder.
+
+Only folders on your own drive can be added this way; a folder shared with you is reached by its
+id, and the source service finds folders by their path. With a MySQL/MariaDB library, or no
+scraper installed, the add-on shows the address to add by hand instead: Videos → Files → *Add
+videos...*, type the address, then *Set content* on it.
 
 Files played from this source go through the add-on's relay, as everything else does, so a long
 film does not stop when OneDrive's link expires. Compared with *Add to library*: nothing is

@@ -364,6 +364,38 @@ msgctxt "#30110"
 msgid "Some folders were too deep or too many to include."
 msgstr "Một số thư mục quá sâu hoặc quá nhiều nên không được đưa vào."
 
+msgctxt "#30111"
+msgid "Movies"
+msgstr "Phim lẻ"
+
+msgctxt "#30112"
+msgid "TV shows (one show per subfolder)"
+msgstr "Phim bộ (mỗi thư mục con là một bộ)"
+
+msgctxt "#30113"
+msgid "One TV show"
+msgstr "Một bộ phim"
+
+msgctxt "#30114"
+msgid "Only a folder on your own drive can be added as a source. A folder shared with you cannot."
+msgstr "Chỉ thư mục trong ổ của bạn mới thêm làm nguồn được. Thư mục được người khác chia sẻ thì không."
+
+msgctxt "#30115"
+msgid "As a Kodi source, this drive is served at http://127.0.0.1 on this device, and any program on the device can list your files through it without signing in. Turn this on?"
+msgstr "Khi làm nguồn cho Kodi, ổ này được phục vụ tại http://127.0.0.1 trên thiết bị, và mọi chương trình trên thiết bị đều xem được danh sách tệp của bạn mà không cần đăng nhập. Bật tính năng này?"
+
+msgctxt "#30116"
+msgid "The add-on could not set up the source. Add it by hand: Videos > Files > Add videos..., path:[CR]%s"
+msgstr "Add-on không thiết lập được nguồn. Hãy thêm tay: Video > Tệp > Thêm video..., đường dẫn:[CR]%s"
+
+msgctxt "#30117"
+msgid "%s was added and is being scanned. Its videos appear in Videos > %s when the scan finishes."
+msgstr "Đã thêm %s và đang quét. Video sẽ xuất hiện trong Video > %s khi quét xong."
+
+msgctxt "#30118"
+msgid "Add to Kodi as a source"
+msgstr "Thêm vào Kodi làm nguồn"
+
 msgctxt "#32000"
 msgid "Exports"
 msgstr "Xuất"

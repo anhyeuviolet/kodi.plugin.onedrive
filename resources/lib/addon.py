@@ -376,7 +376,8 @@ class OneDriveAddon(CloudDriveAddon):
             options.append((self._addon_string(30092),
                             'Container.Update(%s)' % self._url(latest)))
             for action, string_id in (('_add_to_favourites', 30103),
-                                      ('_create_playlist', 30104)):
+                                      ('_create_playlist', 30104),
+                                      ('_add_as_source', 30118)):
                 options.append((self._addon_string(string_id), self._run_plugin(
                     {'action': action, 'content_type': content_type,
                      'driveid': driveid, 'item_driveid': item_driveid,
@@ -529,35 +530,146 @@ class OneDriveAddon(CloudDriveAddon):
                 path = os.path.join(destination, name)
                 label = '%s - %s' % (self._addon_string(30102), name)
                 KodiUtils.mkdirs(os.path.join(path, ''))
-            translate = lambda p: Utils.unicode(KodiUtils.translate_path(p))
-            if library_source.uses_external_database(
-                    translate('special://masterprofile/advancedsettings.xml')):
-                Logger.notice('library: video database is not SQLite; '
-                              'leaving the source to the user')
-                return False
-            database = library_source.find_video_database(
-                translate('special://database/'))
-            if not database:
-                return False
-            scraper = library_source.choose_scraper(
-                content, self._default_scraper(content), self._addon_enabled)
-            if not scraper:
-                Logger.notice('library: no %s scraper installed' % content)
-                return False
-            outcome = library_source.ensure_path_content(
-                database, path, content, scraper)
-            Logger.notice('library: %s as %s (%s): %s'
-                          % (path, content, scraper, outcome))
-            sources = translate('special://profile/sources.xml')
-            library_source.ensure_video_source(sources, label, path)
-            library_source.remember_source(
-                os.path.join(self._profile_path, library_source.REGISTRY_FILE),
-                label, path)
-            return True
+            return self._make_kodi_source(path, label, content) is None
         except Exception as ex:
             Logger.error('library: could not register %s: %s'
                          % (destination, ExceptionUtils.full_stacktrace(ex)))
             return False
+
+    # Why a folder could not be made a Kodi source; None when it was.
+    SOURCE_EXTERNAL_DB = 'external_db'
+    SOURCE_NO_DATABASE = 'no_database'
+    SOURCE_NO_SCRAPER = 'no_scraper'
+
+    def _make_kodi_source(self, path, label, content, single_show=False):
+        """Content and scraper in the video database, entry in sources.xml.
+
+        None when done, else one of the SOURCE_* reasons. Raises on a database
+        or file error; callers decide what a failure means for them.
+        """
+        translate = lambda p: Utils.unicode(KodiUtils.translate_path(p))
+        if library_source.uses_external_database(
+                translate('special://masterprofile/advancedsettings.xml')):
+            Logger.notice('library: video database is not SQLite; '
+                          'leaving the source to the user')
+            return self.SOURCE_EXTERNAL_DB
+        database = library_source.find_video_database(
+            translate('special://database/'))
+        if not database:
+            return self.SOURCE_NO_DATABASE
+        scraper = library_source.choose_scraper(
+            content, self._default_scraper(content), self._addon_enabled)
+        if not scraper:
+            Logger.notice('library: no %s scraper installed' % content)
+            return self.SOURCE_NO_SCRAPER
+        outcome = library_source.ensure_path_content(
+            database, path, content, scraper, single_show=single_show)
+        Logger.notice('library: %s as %s (%s): %s'
+                      % (path, content, scraper, outcome))
+        sources = translate('special://profile/sources.xml')
+        library_source.ensure_video_source(sources, label, path)
+        library_source.remember_source(
+            os.path.join(self._profile_path, library_source.REGISTRY_FILE),
+            label, path)
+        return None
+
+    # ------------------------------------------------------------------
+    # OneDrive itself as a Kodi source, in one step
+    # ------------------------------------------------------------------
+
+    SOURCE_KINDS = ((library_source.MOVIES, False, 30111),
+                    (library_source.TVSHOWS, False, 30112),
+                    (library_source.TVSHOWS, True, 30113))
+
+    def _folder_names_from_root(self, driveid, item_driveid, item_id):
+        """The folder's names from the drive's root down, or None.
+
+        Walked by id through the parents rather than read from Graph's
+        parentReference.path, whose encoding Graph does not pin down. None for
+        a folder on another drive (shared with the user): the source service
+        reaches folders by their path on the account's own drive only.
+        """
+        provider = self.get_provider()
+        provider.configure(self._account_manager, driveid)
+        item = provider.get_item(item_driveid, item_id)
+        if not item or 'folder' not in item:
+            return None
+        if (item_driveid or driveid) != driveid or (
+                item.get('drive_id') and item['drive_id'] != driveid):
+            return None
+        names = [Utils.unicode(item['name'])]
+        parent = item.get('parent')
+        for _ in range(64):
+            if not parent:
+                return None
+            above = provider.get_item(driveid, parent)
+            if not above or not above.get('parent'):
+                return names        # `above` is the root
+            names.insert(0, Utils.unicode(above['name']))
+            parent = above['parent']
+        return None
+
+    def _add_as_source(self, driveid, item_driveid, item_id):
+        """Make a OneDrive folder a Kodi video source, scanned in place.
+
+        The steps the README used to list for the user: turn the source
+        service on (after saying what that means), add the folder's address
+        under the service to sources.xml, give it a content and a scraper, and
+        start a scan of it. No .strm file is written.
+        """
+        folders = self._folder_names_from_root(driveid, item_driveid, item_id)
+        if not folders:
+            self._dialog.ok(self._addon_name, self._addon_string(30114))
+            return
+        name = folders[-1]
+        choice = self._dialog.select(
+            self._addon_string(30100) % name,
+            [self._addon_string(string_id)
+             for _, _, string_id in self.SOURCE_KINDS])
+        if choice is None or choice < 0:
+            return
+        content, single_show, _ = self.SOURCE_KINDS[choice]
+        if not self._setting_on('allow_directory_listing', False):
+            if not self._dialog.yesno(self._addon_name,
+                                      self._addon_string(30115)):
+                return
+            self._addon.setSetting('allow_directory_listing', 'true')
+        account = self._account_manager.get_by_driveid('account', driveid)
+        drive = self._account_manager.get_by_driveid('drive', driveid, account)
+        drive_name = self._account_manager.get_account_display_name(
+            account, drive, self.get_provider())
+        port = self._addon.getSetting('port_directory_listing') or '8586'
+        url = library_source.source_url(port, self._addon_name, drive_name,
+                                        folders)
+        label = 'OneDrive - %s' % name
+        try:
+            refusal = self._make_kodi_source(url, label, content, single_show)
+        except Exception as ex:
+            Logger.error('source: could not add %s: %s'
+                         % (url, ExceptionUtils.full_stacktrace(ex)))
+            refusal = 'error'
+        if refusal:
+            self._dialog.ok(self._addon_name, self._addon_string(30116) % url)
+            return
+        self._scan_when_listening(port, url)
+        self._dialog.ok(self._addon_name, self._addon_string(30117) % (
+            label, KodiUtils.localize(342 if content == library_source.MOVIES
+                                      else 20343)))
+
+    @staticmethod
+    def _scan_when_listening(port, url, seconds=15):
+        """Scan `url` once the source service answers on `port`."""
+        import socket
+        import xbmc
+        monitor = xbmc.Monitor()
+        for _ in range(seconds):
+            try:
+                socket.create_connection(('127.0.0.1', int(port)), 1).close()
+                break
+            except (OSError, ValueError):
+                if monitor.waitForAbort(1):
+                    return
+        KodiUtils.executebuiltin('UpdateLibrary(video,%s)' % url)
 
     @staticmethod
     def _default_scraper(content):
@@ -958,6 +1070,7 @@ class OneDriveAddon(CloudDriveAddon):
         actions['_add_to_library'] = self._add_to_library
         actions['_add_to_favourites'] = self._add_to_favourites
         actions['_create_playlist'] = self._create_playlist
+        actions['_add_as_source'] = self._add_as_source
         actions['_latest_videos'] = self._latest_videos
         actions['_refresh_listing'] = self._refresh_listing
         return actions
