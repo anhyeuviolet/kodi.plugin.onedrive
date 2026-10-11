@@ -28,6 +28,13 @@ the library with no .strm files at all. Two things kept it from working:
     relays the file and renews the link -- so a video played from the source
     behaves as one played from the add-on.
 
+  * Kodi asks for a folder by its address, percent-encoded ("My%20Videos",
+    "Phim%20b%E1%BB%99"), and that text went to Graph as the folder's name,
+    where it was encoded a second time ("My%2520Videos") and not found. Every
+    folder whose name had a space or a letter outside ASCII failed. The
+    provider now gets the decoded name; the service's own caches keep the
+    encoded form they were written with.
+
   * The setting "Allow using OneDrive as a source" was read once, when Kodi
     started; switching it on did nothing until a restart, which nothing said.
     The service now looks at the setting every few seconds and starts
@@ -59,7 +66,30 @@ def relay_url(driveid, item):
         urllib.parse.quote(Utils.str(item['name'])))
 
 
+class _DecodingProvider(object):
+    """The provider, handed a decoded path where the source has an encoded one."""
+
+    def __init__(self, provider):
+        self._provider = provider
+
+    def __getattr__(self, name):
+        return getattr(self._provider, name)
+
+    def get_folder_items(self, *args, **kwargs):
+        if kwargs.get('path'):
+            kwargs['path'] = urllib.parse.unquote(kwargs['path'])
+        return self._provider.get_folder_items(*args, **kwargs)
+
+    def get_item(self, *args, **kwargs):
+        if kwargs.get('path'):
+            kwargs['path'] = urllib.parse.unquote(kwargs['path'])
+        return self._provider.get_item(*args, **kwargs)
+
+
 class RelayingSource(Source):
+
+    def _get_provider(self):
+        return _DecodingProvider(super(RelayingSource, self)._get_provider())
 
     def get_download_url(self, driveid, path):
         item = self.get_item(driveid, path)

@@ -337,3 +337,118 @@ def test_turning_the_setting_off_keeps_the_instructions(tmp_path, monkeypatch):
         assert _rows(db) == []
         assert not os.path.exists(os.path.join(userdata, 'sources.xml'))
         assert addon._dialog.shown[-1][1].startswith('added; add ')
+
+
+def test_one_tv_show_is_marked_as_a_single_show(tmp_path):
+    db = _video_db(str(tmp_path / 'Database'))
+    library_source.ensure_path_content(db, 'http://h/Dark/', 'tvshows', 's',
+                                       single_show=True)
+    connection = sqlite3.connect(db)
+    assert connection.execute(
+        'SELECT useFolderNames FROM path').fetchone() == (1,)
+    connection.close()
+
+
+def test_the_source_address_is_the_one_kodi_browses_to():
+    assert library_source.source_url(
+        '8586', 'OneDrive KN', 'Kenny | Personal', ['Phim bộ', 'Dark']) == (
+        'http://127.0.0.1:8586/source/OneDrive%20KN/Kenny%20%7C%20Personal/'
+        'Phim%20b%E1%BB%99/Dark/')
+
+
+# ---------------------------------------------------------------------------
+# Add to Kodi as a source, through the add-on
+# ---------------------------------------------------------------------------
+
+class _TreeProvider(object):
+    """Root > Videos > Phim bộ, by id, as get_item answers them."""
+
+    ITEMS = {
+        'ROOT': {'id': 'ROOT', 'name': 'root', 'folder': {}, 'parent': None,
+                 'drive_id': 'drive-1'},
+        'V': {'id': 'V', 'name': 'Videos', 'folder': {}, 'parent': 'ROOT',
+              'drive_id': 'drive-1'},
+        'P': {'id': 'P', 'name': 'Phim bộ', 'folder': {}, 'parent': 'V',
+              'drive_id': 'drive-1'},
+        'S': {'id': 'S', 'name': 'Shared', 'folder': {}, 'parent': 'X',
+              'drive_id': 'someone-else'},
+    }
+
+    def configure(self, account_manager, driveid):
+        pass
+
+    def get_item(self, item_driveid=None, item_id=None, **kwargs):
+        return self.ITEMS.get(item_id)
+
+    def get_drive_type_name(self, drive_type):
+        return 'Personal'
+
+
+def _source_addon(tmp_path, monkeypatch, choice=0, consent=True):
+    import xbmc
+    import xbmcvfs
+    from test_quick_access import _library_addon as build
+
+    userdata, db = _kodi_home(tmp_path)
+    monkeypatch.setattr(xbmcvfs, 'translatePath', _translate(userdata))
+    monkeypatch.setattr(xbmc, 'getCondVisibility',
+                        lambda c: 'themoviedb' in c)
+    builtins = []
+    monkeypatch.setattr(xbmc, 'executebuiltin',
+                        lambda command, wait=False: builtins.append(command))
+    addon, _ = build(tmp_path, {})
+    provider = _TreeProvider()
+    addon.get_provider = lambda: provider
+    addon._dialog.choice = choice
+    addon._dialog.yesno = lambda heading, message, *a, **k: (
+        addon._dialog.shown.append(('yesno', message)) or consent)
+    addon._account_manager.get_account_display_name = (
+        lambda account, drive=None, provider=None, with_format=False:
+        'Kenny | Personal')
+    addon._scan_when_listening = lambda port, url, seconds=15: builtins.append(
+        'UpdateLibrary(video,%s)' % url)
+    import xbmcaddon
+    xbmcaddon.Addon.strings.update({30116: 'by hand: %s',
+                                    30117: 'added %s, see %s'})
+    os.makedirs(addon._profile_path)
+    return addon, userdata, db, builtins
+
+
+SOURCE = ('http://127.0.0.1:8586/source/OneDrive%20KN/Kenny%20%7C%20Personal/'
+          'Videos/Phim%20b%E1%BB%99/')
+
+
+def test_a_folder_becomes_a_scanned_source_in_one_step(tmp_path, monkeypatch):
+    with kodi_stubs(tmp_path / 'p'):
+        import xbmcaddon
+        addon, userdata, db, builtins = _source_addon(tmp_path, monkeypatch)
+        addon._add_as_source('drive-1', 'drive-1', 'P')
+
+        assert addon._dialog.shown[0] == ('select', 'what is in Phim bộ?', -1)
+        assert addon._dialog.shown[1][0] == 'yesno', 'asked before serving'
+        assert xbmcaddon.Addon.settings['allow_directory_listing'] == 'true'
+        assert _rows(db) == [(SOURCE, 'movies',
+                              'metadata.themoviedb.org.python', 2147483647, 0)]
+        assert _video_sources(os.path.join(userdata, 'sources.xml')) == [
+            ('OneDrive - Phim bộ', SOURCE)]
+        assert builtins == ['UpdateLibrary(video,%s)' % SOURCE]
+        assert addon._dialog.shown[-1] == (
+            'ok', 'added OneDrive - Phim bộ, see kodi-string-342')
+
+
+def test_refusing_to_serve_the_drive_changes_nothing(tmp_path, monkeypatch):
+    with kodi_stubs(tmp_path / 'p'):
+        import xbmcaddon
+        addon, userdata, db, builtins = _source_addon(tmp_path, monkeypatch,
+                                                      consent=False)
+        addon._add_as_source('drive-1', 'drive-1', 'P')
+        assert 'allow_directory_listing' not in xbmcaddon.Addon.settings
+        assert _rows(db) == [] and builtins == []
+
+
+def test_a_shared_folder_is_refused(tmp_path, monkeypatch):
+    with kodi_stubs(tmp_path / 'p'):
+        addon, userdata, db, builtins = _source_addon(tmp_path, monkeypatch)
+        addon._add_as_source('drive-1', 'someone-else', 'S')
+        assert addon._dialog.shown == [('ok', 'string-30114')]
+        assert _rows(db) == []

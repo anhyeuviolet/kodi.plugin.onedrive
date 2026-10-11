@@ -731,7 +731,7 @@ def test_addon_xml_imports():
 ADDON_STRING_IDS = (set(range(30000, 30012)) | set(range(30017, 30021))
                     | {30032, 30034, 30035} | set(range(30036, 30060))
                     | set(range(30067, 30070)) | set(range(30070, 30072))
-                    | set(range(30072, 30111)))
+                    | set(range(30072, 30119)))
 # The vendored module's contiguous block, left exactly where it was: the module
 # resolves some of these dynamically and one is persisted, so a mechanical
 # renumber cannot see them and would invalidate stored data.
@@ -811,13 +811,13 @@ def test_localize_owns_this_addons_block():
 
 
 def test_string_ids_partitioned():
-    assert len(ADDON_STRING_IDS) == 87, (
+    assert len(ADDON_STRING_IDS) == 95, (
         'the add-on owns 22 of the renumbered ids -- three of the original 25 '
         'went with the settings rows they labelled -- the 23 the sign-in copy '
         "added, re-authorisation's wrong-account refusal, the label and "
         'help of the custom application identifier, the 24 of quick '
-        'access, the 7 of the library source set-up, and the 8 of '
-        'Favourites and playlists')
+        'access, the 7 of the library source set-up, the 8 of '
+        'Favourites and playlists, and the 8 of adding a folder as a source')
     assert len(MODULE_STRING_IDS) == 89, 'the module owns 89 ids'
 
     sets = {}

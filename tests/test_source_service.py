@@ -89,3 +89,65 @@ def test_kodi_stopping_while_it_is_off_starts_nothing(tmp_path, monkeypatch):
         service, monitor, served = _service(monkeypatch, lambda waits: True)
         service.start()
         assert served == []
+
+
+# ---------------------------------------------------------------------------
+# Folder names with a space or a letter outside ASCII
+# ---------------------------------------------------------------------------
+
+class _Cache(object):
+    def __init__(self):
+        self.values = {}
+
+    def get(self, key):
+        return self.values.get(key)
+
+    def set(self, key, value):
+        self.values[key] = value
+
+    def setmany(self, pairs):
+        for key, value in pairs:
+            self.values[key] = value
+
+
+class _Provider(object):
+    def __init__(self):
+        self.paths = []
+
+    def configure(self, account_manager, driveid):
+        pass
+
+    def get_folder_items(self, path=None, **kwargs):
+        self.paths.append(path)
+        return [{'id': 'E1', 'name': 'Tập 1.mkv'}]
+
+    def get_item(self, path=None, **kwargs):
+        self.paths.append(path)
+        return {'id': 'E1', 'name': 'Tập 1.mkv'}
+
+
+def test_kodis_encoded_address_reaches_graph_decoded(tmp_path):
+    """Before, 'Phim%20b%E1%BB%99' went to Graph as a name and was not found."""
+    with kodi_stubs(tmp_path / 'p'):
+        import importlib
+        source_service = importlib.import_module('resources.lib.source_service')
+        provider = _Provider()
+
+        class _Server(object):
+            @staticmethod
+            def data(source_mode=False):
+                return provider
+        source = object.__new__(source_service.RelayingSource)
+        source.server = _Server()
+        source._account_manager = None
+        source._items_cache = _Cache()
+        source._children_cache = _Cache()
+
+        items = source.get_folder_items('drive-1', '/Phim%20b%E1%BB%99/')
+        source.get_item('drive-1', '/M%E1%BB%9Bi/T%E1%BA%ADp%201.mkv')
+
+        assert provider.paths == ['/Phim bộ', '/Mới/Tập 1.mkv']
+        assert items[0]['id'] == 'E1'
+        # The service's own caches keep the encoded form Kodi asks with.
+        assert (source._children_cache.get('drive-1/Phim%20b%E1%BB%99:children')
+                == ['T%E1%BA%ADp%201.mkv'])
